@@ -1,0 +1,74 @@
+<link rel="import" href="../iron-ajax/iron-request.html">
+
+
+<script>
+'use strict';
+
+const RequestHelper = (baseClass) => class extends (baseClass) {
+  static get properties() {
+    return {
+      uploadEndpoint: {
+        type: String,
+        value: null
+      },
+      uploadInProgress: {
+        type: Boolean,
+        value: false
+      },
+      successResponse: {
+        type: Object,
+        value: null
+      },
+      errorResponse: {
+        type: Object,
+        value: null
+      },
+      activeXhrRequest: {
+        type: Object,
+        value: null
+      }
+    };
+  }
+
+  upload(rawFile) {
+
+    let options = {
+      method: 'POST',
+      url: this.uploadEndpoint,
+      body: this._prepareBody(rawFile)
+    };
+    return this.sendRequest(options)
+           .then((response) => {
+             if (this.responsePropertyToExpose) {
+              this.successResponse = response[responsePropertyToExpose];
+             } else {
+              this.successResponse = response;
+             }
+             this.activeXhrRequest = null;
+           }).catch((error) => {
+             this.errorResponse = error;
+             this.activeXhrRequest = null;
+             throw error;
+           })
+  }
+
+  resetResponses() {
+    this.successResponse = null;
+    this.errorResponse = null;
+  }
+
+  _prepareBody(rawFile) {
+    let fd = new FormData()
+    fd.append('file', rawFile);
+    return fd;
+  }
+
+  sendRequest(options) {
+    var request = document.createElement('iron-request');
+    this.activeXhrRequest = request;
+    request.send(options);
+    return request.completes;
+  }
+}
+
+</script>

@@ -1,0 +1,24 @@
+{
+  "name": "etools-upload",
+  "description": "Use to upload files",
+  "version": "1.0.0",
+  "main": "etools-upload.html",
+  "dependencies": {
+    "polymer": "Polymer/polymer#^2.0.0",
+    "paper-button": "^2.1.3",
+    "iron-icon": "^2.1.0",
+    "iron-icons": "^2.1.1",
+    "paper-input": "^2.2.3",
+    "iron-flex-layout": "^2.0.3",
+    "iron-ajax": "^2.1.3",
+    "paper-spinner": "^2.1.0"
+  },
+  "devDependencies": {
+    "iron-demo-helpers": "PolymerElements/iron-demo-helpers#^2.0.0",
+    "web-component-tester": "Polymer/web-component-tester#^6.0.0",
+    "webcomponentsjs": "webcomponents/webcomponentsjs#^1.0.0"
+  },
+  "resolutions": {
+    "polymer": "^2.0.0"
+  }
+}
