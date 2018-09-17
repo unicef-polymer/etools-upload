@@ -1,4 +1,5 @@
 <link rel="import" href="../polymer/polymer-element.html">
+<link rel="import" href="../polymer/lib/elements/dom-if.html">
 <link rel="import" href="../paper-button/paper-button.html">
 <link rel="import" href="../iron-icon/iron-icon.html">
 <link rel="import" href="../iron-icons/iron-icons.html">
@@ -7,32 +8,15 @@
 <link rel="import" href="../iron-flex-layout/iron-flex-layout.html">
 <link rel="import" href="../paper-spinner/paper-spinner.html">
 
+<link rel="import" href="common-styles.html">
+<link rel="import" href="common-mixin.html">
 <link rel="import" href="request-helper.html">
 
 <dom-module id="etools-upload">
   <template>
-    <style>
-      :host {
-        display: block;
-        --paper-input-container-underline:	{
-            display: none;
-        };
-        --paper-input-container-underline-focus:	{
-          display: none;
-        };
-        --paper-input-container-underline-disabled: {
-          display: none;
-        };
+    <style include="common-styles">
 
-      }
-      [hidden] {
-        display: none !important;
-      }
 
-      paper-button {
-        margin: 0 0;
-        padding: 0 0;
-      }
       .file-icon {
         padding-right: 8px;
         min-width: 22px;
@@ -68,19 +52,6 @@
       .file-name {
         overflow: hidden;
         text-overflow: ellipsis;
-      }
-
-      #uploadingSpinner {
-        width: 20px;
-        height: 20px;
-      }
-
-      iron-icon[icon="done"] {
-        color: green;
-      }
-
-      iron-icon[icon="error-outline"] {
-        color: red;
       }
 
     </style>
@@ -147,7 +118,6 @@
 
         <!-- Props -->
         <input hidden
-              class="paper-input-input"
               type="file"
               id="fileInput"
               on-change="_fileSelected"
@@ -173,24 +143,10 @@
      * @polymer
      * @demo demo/index.html
      */
-    class EtoolsUpload extends RequestHelper(Polymer.Element) {
+    class EtoolsUpload extends RequestHelper(CommonMixin(Polymer.Element)) {
       static get is() { return 'etools-upload'; }
       static get properties() {
         return {
-          uploadBtnLabel: {
-            type: String,
-            value: 'Upload file'
-          },
-          readonly: {
-            type: Boolean,
-            value: false
-          },
-          accept: String,
-          endpoint: String,
-          autoUpload: {
-            type: Boolean,
-            value: true
-          },
           fileUrl: {
             type: String,
             value: null,
@@ -214,16 +170,8 @@
           },
           disabled: Boolean,
           invalid: Boolean,
-          errorMessage: String,
-          label: String
+          errorMessage: String
         };
-      }
-
-      _openFileChooser() {
-        var fileEl = this.$.fileInput;
-        if (fileEl) {
-          fileEl.click();
-        }
       }
 
       _thereIsAFileSelectedOrSaved(_filename) {
@@ -250,10 +198,16 @@
       _handleUpload() {
         this.uploadInProgress = true;
 
-        this.upload(this.rawFile).then(() => {
+        this.upload(this.rawFile).then((response) => {
+            if (this.responsePropertyToExpose) {
+              this.successResponse = response[responsePropertyToExpose];
+            } else {
+              this.successResponse = response;
+            }
             this.resetRawFile();
             this.uploadInProgress = false;
           }).catch((err) => {
+            this.errorResponse = error;
             this.setInvalid("Error uploading file: " +  error.message);
             this.uploadInProgress = false;
           });
@@ -280,10 +234,6 @@
         return url.split('?')[0].split('/').pop();
       }
 
-      _showLabel(label) {
-        return typeof label === 'string' && label !== '';
-      }
-
       _showDownloadBtn(fileUrl) {
         return !!fileUrl;
       }
@@ -296,7 +246,6 @@
       }
 
       _hideDeleteBtn(readonly, _filename, hideDeleteBtn, uploadInProgress) {
-
         if (this.readonly || !this._filename || uploadInProgress) {
           return true;
         }

@@ -11,18 +11,7 @@ const RequestHelper = (baseClass) => class extends (baseClass) {
         type: String,
         value: null
       },
-      uploadInProgress: {
-        type: Boolean,
-        value: false
-      },
-      successResponse: {
-        type: Object,
-        value: null
-      },
-      errorResponse: {
-        type: Object,
-        value: null
-      },
+
       activeXhrRequest: {
         type: Object,
         value: null
@@ -39,14 +28,9 @@ const RequestHelper = (baseClass) => class extends (baseClass) {
     };
     return this.sendRequest(options)
            .then((response) => {
-             if (this.responsePropertyToExpose) {
-              this.successResponse = response[responsePropertyToExpose];
-             } else {
-              this.successResponse = response;
-             }
              this.activeXhrRequest = null;
+             return response;
            }).catch((error) => {
-             this.errorResponse = error;
              this.activeXhrRequest = null;
              throw error;
            })
