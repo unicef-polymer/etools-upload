@@ -27,70 +27,42 @@ class EtoolsUploadMulti extends RequestHelperMulti(CommonMixin(PolymerElement)) 
       }
     </style>
 
-    <paper-input-container always-float-label="" disabled\$="[[disabled]]">
+    <div>
+      <div class="upload-btn-and-actions">
+        <paper-button class="upload-button" on-tap="_openFileChooser" title="[[uploadBtnLabel]]" disabled\$="[[_shouldDisableUploadBtn(readonly, uploadInProgress)]]">
+                      <iron-icon icon="file-upload"></iron-icon>
+                      [[uploadBtnLabel]]
+        </paper-button>
 
-          <label slot="label" id="element-label" hidden\$="[[!_showLabel(label)]]" aria-hidden="true">[[label]]</label>
-
-          <div slot="input">
-            <div class="upload-btn-and-actions">
-              <paper-button class="upload-button" on-tap="_openFileChooser" title="[[uploadBtnLabel]]" disabled\$="[[_shouldDisableUploadBtn(readonly, uploadInProgress)]]">
-                            <iron-icon icon="file-upload"></iron-icon>
-                            [[uploadBtnLabel]]
-              </paper-button>
-
-              <!-- File actions -->
-              <div class="file-actions">
-                  <!-- <paper-button class="download-button"
-                      on-tap="_downloadFile"
-                      disabled="[[!_showDownloadBtn(fileUrl)]]"
-                      hidden\$="[[!_showDownloadBtn(fileUrl)]]"
-                      title="Download">
-                    <iron-icon icon="cloud-download" class="dw-icon"></iron-icon>
-                    Download
-                  </paper-button> -->
-
-                  <!-- <paper-button class="change-button"
-                      on-tap="_openFileChooser"
-                      disabled\$="[[!_showChange(readonly, _filename, uploadInProgress)]]"
-                      hidden\$="[[!_showChange(readonly, _filename, uploadInProgress)]]">
-                    Change
-                  </paper-button> -->
-
-                  <!-- <paper-button class="delete-button"
-                      on-tap="_deleteFile"
-                      disabled\$="[[readonly]]"
-                      hidden\$="[[_hideDeleteBtn(readonly, _filename, hideDeleteBtn, uploadInProgress)]]">
-                    Delete
-                  </paper-button> -->
-
-                  <paper-button class="delete-button" on-tap="_cancelUpload" disabled\$="[[!uploadInProgress]]" hidden\$="[[!uploadInProgress]]">
-                    Cancel
-                  </paper-button>
-                </div>
-                <!-- ------------------ -->
-              </div>
-
-              <div class="filenames-container" hidden\$="[[!_thereAreFilesSelected(_filenames)]]">
-                <template is="dom-repeat" items="{{_filenames}}" as="item">
-                  <div>
-                    <iron-icon class="file-icon" icon="attachment"></iron-icon>
-                    <span class="file-name" title="[[item.filename]]">[[item.filename]]</span>
-                    <paper-spinner id="uploadingSpinner" hidden\$="[[!item.uploadInProgress]]" active="[[item.uploadInProgress]]"></paper-spinner>
-                    <iron-icon icon="done" hidden\$="[[!item.success]]"></iron-icon>
-                    <iron-icon icon="error-outline" hidden\$="[[!item.fail]]"></iron-icon>
-                  </div>
-                </template>
-
-              </div>
-
-
-              <!-- Props -->
-            <input hidden="" type="file" id="fileInput" on-change="_filesSelected" multiple="" accept="{{accept}}">
-
-            <a id="downloader" hidden=""></a>
+        <!-- File actions -->
+        <div class="file-actions">
+            <paper-button class="delete-button" on-tap="_cancelUpload" disabled\$="[[!uploadInProgress]]" hidden\$="[[!uploadInProgress]]">
+              Cancel
+            </paper-button>
           </div>
+          <!-- ------------------ -->
+        </div>
 
-      </paper-input-container>
+        <div class="filenames-container" hidden\$="[[!_thereAreFilesSelected(_filenames)]]">
+          <template is="dom-repeat" items="{{_filenames}}" as="item">
+            <div>
+              <iron-icon class="file-icon" icon="attachment"></iron-icon>
+              <span class="file-name" title="[[item.filename]]">[[item.filename]]</span>
+              <paper-spinner id="uploadingSpinner" hidden\$="[[!item.uploadInProgress]]" active="[[item.uploadInProgress]]"></paper-spinner>
+              <iron-icon icon="done" hidden\$="[[!item.success]]"></iron-icon>
+              <iron-icon icon="error-outline" hidden\$="[[!item.fail]]"></iron-icon>
+            </div>
+          </template>
+
+        </div>
+
+
+        <!-- Props -->
+      <input hidden="" type="file" id="fileInput" on-change="_filesSelected" multiple="" accept="{{accept}}">
+
+      <a id="downloader" hidden=""></a>
+    </div>
+
 `;
   }
 
@@ -100,6 +72,10 @@ class EtoolsUploadMulti extends RequestHelperMulti(CommonMixin(PolymerElement)) 
 
   static get properties() {
     return {
+      uploadBtnLabel: {
+        type: String,
+        value: 'Upload files'
+      },
       rawFiles: {
         type: Array,
         value: []
@@ -152,8 +128,13 @@ class EtoolsUploadMulti extends RequestHelperMulti(CommonMixin(PolymerElement)) 
               success: response.allSuccessResponses,
               error: response.allErrorResponses
             });
+
+            setTimeout(this._cleardisplayOfUploadedFiles.bind(this), 2000);
           });
     }
+  }
+  _cleardisplayOfUploadedFiles() {
+    this._filenames = [];
   }
 
   _uploadAllFilesSequentially(files, upload, set) {
@@ -163,7 +144,7 @@ class EtoolsUploadMulti extends RequestHelperMulti(CommonMixin(PolymerElement)) 
       let i;
       let counter = 0;
       for (i = 0; i < files.length; i++) {
-         upload(files[i], i).then((response) => {
+         upload(files[i]).then((response) => {
           set(['_filenames', counter, 'uploadInProgress'], false);
           set(['_filenames', counter, 'success'], true);
 

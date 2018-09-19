@@ -123,6 +123,10 @@ class EtoolsUpload extends RequestHelper(CommonMixin(PolymerElement)) {
   static get is() { return 'etools-upload'; }
   static get properties() {
     return {
+      uploadBtnLabel: {
+        type: String,
+        value: 'Upload file'
+      },
       fileUrl: {
         type: String,
         value: null,

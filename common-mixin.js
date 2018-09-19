@@ -5,11 +5,10 @@ export const CommonMixin = (baseClass) => class extends (baseClass) {
         type: Boolean,
         value: false
       },
-      uploadBtnLabel: {
+      label: {
         type: String,
-        value: 'Upload file'
+        value: ''
       },
-      label: String,
       readonly: {
         type: Boolean,
         value: false
@@ -23,7 +22,7 @@ export const CommonMixin = (baseClass) => class extends (baseClass) {
   }
 
   _showLabel(label) {
-    return typeof label === 'string' && label !== '';
+    return label !== '';
   }
 
   _openFileChooser() {
