@@ -19,26 +19,4 @@
       }
     }
 
-    uploadMulti(rawFile, index) {
-      let options = {
-      method: 'POST',
-      url: this.uploadEndpoint,
-      body: this._prepareBody(rawFile)
-    };
-    return this.sendRequest(options)
-           .then((response) => {
-             this.activeXhrRequest = null;
-             if (index !== undefined) {
-               response.myIndex = index;
-             }
-             return response;
-           }).catch((error) => {
-            if (index !== undefined) {
-               response.myIndex = index;
-             }
-             this.activeXhrRequest = null;
-             throw error;
-           })
-    }
-
   }

@@ -36,11 +36,6 @@ const RequestHelper = (baseClass) => class extends (baseClass) {
            })
   }
 
-  resetResponses() {
-    this.successResponse = null;
-    this.errorResponse = null;
-  }
-
   _prepareBody(rawFile) {
     let fd = new FormData()
     fd.append('file', rawFile);

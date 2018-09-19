@@ -77,8 +77,8 @@
           </div>
           <div class="upload-status">
             <paper-spinner id="uploadingSpinner" hidden$="[[!uploadInProgress]]" active="[[uploadInProgress]]"></paper-spinner>
-            <iron-icon icon="done" hidden$="[[!successResponse]]"></iron-icon>
-            <iron-icon icon="error-outline" hidden$="[[!errorResponse]]"></iron-icon>
+            <iron-icon icon="done" hidden$="[[!success]]"></iron-icon>
+            <iron-icon icon="error-outline" hidden$="[[!fail]]"></iron-icon>
           </div>
 
           <!-- File actions -->
@@ -164,13 +164,17 @@
             type: Boolean,
             value: false
           },
-          responsePropertyToExpose: {
-            type: Boolean,
-            value: null
-          },
           disabled: Boolean,
           invalid: Boolean,
-          errorMessage: String
+          errorMessage: String,
+          success: {
+            type: Boolean,
+            value: false
+          },
+          fail: {
+            type: Boolean,
+            value: false
+          }
         };
       }
 
@@ -184,7 +188,7 @@
           return;
         }
 
-        this.resetResponses();
+        this.resetStatus();
         this.resetValidations();
 
         this._filename = file.name;
@@ -199,17 +203,16 @@
         this.uploadInProgress = true;
 
         this.upload(this.rawFile).then((response) => {
-            if (this.responsePropertyToExpose) {
-              this.successResponse = response[responsePropertyToExpose];
-            } else {
-              this.successResponse = response;
-            }
-            this.resetRawFile();
+            this.success = true;
             this.uploadInProgress = false;
+            this.resetRawFile();
+
+            this.fireEvent('upload-finished', {success: response});
           }).catch((err) => {
-            this.errorResponse = error;
+            this.fail = true;
             this.setInvalid("Error uploading file: " +  error.message);
             this.uploadInProgress = false;
+            this.fireEvent('upload-finished', {error: error});
           });
       }
 
@@ -221,6 +224,11 @@
       resetValidations() {
         this.invalid = false;
         this.errorMessage = null;
+      }
+
+      resetStatus() {
+        this.success = null;
+        this.fail = null;
       }
 
       _fileUrlChanged(fileUrl) {
@@ -272,7 +280,7 @@
           this.dispatchEvent(new CustomEvent('delete-file', {detail: {file: this.files[0], index: 0}, bubbles: true, composed: true }));
         }
 
-        this.resetResponses();
+        this.resetStatus();
         this.resetValidations();
       }
 

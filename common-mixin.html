@@ -45,5 +45,12 @@
         }
       }
 
+      fireEvent(evName, detail) {
+        this.dispatchEvent(new CustomEvent(evName, {
+          detail: detail,
+          bubbles: true,
+          composed: true
+        }));
+      }
 
     }
