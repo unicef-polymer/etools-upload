@@ -1,10 +1,6 @@
-<link rel="import" href="../iron-ajax/iron-request.html">
+import '@polymer/iron-ajax/iron-request.js';
 
-
-<script>
-'use strict';
-
-const RequestHelper = (baseClass) => class extends (baseClass) {
+export const RequestHelper = (baseClass) => class extends (baseClass) {
   static get properties() {
     return {
       uploadEndpoint: {
@@ -36,11 +32,6 @@ const RequestHelper = (baseClass) => class extends (baseClass) {
            })
   }
 
-  resetResponses() {
-    this.successResponse = null;
-    this.errorResponse = null;
-  }
-
   _prepareBody(rawFile) {
     let fd = new FormData()
     fd.append('file', rawFile);
@@ -54,5 +45,3 @@ const RequestHelper = (baseClass) => class extends (baseClass) {
     return request.completes;
   }
 }
-
-</script>

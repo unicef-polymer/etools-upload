@@ -1,7 +1,6 @@
-<link rel="import" href="../../polymer/polymer.html">
-<link rel="import" href="../../iron-flex-layout/iron-flex-layout.html">
+const $_documentContainer = document.createElement('template');
 
-<dom-module id="common-styles">
+$_documentContainer.innerHTML = `<dom-module id="common-styles">
   <template>
     <style>
        [hidden] {
@@ -43,4 +42,6 @@
 
 
   </template>
-</dom-module>
+</dom-module>`;
+
+document.head.appendChild($_documentContainer.content);

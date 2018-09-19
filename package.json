@@ -1,0 +1,39 @@
+{
+  "name": "etools-upload",
+  "version": "2.0.0",
+  "description": "Upload files",
+  "author": "The Polymer Authors",
+  "license": "BSD-3-Clause",
+  "scripts": {
+    "lint:javascript": "eslint . --ext js,html && exit 0",
+    "start": "polymer serve",
+    "build": "polymer build",
+    "lint": "polymer lint",
+    "test": "polymer test",
+    "test:integration": "polymer build # test that psk builds without error with the CLI"
+  },
+  "dependencies": {
+    "@polymer/polymer": "^3.0.5",
+    "@polymer/iron-ajax": "^3.0.0-pre.21",
+    "@polymer/iron-flex-layout": "^3.0.0-pre.21",
+    "@polymer/iron-icons": "^3.0.0-pre.21",
+    "@polymer/iron-icon": "^3.0.0-pre.21",
+    "@polymer/paper-button": "^3.0.0-pre.21",
+    "@polymer/paper-input": "^3.0.0-pre.21",
+    "@polymer/paper-spinner": "^3.0.0-pre.21",
+    "@webcomponents/webcomponentsjs": "^2.0.3",
+    "web-animations-js": "^2.3.1"
+  },
+  "devDependencies": {
+    "babel-eslint": "^8.2.6",
+    "eslint": "^5.2.0",
+    "eslint-config-google": "^0.9.1",
+    "eslint-plugin-html": "^4.0.5",
+    "polymer-cli": "^1.7.7",
+    "wct-browser-legacy": "^1.0.0",
+    "@polymer/iron-demo-helpers": "^3.0.0-pre.21"
+  },
+  "engines": {
+    "node": ">=8.0"
+  }
+}
