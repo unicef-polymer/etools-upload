@@ -58,7 +58,7 @@
 
     <paper-input-container always-float-label disabled$="[[disabled]]" invalid$="[[invalid]]">
 
-      <label slot="label" id="element-label" hidden$="[[!_showLabel(label)]]" aria-hidden="true">[[label]]</label>
+      <label slot="label" id="element-label" no-label-float$="[[!_showLabel(label)]]" aria-hidden="true">[[label]]</label>
 
       <div slot="input">
         <paper-button class="upload-button"
@@ -262,7 +262,7 @@
       }
 
       _cancelUpload() {
-        this.activeXhrRequest.abort();
+        this.abortActiveRequests();
 
         this.setProperties({
           uploadInProgress: false,

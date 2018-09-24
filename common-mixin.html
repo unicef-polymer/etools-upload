@@ -9,19 +9,10 @@
             type: Boolean,
             value: false
           },
-          successResponse: {
-            type: Object,
-            value: null
-          },
-          errorResponse: {
-            type: Object,
-            value: null
-          },
-          uploadBtnLabel: {
+          label: {
             type: String,
-            value: 'Upload file'
+            value: ''
           },
-          label: String,
           readonly: {
             type: Boolean,
             value: false
@@ -35,7 +26,7 @@
       }
 
       _showLabel(label) {
-        return typeof label === 'string' && label !== '';
+        return label !== '';
       }
 
       _openFileChooser() {
