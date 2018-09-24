@@ -144,7 +144,7 @@ class EtoolsUploadMulti extends RequestHelperMulti(CommonMixin(PolymerElement)) 
                 error: response.allErrorResponses
               });
 
-             // setTimeout(this._clearDisplayOfUploadedFiles.bind(this), 2000);
+              setTimeout(this._clearDisplayOfUploadedFiles.bind(this), 2000);
             }
           });
     }
