@@ -38,6 +38,18 @@ $_documentContainer.innerHTML = `<dom-module id="common-styles">
         color: red;
       }
 
+      .delete-button {
+        color: #f1572a;
+      }
+
+      .upload-button {
+        font-weight: 700;
+      }
+      iron-icon {
+        min-width: 22px;
+        min-height: 22px;
+      }
+
     </style>
 
 

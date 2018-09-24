@@ -56,7 +56,7 @@ class EtoolsUpload extends RequestHelper(CommonMixin(PolymerElement)) {
         @apply --layout-horizontal;
         @apply --layout-wrap;
       }
-      .file-name {
+      .filename {
         overflow: hidden;
         text-overflow: ellipsis;
       }
@@ -76,11 +76,11 @@ class EtoolsUpload extends RequestHelper(CommonMixin(PolymerElement)) {
         <div class="filename-and-actions-container">
           <div class="filename-container" hidden\$="[[!_thereIsAFileSelectedOrSaved(_filename)]]">
             <iron-icon class="file-icon" icon="attachment"></iron-icon>
-            <span class="file-name" title="[[_filename]]">[[_filename]]</span>
+            <span class="filename" title="[[_filename]]">[[_filename]]</span>
           </div>
           <div class="upload-status">
             <paper-spinner id="uploadingSpinner" hidden\$="[[!uploadInProgress]]" active="[[uploadInProgress]]"></paper-spinner>
-            <iron-icon icon="done" hidden\$="[[!success]]"></iron-icon>
+            <iron-icon title="Uploaded successfuly!" icon="done" hidden\$="[[!success]]"></iron-icon>
             <iron-icon icon="error-outline" hidden\$="[[!fail]]"></iron-icon>
           </div>
 
@@ -189,6 +189,9 @@ class EtoolsUpload extends RequestHelper(CommonMixin(PolymerElement)) {
 
         this.fireEvent('upload-finished', {success: response});
       }).catch((err) => {
+        if (err.message && err.message === 'Request aborted.') {
+          return;
+        }
         this.fail = true;
         this.setInvalid("Error uploading file: " +  error.message);
         this.uploadInProgress = false;
@@ -234,7 +237,7 @@ class EtoolsUpload extends RequestHelper(CommonMixin(PolymerElement)) {
     return !readonly && !!_filename
   }
 
-  _hideDeleteBtn(readonly, _filename, hideDeleteBtn, uploadInProgress) {
+  _hideDeleteBtn(readonly, filename, hideDeleteBtn, uploadInProgress) {
     if (this.readonly || !this._filename || uploadInProgress) {
       return true;
     }
@@ -243,7 +246,7 @@ class EtoolsUpload extends RequestHelper(CommonMixin(PolymerElement)) {
   }
 
   _cancelUpload() {
-    this.activeXhrRequest.abort();
+    this.abortActiveRequests();
 
     this.setProperties({
       uploadInProgress: false,

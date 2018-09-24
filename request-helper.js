@@ -19,29 +19,28 @@ export const RequestHelper = (baseClass) => class extends (baseClass) {
         value: null
       },
 
-      activeXhrRequest: {
+      activeXhrRequests: {
         type: Object,
-        value: null
+        value: {}
       }
     };
   }
 
-  upload(rawFile) {
-
+  upload(rawFile, requestKey) {
     let options = {
       method: 'POST',
       url: this._getEndpoint(),
       body: this._prepareBody(rawFile),
       headers: this._getCSRFHeader()
     };
-    return this.sendRequest(options)
+    return this.sendRequest(options, requestKey)
            .then((response) => {
-             this.activeXhrRequest = null;
+             delete this.activeXhrRequests[requestKey];
              return response;
            }).catch((error) => {
-             this.activeXhrRequest = null;
+             delete this.activeXhrRequests[requestKey];
              throw error;
-           })
+           });
   }
   _getEndpoint() {
     if (this.endpointInfo && this.endpointInfo.endpoint) {
@@ -91,7 +90,6 @@ export const RequestHelper = (baseClass) => class extends (baseClass) {
       var cookies = document.cookie.split(';');
       for (var i = 0; i < cookies.length; i++) {
         var cookie = cookies[i].trim();
-        // Does this cookie string begin with the name we want?
         if (cookie.substring(0, csrfCookieName.length + 1) === (csrfCookieName + '=')) {
           csrfToken = decodeURIComponent(cookie.substring(csrfCookieName.length + 1));
           break;
@@ -101,9 +99,25 @@ export const RequestHelper = (baseClass) => class extends (baseClass) {
     return csrfToken;
   }
 
-  sendRequest(options) {
+  abortActiveRequests(activeReqKeys) {
+    if (!this.activeXhrRequests) {
+      return;
+    }
+    let keys = activeReqKeys || Object.keys(this.activeXhrRequests);
+    if (keys.length) {
+      keys.forEach(key => {
+        try {
+          this.activeXhrRequests[key].abort();
+          delete this.activeXhrRequests[key];
+        } catch (error) {
+        }
+      });
+    }
+  }
+
+  sendRequest(options, requestKey) {
     var request = document.createElement('iron-request');
-    this.activeXhrRequest = request;
+    this.activeXhrRequests[requestKey] = request;
     request.send(options);
     return request.completes.then((request) => {
       return request.response

@@ -23,8 +23,26 @@ class EtoolsUploadMulti extends RequestHelperMulti(CommonMixin(PolymerElement)) 
     <style include="common-styles">
       .upload-btn-and-actions {
         @apply --layout-horizontal;
-        @apply --layout-wrap;
+        @apply --layout-center;
       }
+
+      .filenames-container {
+        padding-top: 4px;
+        margin-top: 4px;
+        margin-bottom: 16px;
+      }
+      .filename-line {
+        @apply --layout-horizontal;
+        @apply --layout-center;
+      }
+      .filename {
+        padding: 0 16px 0 8px;
+      }
+
+      .delete-button {
+        padding-left: 24px;
+      }
+
     </style>
 
     <div>
@@ -34,30 +52,27 @@ class EtoolsUploadMulti extends RequestHelperMulti(CommonMixin(PolymerElement)) 
                       [[uploadBtnLabel]]
         </paper-button>
 
-        <!-- File actions -->
         <div class="file-actions">
             <paper-button class="delete-button" on-tap="_cancelUpload" disabled\$="[[!uploadInProgress]]" hidden\$="[[!uploadInProgress]]">
-              Cancel
+              <iron-icon icon="clear"></iron-icon>
+              Cancel Upload
             </paper-button>
+        </div>
+      </div>
+
+      <div class="filenames-container" hidden\$="[[!_thereAreFilesSelected(_filenames)]]">
+        <template is="dom-repeat" items="{{_filenames}}" as="item">
+          <div class="filename-line">
+            <iron-icon class="file-icon" icon="attachment"></iron-icon>
+            <span class="filename" title="[[item.filename]]">[[item.filename]]</span>
+            <paper-spinner title="Upload in progress.." id="uploadingSpinner" hidden\$="[[!item.uploadInProgress]]" active="[[item.uploadInProgress]]"></paper-spinner>
+            <iron-icon title="Uploaded successfully!" icon="done" hidden\$="[[!item.success]]"></iron-icon>
+            <iron-icon title="Upload failed!" icon="error-outline" hidden\$="[[!item.fail]]"></iron-icon>
           </div>
-          <!-- ------------------ -->
-        </div>
+        </template>
+      </div>
 
-        <div class="filenames-container" hidden\$="[[!_thereAreFilesSelected(_filenames)]]">
-          <template is="dom-repeat" items="{{_filenames}}" as="item">
-            <div>
-              <iron-icon class="file-icon" icon="attachment"></iron-icon>
-              <span class="file-name" title="[[item.filename]]">[[item.filename]]</span>
-              <paper-spinner id="uploadingSpinner" hidden\$="[[!item.uploadInProgress]]" active="[[item.uploadInProgress]]"></paper-spinner>
-              <iron-icon icon="done" hidden\$="[[!item.success]]"></iron-icon>
-              <iron-icon icon="error-outline" hidden\$="[[!item.fail]]"></iron-icon>
-            </div>
-          </template>
-
-        </div>
-
-
-        <!-- Props -->
+      <!-- Props -->
       <input hidden="" type="file" id="fileInput" on-change="_filesSelected" multiple="" accept="{{accept}}">
 
       <a id="downloader" hidden=""></a>
@@ -123,17 +138,18 @@ class EtoolsUploadMulti extends RequestHelperMulti(CommonMixin(PolymerElement)) 
           .then((response) => {
             this.uploadInProgress = false;
             this.resetRawFiles();
+            if (response && !response.uploadCanceled) {
+              this.fireEvent('upload-finished', {
+                success: response.allSuccessResponses,
+                error: response.allErrorResponses
+              });
 
-            this.fireEvent('upload-finished', {
-              success: response.allSuccessResponses,
-              error: response.allErrorResponses
-            });
-
-            setTimeout(this._cleardisplayOfUploadedFiles.bind(this), 2000);
+             // setTimeout(this._clearDisplayOfUploadedFiles.bind(this), 2000);
+            }
           });
     }
   }
-  _cleardisplayOfUploadedFiles() {
+  _clearDisplayOfUploadedFiles() {
     this._filenames = [];
   }
 
@@ -144,7 +160,7 @@ class EtoolsUploadMulti extends RequestHelperMulti(CommonMixin(PolymerElement)) 
       let i;
       let counter = 0;
       for (i = 0; i < files.length; i++) {
-         upload(files[i]).then((response) => {
+         upload(files[i], files[i].name).then((response) => {
           set(['_filenames', counter, 'uploadInProgress'], false);
           set(['_filenames', counter, 'success'], true);
 
@@ -186,17 +202,18 @@ class EtoolsUploadMulti extends RequestHelperMulti(CommonMixin(PolymerElement)) 
   }
 
   _cancelUpload() {
-    this._cancelUpload = true;
-    if (this.activeXhrRequest) {
-      this.activeXhrRequest.abort();
-    }
+    let activeReqKeys = Object.keys(this.activeXhrRequests);
+    this._filenames = this._filenames.filter(f => activeReqKeys.indexOf(f.filename) < 0);
 
-    this.setProperties({
-      uploadInProgress: false,
-      _filenames: []
-    });
-
+    this.abortActiveRequests(activeReqKeys);
+    this.uploadInProgress = false;
     this.resetRawFiles();
+
+    if (this._filenames.length) {
+      setTimeout(() => {
+        this._clearDisplayOfUploadedFiles.bind(this);
+      }, 2000);
+    }
   }
 
   resetRawFiles() {
