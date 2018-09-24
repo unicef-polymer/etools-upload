@@ -44,6 +44,7 @@ $_documentContainer.innerHTML = `<dom-module id="common-styles">
 
       .upload-button {
         font-weight: 700;
+        color: var(--primary-color);
       }
       iron-icon {
         min-width: 22px;
