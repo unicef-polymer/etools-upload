@@ -11,6 +11,7 @@
     <link rel="import" href="../../iron-demo-helpers/demo-pages-shared-styles.html">
     <link rel="import" href="../../iron-demo-helpers/demo-snippet.html">
     <link rel="import" href="../etools-upload.html">
+    <link rel="import" href="../etools-upload-multi.html">
 
     <custom-style>
       <style is="custom-style" include="demo-pages-shared-styles">
@@ -22,5 +23,12 @@
       <h3>Basic etools-upload demo</h3>
       <etools-upload label="Signed Document" upload-endpoint="https://httpbin.org/post"></etools-upload>
     </div>
+
+    <div class="vertical-section-container centered">
+        <h3>Basic etools-upload-multi demo</h3>
+        <etools-upload-multi upload-btn-label="Upload Files"
+          label="Multiple Signed Documents" upload-endpoint="https://httpbin.org/post">
+        </etools-upload-multi>
+      </div>
   </body>
 </html>

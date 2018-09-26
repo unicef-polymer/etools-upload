@@ -1,4 +1,5 @@
 <link rel="import" href="../polymer/polymer-element.html">
+<link rel="import" href="../polymer/lib/elements/dom-if.html">
 <link rel="import" href="../paper-button/paper-button.html">
 <link rel="import" href="../iron-icon/iron-icon.html">
 <link rel="import" href="../iron-icons/iron-icons.html">
@@ -7,32 +8,15 @@
 <link rel="import" href="../iron-flex-layout/iron-flex-layout.html">
 <link rel="import" href="../paper-spinner/paper-spinner.html">
 
+<link rel="import" href="common-styles.html">
+<link rel="import" href="common-mixin.html">
 <link rel="import" href="request-helper.html">
 
 <dom-module id="etools-upload">
   <template>
-    <style>
-      :host {
-        display: block;
-        --paper-input-container-underline:	{
-            display: none;
-        };
-        --paper-input-container-underline-focus:	{
-          display: none;
-        };
-        --paper-input-container-underline-disabled: {
-          display: none;
-        };
+    <style include="common-styles">
 
-      }
-      [hidden] {
-        display: none !important;
-      }
 
-      paper-button {
-        margin: 0 0;
-        padding: 0 0;
-      }
       .file-icon {
         padding-right: 8px;
         min-width: 22px;
@@ -70,24 +54,11 @@
         text-overflow: ellipsis;
       }
 
-      #uploadingSpinner {
-        width: 20px;
-        height: 20px;
-      }
-
-      iron-icon[icon="done"] {
-        color: green;
-      }
-
-      iron-icon[icon="error-outline"] {
-        color: red;
-      }
-
     </style>
 
     <paper-input-container always-float-label disabled$="[[disabled]]" invalid$="[[invalid]]">
 
-      <label slot="label" id="element-label" hidden$="[[!_showLabel(label)]]" aria-hidden="true">[[label]]</label>
+      <label slot="label" id="element-label" no-label-float$="[[!_showLabel(label)]]" aria-hidden="true">[[label]]</label>
 
       <div slot="input">
         <paper-button class="upload-button"
@@ -106,8 +77,8 @@
           </div>
           <div class="upload-status">
             <paper-spinner id="uploadingSpinner" hidden$="[[!uploadInProgress]]" active="[[uploadInProgress]]"></paper-spinner>
-            <iron-icon icon="done" hidden$="[[!successResponse]]"></iron-icon>
-            <iron-icon icon="error-outline" hidden$="[[!errorResponse]]"></iron-icon>
+            <iron-icon icon="done" hidden$="[[!success]]"></iron-icon>
+            <iron-icon icon="error-outline" hidden$="[[!fail]]"></iron-icon>
           </div>
 
           <!-- File actions -->
@@ -147,7 +118,6 @@
 
         <!-- Props -->
         <input hidden
-              class="paper-input-input"
               type="file"
               id="fileInput"
               on-change="_fileSelected"
@@ -173,23 +143,13 @@
      * @polymer
      * @demo demo/index.html
      */
-    class EtoolsUpload extends RequestHelper(Polymer.Element) {
+    class EtoolsUpload extends RequestHelper(CommonMixin(Polymer.Element)) {
       static get is() { return 'etools-upload'; }
       static get properties() {
         return {
           uploadBtnLabel: {
             type: String,
             value: 'Upload file'
-          },
-          readonly: {
-            type: Boolean,
-            value: false
-          },
-          accept: String,
-          endpoint: String,
-          autoUpload: {
-            type: Boolean,
-            value: true
           },
           fileUrl: {
             type: String,
@@ -208,22 +168,18 @@
             type: Boolean,
             value: false
           },
-          responsePropertyToExpose: {
-            type: Boolean,
-            value: null
-          },
           disabled: Boolean,
           invalid: Boolean,
           errorMessage: String,
-          label: String
+          success: {
+            type: Boolean,
+            value: false
+          },
+          fail: {
+            type: Boolean,
+            value: false
+          }
         };
-      }
-
-      _openFileChooser() {
-        var fileEl = this.$.fileInput;
-        if (fileEl) {
-          fileEl.click();
-        }
       }
 
       _thereIsAFileSelectedOrSaved(_filename) {
@@ -236,7 +192,7 @@
           return;
         }
 
-        this.resetResponses();
+        this.resetStatus();
         this.resetValidations();
 
         this._filename = file.name;
@@ -250,12 +206,17 @@
       _handleUpload() {
         this.uploadInProgress = true;
 
-        this.upload(this.rawFile).then(() => {
-            this.resetRawFile();
+        this.upload(this.rawFile).then((response) => {
+            this.success = true;
             this.uploadInProgress = false;
+            this.resetRawFile();
+
+            this.fireEvent('upload-finished', {success: response});
           }).catch((err) => {
+            this.fail = true;
             this.setInvalid("Error uploading file: " +  error.message);
             this.uploadInProgress = false;
+            this.fireEvent('upload-finished', {error: error});
           });
       }
 
@@ -269,6 +230,11 @@
         this.errorMessage = null;
       }
 
+      resetStatus() {
+        this.success = null;
+        this.fail = null;
+      }
+
       _fileUrlChanged(fileUrl) {
         this._filename = this.getFilenameFromURL(fileUrl);
       }
@@ -278,10 +244,6 @@
           return '';
         }
         return url.split('?')[0].split('/').pop();
-      }
-
-      _showLabel(label) {
-        return typeof label === 'string' && label !== '';
       }
 
       _showDownloadBtn(fileUrl) {
@@ -296,7 +258,6 @@
       }
 
       _hideDeleteBtn(readonly, _filename, hideDeleteBtn, uploadInProgress) {
-
         if (this.readonly || !this._filename || uploadInProgress) {
           return true;
         }
@@ -305,7 +266,7 @@
       }
 
       _cancelUpload() {
-        this.activeXhrRequest.abort();
+        this.abortActiveRequests();
 
         this.setProperties({
           uploadInProgress: false,
@@ -323,7 +284,7 @@
           this.dispatchEvent(new CustomEvent('delete-file', {detail: {file: this.files[0], index: 0}, bubbles: true, composed: true }));
         }
 
-        this.resetResponses();
+        this.resetStatus();
         this.resetValidations();
       }
 

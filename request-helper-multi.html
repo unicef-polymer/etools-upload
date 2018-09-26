@@ -1,0 +1,22 @@
+<link rel="import" href="request-helper.html">
+
+<script>
+  'use strict';
+
+  const RequestHelperMulti = (baseClass) => class extends RequestHelper(baseClass) {
+    static get properties() {
+      return {
+        // True if you can upload more than one file at a time
+        endpointAcceptsMulti: {
+          type: Boolean,
+          value: false
+        },
+        cancelUpload: {
+          type: Boolean,
+          value: false
+        }
+
+      }
+    }
+
+  }
