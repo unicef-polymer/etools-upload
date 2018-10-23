@@ -22,6 +22,10 @@ export const RequestHelper = (baseClass) => class extends (baseClass) {
       activeXhrRequests: {
         type: Object,
         value: {}
+      },
+      jwtLocalStorageKey: {
+        type: String,
+        value: ''
       }
     };
   }
@@ -31,7 +35,7 @@ export const RequestHelper = (baseClass) => class extends (baseClass) {
       method: 'POST',
       url: this._getEndpoint(),
       body: this._prepareBody(rawFile),
-      headers: this._getCSRFHeader()
+      headers: this._getHeaders()
     };
     return this.sendRequest(options, requestKey)
            .then((response) => {
@@ -73,16 +77,24 @@ export const RequestHelper = (baseClass) => class extends (baseClass) {
     return 'file';
   }
 
-  _getCSRFHeader() {
-    let csrftoken = this._getCSRFToken();
-    if (csrftoken) {
-      return {
-        'x-csrftoken': csrftoken
-      };
+  _getHeaders() {
+    let csrfToken = this._getCSRFToken();
+    let jwtToken = this._getJwtToken();
+    let headers = {};
+    if (csrfToken) {
+      headers['x-csrftoken'] = csrfToken;
     }
+    if (jwtToken) {
+      headers['authorization'] = 'JWT ' + jwtToken;
+    }
+    return headers;
   }
 
-  _getCSRFToken() {
+  _getJwtToken() {
+    return localStorage.getItem(this.jwtLocalStorageKey);
+  }
+
+   _getCSRFToken() {
     // check for a csrftoken cookie and return its value
     var csrfCookieName = 'csrftoken';
     var csrfToken = null;
