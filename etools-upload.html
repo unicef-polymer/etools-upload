@@ -140,6 +140,19 @@
 
   </template>
   <script>
+
+    /**
+     * !!! Important
+     * TODO:
+     *  - we can not use only fileUrl, we need something to use for operations... TBD
+     *  - improve validation (validate method should be present);
+     *  be carefull with errorMessage and server error message that will override errorMessage prop
+     *  - delete method thrown an error, there is no this.files array ?????? No data remains here to use for any other
+     *  operation. The only thing that remains is filename everything else is reset
+     *  - replace hideDeleteBtn with showDeleteBtn and set default false
+     */
+
+
     /**
      * `etools-upload`
      * Use to upload files
@@ -249,7 +262,25 @@
       }
 
       _fileUrlChanged(fileUrl) {
+        if (!this.isValidURL(fileUrl)) {
+          return;
+        }
         this._filename = this.getFilenameFromURL(fileUrl);
+      }
+
+      /**
+       * Absolute url str needed to work
+       * @param str
+       * @returns {boolean}
+       */
+      isValidURL(str) {
+        const pattern = new RegExp('^(https?:\\/\\/)?'+ // protocol
+            '((([a-z\\d]([a-z\\d-]*[a-z\\d])*)\\.?)+[a-z]{2,}|'+ // domain name
+            '((\\d{1,3}\\.){3}\\d{1,3}))'+ // ip (v4) address
+            '(\\:\\d+)?(\\/[-a-z\\d%_.~+]*)*'+ //port
+            '(\\?[;&amp;a-z\\d%_.~+=-]*)?'+ // query string
+            '(\\#[-a-z\\d_]*)?$','i');
+        return pattern.test(str);
       }
 
       getFilenameFromURL(url) {
@@ -260,7 +291,7 @@
       }
 
       _showDownloadBtn(fileUrl) {
-        return !!fileUrl;
+        return !!fileUrl && this.isValidURL(fileUrl);
       }
 
       _showChange(readonly, _filename, uploadInProgress) {
@@ -308,7 +339,7 @@
       }
 
       _downloadFile(e) {
-        if (!this.fileUrl) {
+        if (!this.fileUrl || !this.isValidURL(this.fileUrl)) {
           return;
         }
 
