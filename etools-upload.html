@@ -144,7 +144,10 @@
     /**
      * !!! Important
      * TODO:
+     *  - set download btn color as primary color and find a color for change btn
      *  - we can not use only fileUrl, we need something to use for operations... TBD
+     *      - reset check icon when a new valid fileUrl is received
+     *      - increase download spacing (right of filename)
      *  - improve validation (validate method should be present);
      *  be carefull with errorMessage and server error message that will override errorMessage prop
      *  - delete method thrown an error, there is no this.files array ?????? No data remains here to use for any other
@@ -265,6 +268,7 @@
         if (!this.isValidURL(fileUrl)) {
           return;
         }
+        this.resetStatus();
         this._filename = this.getFilenameFromURL(fileUrl);
       }
 
