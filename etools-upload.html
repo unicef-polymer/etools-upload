@@ -14,30 +14,40 @@
 <dom-module id="etools-upload">
   <template>
     <style include="common-styles">
+      #input-main-content {
+        @apply --layout-horizontal;
+        @apply --layout-center;
+      }
 
       .file-icon {
         padding-right: 8px;
+        color: var(--secondary-text-color, rgba(0, 0, 0, 0.54));
       }
 
       .filename-container {
         @apply --layout-horizontal;
         @apply --layout-center;
         @apply --layout-flex;
-        border-bottom: 1px solid var(--etools-upload-primary-text-color, rgba(0, 0, 0, 0.87));
+        border-bottom: 1px solid var(--secondary-text-color, rgba(0, 0, 0, 0.54));
         margin-right: 8px;
         min-width: 145px;
         overflow-wrap: break-word;
+        font-size: 16px;
       }
 
       .download-button {
-        --paper-button: {
-          @apply --layout-center-justified;
-          padding: 0 0;
-        };
+        @apply --layout-center-justified;
+        padding: 0 0;
+        margin-left: 8px;
+        color: var(--etools-upload-primary-color, var(--primary-color));
       }
 
       .dw-icon {
         margin-right: 8px;
+      }
+
+      .change-button {
+        color: var(--secondary-text-color, rgba(0, 0, 0, 0.54));
       }
 
       .file-actions paper-button {
@@ -62,7 +72,7 @@
 
       <label slot="label" id="element-label" hidden$="[[!_showLabel(label)]]" aria-hidden="true">[[label]]</label>
 
-      <div slot="input">
+      <div id="input-main-content" slot="input">
         <paper-button class="upload-button"
                       on-tap="_openFileChooser"
                       title="[[uploadBtnLabel]]"
@@ -107,7 +117,7 @@
             <paper-button class="delete-button"
                           on-tap="_deleteFile"
                           disabled$="[[readonly]]"
-                          hidden$="[[_hideDeleteBtn(readonly, _filename, hideDeleteBtn, uploadInProgress)]]">
+                          hidden$="[[_hideDeleteBtn(readonly, _filename, showDeleteBtn, uploadInProgress)]]">
               Delete
             </paper-button>
 
@@ -137,22 +147,14 @@
 
     </paper-input-container>
 
-
   </template>
   <script>
 
     /**
      * !!! Important
      * TODO:
-     *  - set download btn color as primary color and find a color for change btn
-     *  - we can not use only fileUrl, we need something to use for operations... TBD
-     *      - reset check icon when a new valid fileUrl is received
-     *      - increase download spacing (right of filename)
-     *  - improve validation (validate method should be present);
-     *  be carefull with errorMessage and server error message that will override errorMessage prop
      *  - delete method thrown an error, there is no this.files array ?????? No data remains here to use for any other
      *  operation. The only thing that remains is filename everything else is reset
-     *  - replace hideDeleteBtn with showDeleteBtn and set default false
      */
 
 
@@ -194,13 +196,19 @@
             type: Object,
             value: null
           },
-          hideDeleteBtn: {
+          showDeleteBtn: {
             type: Boolean,
             value: false
           },
           disabled: Boolean,
+          autoValidate: Boolean,
           invalid: Boolean,
-          errorMessage: String,
+          errorMessage: {
+            type: String,
+            value: ''
+          },
+          originalErrorMessage: String,
+          serverErrorMsg: String,
           success: {
             type: Boolean,
             value: false
@@ -210,6 +218,17 @@
             value: false
           }
         };
+      }
+
+      static get observers() {
+        return [
+          'autoValidateHandler(rawFile, fileUrl)'
+        ];
+      }
+
+      connectedCallback() {
+        super.connectedCallback();
+        this.set('originalErrorMessage', this.errorMessage);
       }
 
       _thereIsAFileSelectedOrSaved(_filename) {
@@ -243,15 +262,16 @@
           this.fireEvent('upload-finished', {success: response});
         }).catch((error) => {
           this.fail = true;
-          this.setInvalid('Error uploading file: ' + error.message);
+          this.serverErrorMsg = 'Error uploading file: ' + error.message;
+          this.setInvalid(true, this.serverErrorMsg);
           this.uploadInProgress = false;
           this.fireEvent('upload-finished', {error: error});
         });
       }
 
-      setInvalid(errMsg) {
+      setInvalid(invalid, errMsg) {
         this.errorMessage = errMsg;
-        this.invalid = true;
+        this.invalid = invalid;
       }
 
       resetValidations() {
@@ -262,6 +282,7 @@
       resetStatus() {
         this.success = null;
         this.fail = null;
+        this.serverErrorMsg = null;
       }
 
       _fileUrlChanged(fileUrl) {
@@ -302,12 +323,11 @@
         return uploadInProgress ? false : (!readonly && !!_filename);
       }
 
-      _hideDeleteBtn(readonly, _filename, hideDeleteBtn, uploadInProgress) {
+      _hideDeleteBtn(readonly, _filename, showDeleteBtn, uploadInProgress) {
         if (this.readonly || !this._filename || uploadInProgress) {
           return true;
         }
-
-        return this.hideDeleteBtn;
+        return !this.showDeleteBtn;
       }
 
       _cancelUpload() {
@@ -325,9 +345,10 @@
         if (this.rawFile) {
           this.resetRawFile();
           this._filename = null;
-        } else {
+        } else if (!isNaN(this.fileUrl)) {
           this.dispatchEvent(new CustomEvent('delete-file', {
-            detail: {file: this.files[0], index: 0},
+            // TODO: fileUrl will be an id in this case, id that we can use to delete the file from server
+            detail: {file: this.fileUrl},
             bubbles: true,
             composed: true
           }));
@@ -354,6 +375,29 @@
         // a.click() doesn't work in ff, edge
         a.dispatchEvent(new MouseEvent('click', {bubbles: true, cancelable: true, view: window}));
         window.URL.revokeObjectURL(this.fileUrl);
+      }
+
+      validate() {
+        let valid = true;
+        let errMsg = this.originalErrorMessage;
+        if (this.required) {
+          const uploadReqFailed = this.rawFile instanceof File && this.fail === true;
+          if ((!this.rawFile && !this.fileUrl) || uploadReqFailed) {
+            valid = false;
+          }
+          if (uploadReqFailed) {
+            errMsg = this.serverErrorMsg;
+          }
+        }
+
+        this.setInvalid(!valid, errMsg);
+        return valid;
+      }
+
+      autoValidateHandler() {
+        if (this.autoValidate) {
+          this.validate();
+        }
       }
 
     }
