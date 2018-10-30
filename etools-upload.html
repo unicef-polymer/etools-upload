@@ -1,11 +1,10 @@
 <link rel="import" href="../polymer/polymer-element.html">
 <link rel="import" href="../polymer/lib/elements/dom-if.html">
-<link rel="import" href="../paper-button/paper-button.html">
-<link rel="import" href="../iron-icon/iron-icon.html">
+<link rel="import" href="../iron-flex-layout/iron-flex-layout.html">
 <link rel="import" href="../iron-icons/iron-icons.html">
 <link rel="import" href="../paper-input/paper-input-container.html">
 <link rel="import" href="../paper-input/paper-input-error.html">
-<link rel="import" href="../iron-flex-layout/iron-flex-layout.html">
+<link rel="import" href="../paper-button/paper-button.html">
 <link rel="import" href="../paper-spinner/paper-spinner.html">
 
 <link rel="import" href="common-styles.html">
@@ -15,40 +14,51 @@
 <dom-module id="etools-upload">
   <template>
     <style include="common-styles">
-
+      #input-main-content {
+        @apply --layout-horizontal;
+        @apply --layout-center;
+      }
 
       .file-icon {
         padding-right: 8px;
-        min-width: 22px;
-        min-height: 22px
+        color: var(--secondary-text-color, rgba(0, 0, 0, 0.54));
       }
 
       .filename-container {
         @apply --layout-horizontal;
         @apply --layout-center;
         @apply --layout-flex;
-        border-bottom: 1px solid grey;
+        border-bottom: 1px solid var(--secondary-text-color, rgba(0, 0, 0, 0.54));
         margin-right: 8px;
         min-width: 145px;
         overflow-wrap: break-word;
+        font-size: 16px;
       }
 
       .download-button {
-        --paper-button: {
-          @apply --layout-center-justified;
-          padding: 0 0;
-        };
+        @apply --layout-center-justified;
+        padding: 0 0;
+        margin-left: 8px;
+        color: var(--etools-upload-primary-color, var(--primary-color));
       }
+
       .dw-icon {
         margin-right: 8px;
       }
+
+      .change-button {
+        color: var(--secondary-text-color, rgba(0, 0, 0, 0.54));
+      }
+
       .file-actions paper-button {
         vertical-align: middle;
       }
+
       .filename-and-actions-container {
         @apply --layout-horizontal;
         @apply --layout-wrap;
       }
+
       .file-name {
         overflow: hidden;
         text-overflow: ellipsis;
@@ -56,72 +66,77 @@
 
     </style>
 
-    <paper-input-container always-float-label disabled$="[[disabled]]" invalid$="[[invalid]]">
+    <paper-input-container always-float-label="[[alwaysFloatLabel]]"
+                           no-label-float="[[!_showLabel(label)]]"
+                           disabled$="[[disabled]]" invalid$="[[invalid]]">
 
-      <label slot="label" id="element-label" no-label-float$="[[!_showLabel(label)]]" aria-hidden="true">[[label]]</label>
+      <label slot="label" id="element-label" hidden$="[[!_showLabel(label)]]" aria-hidden="true">[[label]]</label>
 
-      <div slot="input">
+      <div id="input-main-content" slot="input">
         <paper-button class="upload-button"
                       on-tap="_openFileChooser"
                       title="[[uploadBtnLabel]]"
                       disabled$="[[readonly]]"
                       hidden$="[[_thereIsAFileSelectedOrSaved(_filename)]]">
-                      <iron-icon icon="file-upload"></iron-icon>
-                      [[uploadBtnLabel]]
+          <iron-icon icon="file-upload"></iron-icon>
+          [[uploadBtnLabel]]
         </paper-button>
 
         <div class="filename-and-actions-container">
+          <!-- File name container an upload status -->
           <div class="filename-container" hidden$="[[!_thereIsAFileSelectedOrSaved(_filename)]]">
             <iron-icon class="file-icon" icon="attachment"></iron-icon>
             <span class="file-name" title="[[_filename]]">[[_filename]]</span>
           </div>
           <div class="upload-status">
-            <paper-spinner id="uploadingSpinner" hidden$="[[!uploadInProgress]]" active="[[uploadInProgress]]"></paper-spinner>
+            <paper-spinner id="uploadingSpinner" hidden$="[[!uploadInProgress]]"
+                           active="[[uploadInProgress]]"></paper-spinner>
             <iron-icon icon="done" hidden$="[[!success]]"></iron-icon>
             <iron-icon icon="error-outline" hidden$="[[!fail]]"></iron-icon>
           </div>
+          <!-- end file name container an upload status -->
 
           <!-- File actions -->
           <div class="file-actions">
             <paper-button class="download-button"
-                on-tap="_downloadFile"
-                disabled="[[!_showDownloadBtn(fileUrl)]]"
-                hidden$="[[!_showDownloadBtn(fileUrl)]]"
-                title="Download">
+                          on-tap="_downloadFile"
+                          disabled="[[!_showDownloadBtn(fileUrl)]]"
+                          hidden$="[[!_showDownloadBtn(fileUrl)]]"
+                          title="Download">
               <iron-icon icon="cloud-download" class="dw-icon"></iron-icon>
               Download
             </paper-button>
 
             <paper-button class="change-button"
-                on-tap="_openFileChooser"
-                disabled$="[[!_showChange(readonly, _filename, uploadInProgress)]]"
-                hidden$="[[!_showChange(readonly, _filename, uploadInProgress)]]">
+                          on-tap="_openFileChooser"
+                          disabled$="[[!_showChange(readonly, _filename, uploadInProgress)]]"
+                          hidden$="[[!_showChange(readonly, _filename, uploadInProgress)]]">
               Change
             </paper-button>
 
             <paper-button class="delete-button"
-                on-tap="_deleteFile"
-                disabled$="[[readonly]]"
-                hidden$="[[_hideDeleteBtn(readonly, _filename, hideDeleteBtn, uploadInProgress)]]">
+                          on-tap="_deleteFile"
+                          disabled$="[[readonly]]"
+                          hidden$="[[_hideDeleteBtn(readonly, _filename, showDeleteBtn, uploadInProgress)]]">
               Delete
             </paper-button>
 
             <paper-button class="delete-button"
-                on-tap="_cancelUpload"
-                disabled$="[[!uploadInProgress]]"
-                hidden$="[[!uploadInProgress]]">
+                          on-tap="_cancelUpload"
+                          disabled$="[[!uploadInProgress]]"
+                          hidden$="[[!uploadInProgress]]">
               Cancel
             </paper-button>
           </div>
-          <!-- ------------------ -->
+          <!-- End file actions -->
         </div>
 
         <!-- Props -->
         <input hidden
-              type="file"
-              id="fileInput"
-              on-change="_fileSelected"
-              accept="{{accept}}">
+               type="file"
+               id="fileInput"
+               on-change="_fileSelected"
+               accept="{{accept}}">
 
         <a id="downloader" hidden></a>
       </div>
@@ -132,24 +147,41 @@
 
     </paper-input-container>
 
-
   </template>
   <script>
+
+    /**
+     * !!! Important
+     * TODO:
+     *  - delete method thrown an error, there is no this.files array ?????? No data remains here to use for any other
+     *  operation. The only thing that remains is filename everything else is reset
+     */
+
+
     /**
      * `etools-upload`
      * Use to upload files
      *
      * @customElement
      * @polymer
+     * @appliesMixin EtoolsUploadRequest
+     * @appliesMixin EtoolsUploadCommon
      * @demo demo/index.html
      */
-    class EtoolsUpload extends RequestHelper(CommonMixin(Polymer.Element)) {
-      static get is() { return 'etools-upload'; }
+    class EtoolsUpload extends EtoolsUploadRequest(EtoolsUploadCommon(Polymer.Element)) {
+      static get is() {
+        return 'etools-upload';
+      }
+
       static get properties() {
         return {
           uploadBtnLabel: {
             type: String,
             value: 'Upload file'
+          },
+          alwaysFloatLabel: {
+            type: Boolean,
+            value: true
           },
           fileUrl: {
             type: String,
@@ -164,13 +196,19 @@
             type: Object,
             value: null
           },
-          hideDeleteBtn: {
+          showDeleteBtn: {
             type: Boolean,
             value: false
           },
           disabled: Boolean,
+          autoValidate: Boolean,
           invalid: Boolean,
-          errorMessage: String,
+          errorMessage: {
+            type: String,
+            value: ''
+          },
+          originalErrorMessage: String,
+          serverErrorMsg: String,
           success: {
             type: Boolean,
             value: false
@@ -180,6 +218,17 @@
             value: false
           }
         };
+      }
+
+      static get observers() {
+        return [
+          'autoValidateHandler(rawFile, fileUrl)'
+        ];
+      }
+
+      connectedCallback() {
+        super.connectedCallback();
+        this.set('originalErrorMessage', this.errorMessage);
       }
 
       _thereIsAFileSelectedOrSaved(_filename) {
@@ -199,7 +248,7 @@
         this.rawFile = file;
 
         if (this.autoUpload) {
-         this._handleUpload();
+          this._handleUpload();
         }
       }
 
@@ -207,22 +256,24 @@
         this.uploadInProgress = true;
 
         this.upload(this.rawFile).then((response) => {
-            this.success = true;
-            this.uploadInProgress = false;
-            this.resetRawFile();
-
-            this.fireEvent('upload-finished', {success: response});
-          }).catch((err) => {
-            this.fail = true;
-            this.setInvalid("Error uploading file: " +  error.message);
-            this.uploadInProgress = false;
-            this.fireEvent('upload-finished', {error: error});
-          });
+          this.success = true;
+          this.uploadInProgress = false;
+          this.resetRawFile();
+          this.fireEvent('upload-finished', {success: response});
+        }).catch((error) => {
+          this.fail = true;
+          this.serverErrorMsg = 'Error uploading file: ' + error.message;
+          this.setInvalid(true, this.serverErrorMsg);
+          this.uploadInProgress = false;
+          this.fireEvent('upload-finished', {error: error});
+        });
       }
 
-      setInvalid(errMsg) {
-        this.errorMessage = errMsg;
-        this.invalid = true;
+      setInvalid(invalid, errMsg) {
+        if (typeof errMsg === 'string') {
+          this.errorMessage = errMsg;
+        }
+        this.invalid = invalid;
       }
 
       resetValidations() {
@@ -233,10 +284,30 @@
       resetStatus() {
         this.success = null;
         this.fail = null;
+        this.serverErrorMsg = null;
       }
 
       _fileUrlChanged(fileUrl) {
+        if (!this.isValidURL(fileUrl)) {
+          return;
+        }
+        this.resetStatus();
         this._filename = this.getFilenameFromURL(fileUrl);
+      }
+
+      /**
+       * Absolute url str needed to work
+       * @param str
+       * @returns {boolean}
+       */
+      isValidURL(str) {
+        const pattern = new RegExp('^(https?:\\/\\/)?'+ // protocol
+            '((([a-z\\d]([a-z\\d-]*[a-z\\d])*)\\.?)+[a-z]{2,}|'+ // domain name
+            '((\\d{1,3}\\.){3}\\d{1,3}))'+ // ip (v4) address
+            '(\\:\\d+)?(\\/[-a-z\\d%_.~+]*)*'+ //port
+            '(\\?[;&amp;a-z\\d%_.~+=-]*)?'+ // query string
+            '(\\#[-a-z\\d_]*)?$','i');
+        return pattern.test(str);
       }
 
       getFilenameFromURL(url) {
@@ -247,22 +318,18 @@
       }
 
       _showDownloadBtn(fileUrl) {
-        return !!fileUrl;
+        return !!fileUrl && this.isValidURL(fileUrl);
       }
 
       _showChange(readonly, _filename, uploadInProgress) {
-        if (uploadInProgress) {
-          return false;
-        }
-        return !readonly && !!_filename
+        return uploadInProgress ? false : (!readonly && !!_filename);
       }
 
-      _hideDeleteBtn(readonly, _filename, hideDeleteBtn, uploadInProgress) {
+      _hideDeleteBtn(readonly, _filename, showDeleteBtn, uploadInProgress) {
         if (this.readonly || !this._filename || uploadInProgress) {
           return true;
         }
-
-        return this.hideDeleteBtn;
+        return !this.showDeleteBtn;
       }
 
       _cancelUpload() {
@@ -278,10 +345,15 @@
 
       _deleteFile(e) {
         if (this.rawFile) {
-         this.resetRawFile();
-         this._filename = null;
-        } else {
-          this.dispatchEvent(new CustomEvent('delete-file', {detail: {file: this.files[0], index: 0}, bubbles: true, composed: true }));
+          this.resetRawFile();
+          this._filename = null;
+        } else if (!isNaN(this.fileUrl)) {
+          this.dispatchEvent(new CustomEvent('delete-file', {
+            // TODO: fileUrl will be an id in this case, id that we can use to delete the file from server
+            detail: {file: this.fileUrl},
+            bubbles: true,
+            composed: true
+          }));
         }
 
         this.resetStatus();
@@ -294,20 +366,40 @@
       }
 
       _downloadFile(e) {
-        if (!this.fileUrl) {
+        if (!this.fileUrl || !this.isValidURL(this.fileUrl)) {
           return;
         }
 
-        var a = this.$.downloader;
+        const a = this.$.downloader;
         a.href = this.fileUrl;
         a.download = this._filename;
 
-        //* a.click() doesn't work in ff, edge *
+        // a.click() doesn't work in ff, edge
         a.dispatchEvent(new MouseEvent('click', {bubbles: true, cancelable: true, view: window}));
-
-       // window.URL.revokeObjectURL(this.fileUrl); is this neccessary?
+        window.URL.revokeObjectURL(this.fileUrl);
       }
 
+      validate() {
+        let valid = true;
+        let errMsg = this.originalErrorMessage;
+        if (this.required) {
+          const uploadReqFailed = this.rawFile instanceof File && this.fail === true;
+          if ((!this.rawFile && !this.fileUrl) || uploadReqFailed) {
+            valid = false;
+          }
+          if (uploadReqFailed) {
+            errMsg = this.serverErrorMsg;
+          }
+        }
+        this.setInvalid(!valid, errMsg);
+        return valid;
+      }
+
+      autoValidateHandler() {
+        if (this.autoValidate) {
+          this.validate();
+        }
+      }
 
     }
 

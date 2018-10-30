@@ -1,47 +1,56 @@
-
 <script>
-    'use strict';
-
-    const CommonMixin = (baseClass) => class extends (baseClass) {
-      static get properties() {
-        return {
-          uploadInProgress: {
-            type: Boolean,
-            value: false
-          },
-          label: {
-            type: String,
-            value: ''
-          },
-          readonly: {
-            type: Boolean,
-            value: false
-          },
-          accept: String,
-          autoUpload: {
-            type: Boolean,
-            value: true
-          },
-        };
-      }
-
-      _showLabel(label) {
-        return label !== '';
-      }
-
-      _openFileChooser() {
-        var fileEl = this.$.fileInput;
-        if (fileEl) {
-          fileEl.click();
+  'use strict';
+  /* exported EtoolsUploadCommon */
+  /**
+   * @polymer
+   * @mixinFunction
+   */
+  const EtoolsUploadCommon = baseClass => class extends (baseClass) {
+    static get properties() {
+      return {
+        uploadInProgress: {
+          type: Boolean,
+          value: false
+        },
+        label: {
+          type: String,
+          value: ''
+        },
+        required: {
+          type: Boolean,
+          value: false
+        },
+        readonly: {
+          type: Boolean,
+          value: false
+        },
+        accept: String,
+        autoUpload: {
+          type: Boolean,
+          value: true
         }
-      }
-
-      fireEvent(evName, detail) {
-        this.dispatchEvent(new CustomEvent(evName, {
-          detail: detail,
-          bubbles: true,
-          composed: true
-        }));
-      }
-
+      };
     }
+
+    _showLabel(label) {
+      return label !== '';
+    }
+
+    _openFileChooser() {
+      const fileEl = this.$.fileInput;
+      if (fileEl) {
+        fileEl.dispatchEvent(new MouseEvent('click', {bubbles: true, cancelable: true, view: window}));
+        // fileEl.click();
+      }
+    }
+
+    fireEvent(evName, detail) {
+      this.dispatchEvent(new CustomEvent(evName, {
+        detail: detail,
+        bubbles: true,
+        composed: true
+      }));
+    }
+
+  };
+</script>

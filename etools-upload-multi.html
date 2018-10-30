@@ -78,9 +78,11 @@
      *
      * @customElement
      * @polymer
+     * @appliesMixin EtoolsMultiUploadRequest
+     * @appliesMixin EtoolsUploadCommon
      * @extends {Polymer.Element}
      */
-    class EtoolsUploadMulti extends RequestHelperMulti(CommonMixin(Polymer.Element)) {
+    class EtoolsUploadMulti extends EtoolsMultiUploadRequest(EtoolsUploadCommon(Polymer.Element)) {
 
       static get is() {
         return 'etools-upload-multi';
