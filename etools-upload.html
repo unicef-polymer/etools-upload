@@ -270,7 +270,9 @@
       }
 
       setInvalid(invalid, errMsg) {
-        this.errorMessage = errMsg;
+        if (typeof errMsg === 'string') {
+          this.errorMessage = errMsg;
+        }
         this.invalid = invalid;
       }
 
@@ -389,7 +391,6 @@
             errMsg = this.serverErrorMsg;
           }
         }
-
         this.setInvalid(!valid, errMsg);
         return valid;
       }
