@@ -3,7 +3,12 @@
 <script>
   'use strict';
 
-  const RequestHelperMulti = (baseClass) => class extends RequestHelper(baseClass) {
+  /* exported EtoolsMultiUploadRequest */
+  /**
+   * @polymer
+   * @mixinFunction
+   */
+  const EtoolsMultiUploadRequest = baseClass => class extends EtoolsUploadRequest(baseClass) {
     static get properties() {
       return {
         // True if you can upload more than one file at a time
@@ -15,8 +20,7 @@
           type: Boolean,
           value: false
         }
-
-      }
+      };
     }
-
-  }
+  };
+</script>
