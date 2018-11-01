@@ -35,6 +35,14 @@
         font-size: 16px;
       }
 
+      :host([readonly]) .filename-container {
+        border-bottom: none;
+      }
+
+      :host([disabled]) .filename-container {
+        border-bottom: 1px dashed var(--secondary-text-color, rgba(0, 0, 0, 0.54));
+      }
+
       .download-button {
         @apply --layout-center-justified;
         padding: 0 0;
@@ -62,6 +70,7 @@
       .file-name {
         overflow: hidden;
         text-overflow: ellipsis;
+        white-space: nowrap;
       }
 
     </style>
@@ -199,13 +208,6 @@
           showDeleteBtn: {
             type: Boolean,
             value: false
-          },
-          disabled: Boolean,
-          autoValidate: Boolean,
-          invalid: Boolean,
-          errorMessage: {
-            type: String,
-            value: ''
           },
           originalErrorMessage: String,
           serverErrorMsg: String,
@@ -346,18 +348,16 @@
       _deleteFile(e) {
         if (this.rawFile) {
           this.resetRawFile();
-          this._filename = null;
-        } else if (!isNaN(this.fileUrl)) {
-          this.dispatchEvent(new CustomEvent('delete-file', {
-            // TODO: fileUrl will be an id in this case, id that we can use to delete the file from server
-            detail: {file: this.fileUrl},
-            bubbles: true,
-            composed: true
-          }));
         }
-
+        this._filename = null;
         this.resetStatus();
-        this.resetValidations();
+        // TODO: should delete req be implemented here?
+        this.dispatchEvent(new CustomEvent('delete-file', {
+          detail: {file: this.fileUrl},
+          bubbles: true,
+          composed: true
+        }));
+        this.fileUrl = null;
       }
 
       resetRawFile() {
