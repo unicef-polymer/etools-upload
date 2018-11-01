@@ -18,16 +18,37 @@
         },
         required: {
           type: Boolean,
-          value: false
+          value: false,
+          reflectToAttribute: true
         },
         readonly: {
           type: Boolean,
-          value: false
+          value: false,
+          reflectToAttribute: true
         },
         accept: String,
         autoUpload: {
           type: Boolean,
           value: true
+        },
+        disabled: {
+          type: Boolean,
+          value: false,
+          reflectToAttribute: true
+        },
+        invalid: {
+          type: Boolean,
+          value: false,
+          reflectToAttribute: true
+        },
+        autoValidate: {
+          type: Boolean,
+          value: false,
+          reflectToAttribute: true
+        },
+        errorMessage: {
+          type: String,
+          value: ''
         }
       };
     }

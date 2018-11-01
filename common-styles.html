@@ -45,6 +45,15 @@
         color: var(--etools-upload-primary-color, var(--primary-color));
       }
 
+      :host([readonly]) .upload-button {
+        color: var(--secondary-text-color, rgba(0, 0, 0, 0.54));
+      }
+
+      :host([disabled]) .upload-button {
+        pointer-events: none;
+        opacity: 0.33;
+      }
+
       .upload-button iron-icon {
         margin-right: 8px;
       }
