@@ -35,6 +35,14 @@
         font-size: 16px;
       }
 
+      :host([readonly]) .filename-container {
+        border-bottom: none;
+      }
+
+      :host([disabled]) .filename-container {
+        border-bottom: 1px dashed var(--secondary-text-color, rgba(0, 0, 0, 0.54));
+      }
+
       .download-button {
         @apply --layout-center-justified;
         padding: 0 0;
