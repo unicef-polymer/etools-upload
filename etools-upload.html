@@ -146,8 +146,6 @@
                id="fileInput"
                on-change="_fileSelected"
                accept="{{accept}}">
-
-        <a id="downloader" hidden></a>
       </div>
 
       <template is="dom-if" if="[[invalid]]">
@@ -352,11 +350,7 @@
         this._filename = null;
         this.resetStatus();
         // TODO: should delete req be implemented here?
-        this.dispatchEvent(new CustomEvent('delete-file', {
-          detail: {file: this.fileUrl},
-          bubbles: true,
-          composed: true
-        }));
+        this.fireEvent('delete-file', {file: this.fileUrl});
         this.fileUrl = null;
       }
 
@@ -369,14 +363,7 @@
         if (!this.fileUrl || !this.isValidURL(this.fileUrl)) {
           return;
         }
-
-        const a = this.$.downloader;
-        a.href = this.fileUrl;
-        a.download = this._filename;
-
-        // a.click() doesn't work in ff, edge
-        a.dispatchEvent(new MouseEvent('click', {bubbles: true, cancelable: true, view: window}));
-        window.URL.revokeObjectURL(this.fileUrl);
+        this.downloadFileUsingUrl(this._filename, this.fileUrl, this.openInNewTab);
       }
 
       validate() {

@@ -50,6 +50,10 @@
         errorMessage: {
           type: String,
           value: ''
+        },
+        openInNewTab: {
+          type: Boolean,
+          value: true
         }
       };
     }
@@ -62,7 +66,6 @@
       const fileEl = this.$.fileInput;
       if (fileEl) {
         fileEl.dispatchEvent(new MouseEvent('click', {bubbles: true, cancelable: true, view: window}));
-        // fileEl.click();
       }
     }
 
@@ -72,6 +75,17 @@
         bubbles: true,
         composed: true
       }));
+    }
+
+    downloadFileUsingUrl(filename, url, openInNewTab) {
+      const a = document.createElement('a');
+      a.href = url;
+      if (openInNewTab) {
+        a.target = '_blank';
+      }
+      a.download = filename;
+      a.dispatchEvent(new MouseEvent('click', {bubbles: true, cancelable: true, view: window}));
+      window.URL.revokeObjectURL(url);
     }
 
   };
