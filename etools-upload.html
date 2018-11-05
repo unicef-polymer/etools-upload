@@ -254,6 +254,7 @@
 
       _handleUpload() {
         this.uploadInProgress = true;
+        this.fireEvent('upload-started');
 
         this.upload(this.rawFile).then((response) => {
           this.success = true;
