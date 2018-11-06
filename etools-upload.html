@@ -241,6 +241,8 @@
           return;
         }
 
+        this._fireChangeFileEventIfApplicable();
+
         this.resetStatus();
         this.resetValidations();
 
@@ -249,6 +251,13 @@
 
         if (this.autoUpload) {
           this._handleUpload();
+        }
+      }
+
+      _fireChangeFileEventIfApplicable() {
+        if (this.fileUrl && !isNaN(this.fileUrl)) {
+          // if fileUrl is a number , then the previous upload was not saved
+          this.fireEvent('change-unsaved-file');
         }
       }
 
