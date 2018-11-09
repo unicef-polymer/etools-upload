@@ -393,6 +393,9 @@
       }
 
       autoValidateHandler() {
+        if (typeof this.fileUrl === 'undefined') {
+          this.invalid = false;
+        }
         if (this.autoValidate) {
           this.validate();
         }
