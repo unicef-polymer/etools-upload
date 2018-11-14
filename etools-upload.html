@@ -297,27 +297,17 @@
         this.serverErrorMsg = null;
       }
 
+
       _fileUrlChanged(fileUrl) {
-        if (!this.isValidURL(fileUrl)) {
+        if (fileUrl && !this.isNaN(fileUrl)) {
+          // fileUrl is a number after the upload is finished
+          // and becomes an url after the number is saved on the object=intervention, agreement etc
+          // checking for a valid url instead of number creates catastrophic backtracking
+          // https://stackoverflow.com/questions/17116675/why-does-this-regex-make-chrome-hang
           return;
         }
         this.resetStatus();
         this._filename = this.getFilenameFromURL(fileUrl);
-      }
-
-      /**
-       * Absolute url str needed to work
-       * @param str
-       * @returns {boolean}
-       */
-      isValidURL(str) {
-        const pattern = new RegExp('^(https?:\\/\\/)?'+ // protocol
-            '((([a-z\\d]([a-z\\d-]*[a-z\\d])*)\\.?)+[a-z]{2,}|'+ // domain name
-            '((\\d{1,3}\\.){3}\\d{1,3}))?'+ // ip (v4) address
-            '(\\:\\d+)?(\\/[-a-z\\d%_.~+]*)*'+ //port + path
-            '(\\?[;&amp;a-z\\d%_.~+=-]*)?'+ // query string
-            '(\\#[-a-z\\d_]*)?$','i');// hash
-        return pattern.test(str);
       }
 
       getFilenameFromURL(url) {
@@ -328,7 +318,7 @@
       }
 
       _showDownloadBtn(fileUrl) {
-        return !!fileUrl && this.isValidURL(fileUrl);
+        return !!fileUrl && this.isNaN(fileUrl);
       }
 
       _showChange(readonly, _filename, uploadInProgress) {
@@ -370,7 +360,7 @@
       }
 
       _downloadFile(e) {
-        if (!this.fileUrl || !this.isValidURL(this.fileUrl)) {
+        if (!this.fileUrl || !this.isNaN(this.fileUrl)) {
           return;
         }
         this.downloadFile(this._filename, this.fileUrl, this.openInNewTab);
