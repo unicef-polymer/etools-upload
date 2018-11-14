@@ -299,7 +299,7 @@
 
 
       _fileUrlChanged(fileUrl) {
-        if (fileUrl && !this.isNaN(fileUrl)) {
+        if (fileUrl && !isNaN(fileUrl)) {
           // fileUrl is a number after the upload is finished
           // and becomes an url after the number is saved on the object=intervention, agreement etc
           return;
@@ -316,7 +316,7 @@
       }
 
       _showDownloadBtn(fileUrl) {
-        return !!fileUrl && this.isNaN(fileUrl);
+        return !!fileUrl && isNaN(fileUrl);
       }
 
       _showChange(readonly, _filename, uploadInProgress) {
@@ -358,7 +358,7 @@
       }
 
       _downloadFile(e) {
-        if (!this.fileUrl || !this.isNaN(this.fileUrl)) {
+        if (!this.fileUrl || !isNaN(this.fileUrl)) {
           return;
         }
         this.downloadFile(this._filename, this.fileUrl, this.openInNewTab);
