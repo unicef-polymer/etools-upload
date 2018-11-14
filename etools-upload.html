@@ -302,8 +302,6 @@
         if (fileUrl && !this.isNaN(fileUrl)) {
           // fileUrl is a number after the upload is finished
           // and becomes an url after the number is saved on the object=intervention, agreement etc
-          // checking for a valid url instead of number creates catastrophic backtracking
-          // https://stackoverflow.com/questions/17116675/why-does-this-regex-make-chrome-hang
           return;
         }
         this.resetStatus();
