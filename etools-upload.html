@@ -327,7 +327,7 @@
         if (this.readonly || !this._filename || uploadInProgress) {
           return true;
         }
-        return !this.showDeleteBtn;
+        return this.showDeleteBtn;
       }
 
       _cancelUpload() {
