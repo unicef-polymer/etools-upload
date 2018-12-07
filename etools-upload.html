@@ -14,6 +14,7 @@
 <dom-module id="etools-upload">
   <template>
     <style include="common-styles">
+
       #input-main-content {
         @apply --layout-horizontal;
         @apply --layout-center;
@@ -67,7 +68,7 @@
         @apply --layout-wrap;
       }
 
-      .file-name {
+      .file-name:not([allow-multiline-filename]) {
         overflow: hidden;
         text-overflow: ellipsis;
         white-space: nowrap;
@@ -95,7 +96,7 @@
           <!-- File name container an upload status -->
           <div class="filename-container" hidden$="[[!_thereIsAFileSelectedOrSaved(_filename)]]">
             <iron-icon class="file-icon" icon="attachment"></iron-icon>
-            <span class="file-name" title="[[_filename]]">[[_filename]]</span>
+            <span class="file-name" allow-multiline-filename$="[[allowMultilineFilename]]" title="[[_filename]]">[[_filename]]</span>
           </div>
           <div class="upload-status">
             <paper-spinner id="uploadingSpinner" hidden$="[[!uploadInProgress]]"
@@ -118,8 +119,8 @@
 
             <paper-button class="change-button"
                           on-tap="_openFileChooser"
-                          disabled$="[[!_showChange(readonly, _filename, uploadInProgress)]]"
-                          hidden$="[[!_showChange(readonly, _filename, uploadInProgress)]]">
+                          disabled$="[[!_showChange(readonly, _filename, uploadInProgress, showChange)]]"
+                          hidden$="[[!_showChange(readonly, _filename, uploadInProgress, showChange)]]">
               Change
             </paper-button>
 
@@ -216,6 +217,15 @@
           fail: {
             type: Boolean,
             value: false
+          },
+          showChange: {
+            type: Boolean,
+            value: true
+          },
+          allowMultilineFilename: {
+            type: Boolean,
+            value: false,
+            reflectToAttribute: true
           }
         };
       }
@@ -319,7 +329,10 @@
         return !!fileUrl && isNaN(fileUrl);
       }
 
-      _showChange(readonly, _filename, uploadInProgress) {
+      _showChange(readonly, _filename, uploadInProgress, showChange) {
+        if (!showChange) {
+          return false;
+        }
         return uploadInProgress ? false : (!readonly && !!_filename);
       }
 
