@@ -66,13 +66,20 @@
       .filename-and-actions-container {
         @apply --layout-horizontal;
         @apply --layout-wrap;
+        max-width: 100%;
       }
 
-      .file-name:not([allow-multiline-filename]) {
+      .file-name {
         overflow: hidden;
         text-overflow: ellipsis;
         white-space: nowrap;
       }
+
+      /*.file-name:not([allow-multiline-filename]) {*/
+      /*overflow: hidden;*/
+      /*text-overflow: ellipsis;*/
+      /*white-space: nowrap;*/
+      /*}*/
 
     </style>
 
