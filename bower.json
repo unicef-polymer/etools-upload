@@ -1,7 +1,7 @@
 {
   "name": "etools-upload",
   "description": "Use to upload files",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "main": "etools-upload.html",
   "dependencies": {
     "polymer": "Polymer/polymer#^2.0.0",

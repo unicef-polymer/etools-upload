@@ -66,9 +66,10 @@
       .filename-and-actions-container {
         @apply --layout-horizontal;
         @apply --layout-wrap;
+        max-width: 100%;
       }
 
-      .file-name:not([allow-multiline-filename]) {
+      .file-name {
         overflow: hidden;
         text-overflow: ellipsis;
         white-space: nowrap;
@@ -96,7 +97,7 @@
           <!-- File name container an upload status -->
           <div class="filename-container" hidden$="[[!_thereIsAFileSelectedOrSaved(_filename)]]">
             <iron-icon class="file-icon" icon="attachment"></iron-icon>
-            <span class="file-name" allow-multiline-filename$="[[allowMultilineFilename]]" title="[[_filename]]">[[_filename]]</span>
+            <span class="file-name" title="[[_filename]]">[[_filename]]</span>
           </div>
           <div class="upload-status">
             <paper-spinner id="uploadingSpinner" hidden$="[[!uploadInProgress]]"
