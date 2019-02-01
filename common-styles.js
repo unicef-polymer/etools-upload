@@ -9,10 +9,11 @@ $_documentContainer.innerHTML = `<dom-module id="common-styles">
 
       :host {
         display: block;
-        --paper-input-container-underline:	{
-            display: none;
+        width: 100%;
+        --paper-input-container-underline: {
+          display: none;
         };
-        --paper-input-container-underline-focus:	{
+        --paper-input-container-underline-focus: {
           display: none;
         };
         --paper-input-container-underline-disabled: {
@@ -21,6 +22,7 @@ $_documentContainer.innerHTML = `<dom-module id="common-styles">
       }
 
       paper-button {
+        font-weight: 700;
         margin: 0 0;
         padding: 0 0;
       }
@@ -31,11 +33,12 @@ $_documentContainer.innerHTML = `<dom-module id="common-styles">
       }
 
       iron-icon[icon="done"] {
-        color: green;
+        color: var(--etools-upload-success-color, #72c300);
       }
 
-      iron-icon[icon="error-outline"] {
-        color: red;
+      iron-icon[icon="error-outline"],
+      .delete-button {
+        color: var(--etools-upload-danger-color, #ea4022);
       }
 
       .delete-button {
@@ -43,9 +46,23 @@ $_documentContainer.innerHTML = `<dom-module id="common-styles">
       }
 
       .upload-button {
-        font-weight: 700;
-        color: var(--primary-color);
+        color: var(--etools-upload-primary-color, var(--primary-color));
+        margin-right: 8px;
       }
+      
+      :host([readonly]) .upload-button {
+        color: var(--secondary-text-color, rgba(0, 0, 0, 0.54));
+      }
+      
+      :host([disabled]) .upload-button {
+        pointer-events: none;
+        opacity: 0.33;
+      }
+      
+      .upload-button iron-icon {
+        margin-right: 8px;
+      }
+      
       iron-icon {
         min-width: 22px;
         min-height: 22px;

@@ -9,15 +9,44 @@ export const CommonMixin = (baseClass) => class extends (baseClass) {
         type: String,
         value: ''
       },
+      required: {
+        type: Boolean,
+        value: false,
+        reflectToAttribute: true
+      },
       readonly: {
         type: Boolean,
-        value: false
+        value: false,
+        reflectToAttribute: true
       },
       accept: String,
       autoUpload: {
         type: Boolean,
         value: true
       },
+      disabled: {
+        type: Boolean,
+        value: false,
+        reflectToAttribute: true
+      },
+      invalid: {
+        type: Boolean,
+        value: false,
+        reflectToAttribute: true
+      },
+      autoValidate: {
+        type: Boolean,
+        value: false,
+        reflectToAttribute: true
+      },
+      errorMessage: {
+        type: String,
+        value: ''
+      },
+      openInNewTab: {
+        type: Boolean,
+        value: true
+      }
     };
   }
 
@@ -26,9 +55,9 @@ export const CommonMixin = (baseClass) => class extends (baseClass) {
   }
 
   _openFileChooser() {
-    var fileEl = this.$.fileInput;
+    const fileEl = this.$.fileInput;
     if (fileEl) {
-      fileEl.click();
+      fileEl.dispatchEvent(new MouseEvent('click', {bubbles: true, cancelable: true, view: window}));
     }
   }
 
@@ -38,6 +67,17 @@ export const CommonMixin = (baseClass) => class extends (baseClass) {
       bubbles: true,
       composed: true
     }));
+  }
+
+  downloadFile(filename, url, openInNewTab) {
+    const a = document.createElement('a');
+    a.href = url;
+    if (openInNewTab) {
+      a.target = '_blank';
+    }
+    a.download = filename;
+    a.dispatchEvent(new MouseEvent('click', {bubbles: true, cancelable: true, view: window}));
+    window.URL.revokeObjectURL(url);
   }
 
 
