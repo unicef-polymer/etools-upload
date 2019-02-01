@@ -298,11 +298,11 @@ class EtoolsUpload extends RequestHelper(CommonMixin(PolymerElement)) {
     return uploadInProgress ? false : (!readonly && !!_filename);
   }
 
-  _hideDeleteBtn(readonly, _filename, showDeleteBtn, uploadInProgress) {
+  _showDeleteBtn(readonly, _filename, showDeleteBtn, uploadInProgress) {
     if (this.readonly || !this._filename || uploadInProgress) {
       return true;
     }
-    return !this.showDeleteBtn;
+    return this.showDeleteBtn;
   }
 
   _cancelUpload() {
