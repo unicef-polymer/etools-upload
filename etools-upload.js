@@ -23,42 +23,64 @@ class EtoolsUpload extends RequestHelper(CommonMixin(PolymerElement)) {
     return html`
     <style include="common-styles">
 
+      #input-main-content {
+        @apply --layout-horizontal;
+        @apply --layout-center;
+      }
 
       .file-icon {
         padding-right: 8px;
-        min-width: 22px;
-        min-height: 22px
+        color: var(--secondary-text-color, rgba(0, 0, 0, 0.54));
       }
 
       .filename-container {
         @apply --layout-horizontal;
         @apply --layout-center;
         @apply --layout-flex;
-        border-bottom: 1px solid grey;
+        border-bottom: 1px solid var(--secondary-text-color, rgba(0, 0, 0, 0.54));
         margin-right: 8px;
         min-width: 145px;
         overflow-wrap: break-word;
+        font-size: 16px;
+      }
+      
+      :host([readonly]) .filename-container {
+        border-bottom: none;
+      }
+      
+      :host([disabled]) .filename-container {
+        border-bottom: 1px dashed var(--secondary-text-color, rgba(0, 0, 0, 0.54));
       }
 
       .download-button {
-        --paper-button: {
-          @apply --layout-center-justified;
-          padding: 0 0;
-        };
+        @apply --layout-center-justified;
+        padding: 0 0;
+        margin-left: 8px;
+        color: var(--etools-upload-primary-color, var(--primary-color));
       }
+      
       .dw-icon {
         margin-right: 8px;
       }
+      
+      .change-button {
+        color: var(--secondary-text-color, rgba(0, 0, 0, 0.54));
+      }
+      
       .file-actions paper-button {
         vertical-align: middle;
       }
+      
       .filename-and-actions-container {
         @apply --layout-horizontal;
         @apply --layout-wrap;
+        max-width: 100%;
       }
-      .filename {
+      
+      .file-name {
         overflow: hidden;
         text-overflow: ellipsis;
+        white-space: nowrap;
       }
 
     </style>
@@ -95,7 +117,7 @@ class EtoolsUpload extends RequestHelper(CommonMixin(PolymerElement)) {
               Change
             </paper-button>
 
-            <paper-button class="delete-button" on-tap="_deleteFile" disabled\$="[[readonly]]" hidden\$="[[_hideDeleteBtn(readonly, _filename, hideDeleteBtn, uploadInProgress)]]">
+            <paper-button class="delete-button" on-tap="_deleteFile" disabled\$="[[readonly]]" hidden\$="[[_showDeleteBtn(readonly, _filename, showDeleteBtn, uploadInProgress)]]">
               Delete
             </paper-button>
 
@@ -127,6 +149,10 @@ class EtoolsUpload extends RequestHelper(CommonMixin(PolymerElement)) {
         type: String,
         value: 'Upload file'
       },
+      alwaysFloatLabel: {
+        type: Boolean,
+        value: true
+      },
       fileUrl: {
         type: String,
         value: null,
@@ -140,13 +166,13 @@ class EtoolsUpload extends RequestHelper(CommonMixin(PolymerElement)) {
         type: Object,
         value: null
       },
-      hideDeleteBtn: {
+      showDeleteBtn: {
         type: Boolean,
         value: false
       },
-      disabled: Boolean,
-      invalid: Boolean,
       errorMessage: String,
+      originalErrorMessage: String,
+      serverErrorMsg: String,
       success: {
         type: Boolean,
         value: false
@@ -154,8 +180,28 @@ class EtoolsUpload extends RequestHelper(CommonMixin(PolymerElement)) {
       fail: {
         type: Boolean,
         value: false
+      },
+      showChange: {
+        type: Boolean,
+        value: true
+      },
+      allowMultilineFilename: {
+        type: Boolean,
+        value: false,
+        reflectToAttribute: true
       }
     };
+  }
+
+  static get observers() {
+    return [
+      'autoValidateHandler(rawFile, fileUrl)'
+    ];
+  }
+
+  connectedCallback() {
+    super.connectedCallback();
+    this.set('originalErrorMessage', this.errorMessage);
   }
 
   _thereIsAFileSelectedOrSaved(_filename) {
@@ -168,6 +214,8 @@ class EtoolsUpload extends RequestHelper(CommonMixin(PolymerElement)) {
       return;
     }
 
+    this._fireChangeFileEventIfApplicable()
+
     this.resetStatus();
     this.resetValidations();
 
@@ -179,30 +227,36 @@ class EtoolsUpload extends RequestHelper(CommonMixin(PolymerElement)) {
     }
   }
 
+  _fireChangeFileEventIfApplicable() {
+    if (this.fileUrl && !isNaN(this.fileUrl)) {
+      // if fileUrl is a number , then the previous upload was not saved
+      this.fireEvent('change-unsaved-file');
+    }
+  }
+
   _handleUpload() {
     this.uploadInProgress = true;
+    this.fireEvent('upload-started');
 
     this.upload(this.rawFile).then((response) => {
         this.success = true;
         this.uploadInProgress = false;
         this.resetRawFile();
-
         this.fireEvent('upload-finished', {success: response});
       }).catch((err) => {
-        if (err.message && err.message === 'Request aborted.') {
-          return;
-        }
         this.fail = true;
-        this.setInvalid("Error uploading file: " +  error.message);
+        this.serverErrorMsg = 'Error uploading file: ' + err.message;
+        this.setInvalid(true, this.serverErrorMsg);
         this.uploadInProgress = false;
-
-        this.fireEvent('upload-finished', {error: error});
-      });
+        this.fireEvent('upload-finished', {error: err});
+    });
   }
 
-  setInvalid(errMsg) {
-    this.errorMessage = errMsg;
-    this.invalid = true;
+  setInvalid(invalid, errMsg) {
+    if (typeof errMsg === 'string') {
+      this.errorMessage = errMsg;
+    }
+    this.invalid = invalid;
   }
 
   resetValidations() {
@@ -213,9 +267,16 @@ class EtoolsUpload extends RequestHelper(CommonMixin(PolymerElement)) {
   resetStatus() {
     this.success = null;
     this.fail = null;
+    this.serverErrorMsg = null;
   }
 
   _fileUrlChanged(fileUrl) {
+    if (fileUrl && !isNaN(fileUrl)) {
+      // fileUrl is a number after the upload is finished
+      // and becomes an url after the number is saved on the object=intervention, agreement etc
+      return;
+    }
+    this.resetStatus();
     this._filename = this.getFilenameFromURL(fileUrl);
   }
 
@@ -227,22 +288,21 @@ class EtoolsUpload extends RequestHelper(CommonMixin(PolymerElement)) {
   }
 
   _showDownloadBtn(fileUrl) {
-    return !!fileUrl;
+    return !!fileUrl && isNaN(fileUrl);
   }
 
-  _showChange(readonly, _filename, uploadInProgress) {
-    if (uploadInProgress) {
+  _showChange(readonly, _filename, uploadInProgress, showChange) {
+    if (!showChange) {
       return false;
     }
-    return !readonly && !!_filename
+    return uploadInProgress ? false : (!readonly && !!_filename);
   }
 
-  _hideDeleteBtn(readonly, filename, hideDeleteBtn, uploadInProgress) {
+  _hideDeleteBtn(readonly, _filename, showDeleteBtn, uploadInProgress) {
     if (this.readonly || !this._filename || uploadInProgress) {
       return true;
     }
-
-    return this.hideDeleteBtn;
+    return !this.showDeleteBtn;
   }
 
   _cancelUpload() {
@@ -258,14 +318,13 @@ class EtoolsUpload extends RequestHelper(CommonMixin(PolymerElement)) {
 
   _deleteFile(e) {
     if (this.rawFile) {
-     this.resetRawFile();
-     this._filename = null;
-    } else {
-      this.dispatchEvent(new CustomEvent('delete-file', {detail: {file: this.files[0], index: 0}, bubbles: true, composed: true }));
+      this.resetRawFile();
     }
-
+    this._filename = null;
     this.resetStatus();
-    this.resetValidations();
+    // TODO: should delete req be implemented here?
+    this.fireEvent('delete-file', {file: this.fileUrl});
+    this.fileUrl = null;
   }
 
   resetRawFile() {
@@ -274,18 +333,36 @@ class EtoolsUpload extends RequestHelper(CommonMixin(PolymerElement)) {
   }
 
   _downloadFile(e) {
-    if (!this.fileUrl) {
+    if (!this.fileUrl || !isNaN(this.fileUrl)) {
       return;
     }
+    this.downloadFile(this._filename, this.fileUrl, this.openInNewTab);
+  }
 
-    var a = this.$.downloader;
-    a.href = this.fileUrl;
-    a.download = this._filename;
+  validate() {
+    let valid = true;
+    let errMsg = this.originalErrorMessage;
+    if (this.required) {
+      const uploadReqFailed = this.rawFile instanceof File && this.fail === true;
+      if ((!this.rawFile && !this.fileUrl) || uploadReqFailed) {
+        valid = false;
+      }
+      if (uploadReqFailed) {
+        errMsg = this.serverErrorMsg;
+      }
+    }
+    this.setInvalid(!valid, errMsg);
+    return valid;
+  }
 
-    //* a.click() doesn't work in ff, edge *
-    a.dispatchEvent(new MouseEvent('click', {bubbles: true, cancelable: true, view: window}));
-
-   // window.URL.revokeObjectURL(this.fileUrl); is this neccessary?
+  autoValidateHandler() {
+    if (typeof this.fileUrl === 'undefined') {
+      this.resetStatus();
+      this.invalid = false;
+    }
+    if (this.autoValidate) {
+      this.validate();
+    }
   }
 }
 
