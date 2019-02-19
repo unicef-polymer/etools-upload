@@ -27,6 +27,12 @@ class EtoolsUpload extends RequestHelper(CommonMixin(PolymerElement)) {
         @apply --layout-horizontal;
         @apply --layout-center;
       }
+      
+      .filename-and-actions-container {
+        @apply --layout-horizontal;
+        @apply --layout-flex;
+        max-width: 100%;
+      }
 
       .file-icon {
         padding-right: 8px;
@@ -42,6 +48,12 @@ class EtoolsUpload extends RequestHelper(CommonMixin(PolymerElement)) {
         min-width: 145px;
         overflow-wrap: break-word;
         font-size: 16px;
+      }
+      
+      .filename {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
       }
       
       :host([readonly]) .filename-container {
@@ -71,18 +83,6 @@ class EtoolsUpload extends RequestHelper(CommonMixin(PolymerElement)) {
         vertical-align: middle;
       }
       
-      .filename-and-actions-container {
-        @apply --layout-horizontal;
-        @apply --layout-wrap;
-        max-width: 100%;
-      }
-      
-      .file-name {
-        overflow: hidden;
-        text-overflow: ellipsis;
-        white-space: nowrap;
-      }
-
     </style>
 
     <paper-input-container always-float-label="" disabled\$="[[disabled]]" invalid\$="[[invalid]]">
