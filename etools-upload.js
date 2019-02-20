@@ -7,7 +7,8 @@ import '@polymer/paper-input/paper-input-container.js';
 import '@polymer/paper-input/paper-input-error.js';
 import '@polymer/iron-flex-layout/iron-flex-layout.js';
 import '@polymer/paper-spinner/paper-spinner.js';
-import './common-styles.js';
+import {CommonStyles} from "./common-styles.js";
+
 import { CommonMixin } from './common-mixin.js';
 import { RequestHelper } from './request-helper.js';
 /**
@@ -21,7 +22,8 @@ import { RequestHelper } from './request-helper.js';
 class EtoolsUpload extends RequestHelper(CommonMixin(PolymerElement)) {
   static get template() {
     return html`
-    <style include="common-styles">
+        ${CommonStyles}
+    <style>
 
       #input-main-content {
         @apply --layout-horizontal;
