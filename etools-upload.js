@@ -86,30 +86,30 @@ class EtoolsUpload extends RequestHelper(CommonMixin(PolymerElement)) {
       
     </style>
 
-    <paper-input-container always-float-label="" disabled\$="[[disabled]]" invalid\$="[[invalid]]">
+    <paper-input-container always-float-label="" disabled$="[[disabled]]" invalid$="[[invalid]]">
 
-      <label slot="label" id="element-label" hidden\$="[[!_showLabel(label)]]" aria-hidden="true">[[label]]</label>
+      <label slot="label" id="element-label" hidden$="[[!_showLabel(label)]]" aria-hidden="true">[[label]]</label>
 
       <div slot="input">
-        <paper-button class="upload-button" on-tap="_openFileChooser" title="[[uploadBtnLabel]]" disabled\$="[[readonly]]" hidden\$="[[_thereIsAFileSelectedOrSaved(_filename)]]">
+        <paper-button class="upload-button" on-tap="_openFileChooser" title="[[uploadBtnLabel]]" disabled$="[[readonly]]" hidden$="[[_thereIsAFileSelectedOrSaved(_filename)]]">
                       <iron-icon icon="file-upload"></iron-icon>
                       [[uploadBtnLabel]]
         </paper-button>
 
         <div class="filename-and-actions-container">
-          <div class="filename-container" hidden\$="[[!_thereIsAFileSelectedOrSaved(_filename)]]">
+          <div class="filename-container" hidden$="[[!_thereIsAFileSelectedOrSaved(_filename)]]">
             <iron-icon class="file-icon" icon="attachment"></iron-icon>
             <span class="filename" title="[[_filename]]">[[_filename]]</span>
           </div>
           <div class="upload-status">
-            <paper-spinner id="uploadingSpinner" hidden\$="[[!uploadInProgress]]" active="[[uploadInProgress]]"></paper-spinner>
-            <iron-icon title="Uploaded successfuly!" icon="done" hidden\$="[[!success]]"></iron-icon>
-            <iron-icon icon="error-outline" hidden\$="[[!fail]]"></iron-icon>
+            <paper-spinner id="uploadingSpinner" hidden$="[[!uploadInProgress]]" active="[[uploadInProgress]]"></paper-spinner>
+            <iron-icon title="Uploaded successfuly!" icon="done" hidden$="[[!success]]"></iron-icon>
+            <iron-icon icon="error-outline" hidden$="[[!fail]]"></iron-icon>
           </div>
 
           <!-- File actions -->
           <div class="file-actions">
-            <paper-button class="download-button" on-tap="_downloadFile" disabled="[[!_showDownloadBtn(fileUrl)]]" hidden\$="[[!_showDownloadBtn(fileUrl)]]" title="Download">
+            <paper-button class="download-button" on-tap="_downloadFile" disabled="[[!_showDownloadBtn(fileUrl)]]" hidden$="[[!_showDownloadBtn(fileUrl)]]" title="Download">
               <iron-icon icon="cloud-download" class="dw-icon"></iron-icon>
               Download
             </paper-button>
@@ -118,7 +118,7 @@ class EtoolsUpload extends RequestHelper(CommonMixin(PolymerElement)) {
               Change
             </paper-button>
 
-            <paper-button class="delete-button" on-tap="_deleteFile" disabled$="[[readonly]]" hidden$="[[_showDeleteBtn(readonly, _filename, showDeleteBtn, uploadInProgress)]]">
+            <paper-button class="delete-button" on-tap="_deleteFile" disabled$="[[readonly]]" hidden$="[[!_showDeleteBtn(readonly, _filename, showDeleteBtn, uploadInProgress)]]">
               Delete
             </paper-button>
 
@@ -300,10 +300,7 @@ class EtoolsUpload extends RequestHelper(CommonMixin(PolymerElement)) {
   }
 
   _showDeleteBtn(readonly, _filename, showDeleteBtn, uploadInProgress) {
-    if (readonly || !_filename || uploadInProgress) {
-      return true;
-    }
-    return showDeleteBtn;
+    return (!readonly && _filename && !uploadInProgress) || showDeleteBtn;
   }
 
   _cancelUpload() {
