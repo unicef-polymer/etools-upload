@@ -20,6 +20,7 @@ import { RequestHelper } from './request-helper.js';
  */
 class EtoolsUpload extends RequestHelper(CommonMixin(PolymerElement)) {
   static get template() {
+    // language=HTML
     return html`
     <style include="common-styles">
 
@@ -113,15 +114,15 @@ class EtoolsUpload extends RequestHelper(CommonMixin(PolymerElement)) {
               Download
             </paper-button>
 
-            <paper-button class="change-button" on-tap="_openFileChooser" disabled\$="[[!_showChange(readonly, _filename, uploadInProgress)]]" hidden\$="[[!_showChange(readonly, _filename, uploadInProgress)]]">
+            <paper-button class="change-button" on-tap="_openFileChooser" disabled$="[[!_showChange(readonly, _filename, uploadInProgress)]]" hidden$="[[!_showChange(readonly, _filename, uploadInProgress)]]">
               Change
             </paper-button>
 
-            <paper-button class="delete-button" on-tap="_deleteFile" disabled\$="[[readonly]]" hidden\$="[[_showDeleteBtn(readonly, _filename, showDeleteBtn, uploadInProgress)]]">
+            <paper-button class="delete-button" on-tap="_deleteFile" disabled$="[[readonly]]" hidden$="[[_showDeleteBtn(readonly, _filename, showDeleteBtn, uploadInProgress)]]">
               Delete
             </paper-button>
 
-            <paper-button class="delete-button" on-tap="_cancelUpload" disabled\$="[[!uploadInProgress]]" hidden\$="[[!uploadInProgress]]">
+            <paper-button class="delete-button" on-tap="_cancelUpload" disabled$="[[!uploadInProgress]]" hidden$="[[!uploadInProgress]]">
               Cancel
             </paper-button>
           </div>
@@ -299,10 +300,10 @@ class EtoolsUpload extends RequestHelper(CommonMixin(PolymerElement)) {
   }
 
   _showDeleteBtn(readonly, _filename, showDeleteBtn, uploadInProgress) {
-    if (this.readonly || !this._filename || uploadInProgress) {
+    if (readonly || !_filename || uploadInProgress) {
       return true;
     }
-    return this.showDeleteBtn;
+    return showDeleteBtn;
   }
 
   _cancelUpload() {
