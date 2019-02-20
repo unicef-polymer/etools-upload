@@ -1,9 +1,7 @@
-const $_documentContainer = document.createElement('template');
-
-$_documentContainer.innerHTML = `<dom-module id="common-styles">
-  <template>
+import { html } from '@polymer/polymer/polymer-element.js';
+export const CommonStyles = html `
     <style>
-       [hidden] {
+       *[hidden] {
         display: none !important;
       }
 
@@ -68,10 +66,4 @@ $_documentContainer.innerHTML = `<dom-module id="common-styles">
         min-height: 22px;
       }
 
-    </style>
-
-
-  </template>
-</dom-module>`;
-
-document.head.appendChild($_documentContainer.content);
+    </style>`;
