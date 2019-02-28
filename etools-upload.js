@@ -45,7 +45,6 @@ class EtoolsUpload extends RequestHelper(CommonMixin(PolymerElement)) {
       .filename-container {
         @apply --layout-horizontal;
         @apply --layout-center;
-        @apply --layout-flex;
         border-bottom: 1px solid var(--secondary-text-color, rgba(0, 0, 0, 0.54));
         margin-right: 8px;
         min-width: 145px;
@@ -217,7 +216,7 @@ class EtoolsUpload extends RequestHelper(CommonMixin(PolymerElement)) {
       return;
     }
 
-    this._fireChangeFileEventIfApplicable()
+    this._fireChangeFileEventIfApplicable();
 
     this.resetStatus();
     this.resetValidations();
