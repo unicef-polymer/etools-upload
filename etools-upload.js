@@ -171,7 +171,7 @@ class EtoolsUpload extends RequestHelper(CommonMixin(PolymerElement)) {
       },
       showDeleteBtn: {
         type: Boolean,
-        value: false
+        value: true
       },
       errorMessage: String,
       originalErrorMessage: String,
@@ -226,7 +226,7 @@ class EtoolsUpload extends RequestHelper(CommonMixin(PolymerElement)) {
     this.rawFile = file;
 
     if (this.autoUpload) {
-     this._handleUpload();
+      this._handleUpload();
     }
   }
 
@@ -242,16 +242,16 @@ class EtoolsUpload extends RequestHelper(CommonMixin(PolymerElement)) {
     this.fireEvent('upload-started');
 
     this.upload(this.rawFile).then((response) => {
-        this.success = true;
-        this.uploadInProgress = false;
-        this.resetRawFile();
-        this.fireEvent('upload-finished', {success: response});
-      }).catch((err) => {
-        this.fail = true;
-        this.serverErrorMsg = 'Error uploading file: ' + err.message;
-        this.setInvalid(true, this.serverErrorMsg);
-        this.uploadInProgress = false;
-        this.fireEvent('upload-finished', {error: err});
+      this.success = true;
+      this.uploadInProgress = false;
+      this.resetRawFile();
+      this.fireEvent('upload-finished', {success: response});
+    }).catch((err) => {
+      this.fail = true;
+      this.serverErrorMsg = 'Error uploading file: ' + err.message;
+      this.setInvalid(true, this.serverErrorMsg);
+      this.uploadInProgress = false;
+      this.fireEvent('upload-finished', {error: err});
     });
   }
 
@@ -302,7 +302,7 @@ class EtoolsUpload extends RequestHelper(CommonMixin(PolymerElement)) {
   }
 
   _showDeleteBtn(readonly, _filename, showDeleteBtn, uploadInProgress) {
-    return (!readonly && _filename && !uploadInProgress) || showDeleteBtn;
+    return (!readonly && _filename && !uploadInProgress && showDeleteBtn);
   }
 
   _cancelUpload() {
