@@ -295,10 +295,7 @@ class EtoolsUpload extends RequestHelper(CommonMixin(PolymerElement)) {
   }
 
   _showChange(readonly, _filename, uploadInProgress, showChange) {
-    if (!showChange) {
-      return false;
-    }
-    return uploadInProgress ? false : (!readonly && !!_filename);
+    return (!readonly && _filename && !uploadInProgress) || showChange;
   }
 
   _showDeleteBtn(readonly, _filename, showDeleteBtn, uploadInProgress) {

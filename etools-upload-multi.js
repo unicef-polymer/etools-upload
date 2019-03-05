@@ -7,7 +7,7 @@ import '@polymer/paper-input/paper-input-container.js';
 import '@polymer/paper-input/paper-input-error.js';
 import '@polymer/iron-flex-layout/iron-flex-layout.js';
 import '@polymer/paper-spinner/paper-spinner.js';
-import './common-styles.js';
+import {CommonStyles} from "./common-styles";
 import { CommonMixin } from './common-mixin.js';
 import { RequestHelperMulti } from './request-helper-multi.js';
 /**
@@ -19,8 +19,10 @@ import { RequestHelperMulti } from './request-helper-multi.js';
  */
 class EtoolsUploadMulti extends RequestHelperMulti(CommonMixin(PolymerElement)) {
   static get template() {
+    // language=HTML
     return html`
-    <style include="common-styles">
+        ${CommonStyles}
+    <style>
       .upload-btn-and-actions {
         @apply --layout-horizontal;
         @apply --layout-center;
@@ -47,27 +49,27 @@ class EtoolsUploadMulti extends RequestHelperMulti(CommonMixin(PolymerElement)) 
 
     <div>
       <div class="upload-btn-and-actions">
-        <paper-button class="upload-button" on-tap="_openFileChooser" title="[[uploadBtnLabel]]" disabled\$="[[_shouldDisableUploadBtn(readonly, uploadInProgress)]]">
+        <paper-button class="upload-button" on-tap="_openFileChooser" title="[[uploadBtnLabel]]" disabled$="[[_shouldDisableUploadBtn(readonly, uploadInProgress)]]">
                       <iron-icon icon="file-upload"></iron-icon>
                       [[uploadBtnLabel]]
         </paper-button>
 
         <div class="file-actions">
-            <paper-button class="delete-button" on-tap="_cancelUpload" disabled\$="[[!uploadInProgress]]" hidden\$="[[!uploadInProgress]]">
+            <paper-button class="delete-button" on-tap="_cancelUpload" disabled$="[[!uploadInProgress]]" hidden$="[[!uploadInProgress]]">
               <iron-icon icon="clear"></iron-icon>
               Cancel Upload
             </paper-button>
         </div>
       </div>
 
-      <div class="filenames-container" hidden\$="[[!_thereAreFilesSelected(_filenames)]]">
+      <div class="filenames-container" hidden$="[[!_thereAreFilesSelected(_filenames)]]">
         <template is="dom-repeat" items="{{_filenames}}" as="item">
           <div class="filename-line">
             <iron-icon class="file-icon" icon="attachment"></iron-icon>
             <span class="filename" title="[[item.filename]]">[[item.filename]]</span>
-            <paper-spinner title="Upload in progress.." id="uploadingSpinner" hidden\$="[[!item.uploadInProgress]]" active="[[item.uploadInProgress]]"></paper-spinner>
-            <iron-icon title="Uploaded successfully!" icon="done" hidden\$="[[!item.success]]"></iron-icon>
-            <iron-icon title="Upload failed!" icon="error-outline" hidden\$="[[!item.fail]]"></iron-icon>
+            <paper-spinner title="Upload in progress.." id="uploadingSpinner" hidden$="[[!item.uploadInProgress]]" active="[[item.uploadInProgress]]"></paper-spinner>
+            <iron-icon title="Uploaded successfully!" icon="done" hidden$="[[!item.success]]"></iron-icon>
+            <iron-icon title="Upload failed!" icon="error-outline" hidden$="[[!item.fail]]"></iron-icon>
           </div>
         </template>
       </div>
