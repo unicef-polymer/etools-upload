@@ -7,6 +7,7 @@ Use to upload files
 
 ## Description
 Polymer 3 component used for uploading files.
+When `autoUpload` is true and `uploadEndpoint` is set , it automatically uploads the file and returns an id stored in the `fileUrl` property.
 
 ### Components
 * \<etools-upload\>
@@ -22,6 +23,7 @@ Polymer 3 component used for uploading files.
 7. `required`: can be used as html attribute or polymer property (Ex: required$="[[permissions.allowEdit]]"), specifies if control must be filled out
 8. `auto-validate`: if set to true and control is required validate if control is set
 9. `error-message`: custom text to be displayed on upload error
+10. `auto-upload`: if `true` it automatically upload the file after selection. default is `true`.
 
 #Buttons
 
