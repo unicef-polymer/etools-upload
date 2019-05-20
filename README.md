@@ -16,7 +16,7 @@ Polymer 3 component used for uploading files.
 1. `label`: text to be displayed on top of the control 
 2. `uploadBtnLabel`: text to be displayed on the button, default is 'Upload file'
 3. `accept`: accepted file types (Ex: ".doc,.docx,.pdf,.jpg,.png")
-4. `file-url`: text representing the file name 
+4. `file-url`: When a new file is uploaded and the upload has finished it holds the id of the file. After the id is saved on the entity for which the upload was made it will hold the url to the file. 
 5. `upload-endpoint`: url for the upload
 6. `readonly`: can be used as html attribute or polymer property (Ex: readonly$="[[!permissions.allowEdit]]"), enable/disable upload control
 7. `required`: can be used as html attribute or polymer property (Ex: required$="[[permissions.allowEdit]]"), specifies if control must be filled out
