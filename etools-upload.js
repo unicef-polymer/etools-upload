@@ -30,7 +30,7 @@ class EtoolsUpload extends RequestHelper(CommonMixin(PolymerElement)) {
         @apply --layout-horizontal;
         @apply --layout-center;
       }
-      
+
       .filename-and-actions-container {
         @apply --layout-horizontal;
         @apply --layout-flex;
@@ -51,17 +51,17 @@ class EtoolsUpload extends RequestHelper(CommonMixin(PolymerElement)) {
         overflow-wrap: break-word;
         font-size: 16px;
       }
-      
+
       .filename {
         overflow: hidden;
         text-overflow: ellipsis;
         white-space: nowrap;
       }
-      
+
       :host([readonly]) .filename-container {
         border-bottom: none;
       }
-      
+
       :host([disabled]) .filename-container {
         border-bottom: 1px dashed var(--secondary-text-color, rgba(0, 0, 0, 0.54));
       }
@@ -72,19 +72,19 @@ class EtoolsUpload extends RequestHelper(CommonMixin(PolymerElement)) {
         margin-left: 8px;
         color: var(--etools-upload-primary-color, var(--primary-color));
       }
-      
+
       .dw-icon {
         margin-right: 8px;
       }
-      
+
       .change-button {
         color: var(--secondary-text-color, rgba(0, 0, 0, 0.54));
       }
-      
+
       .file-actions paper-button {
         vertical-align: middle;
       }
-      
+
     </style>
 
     <paper-input-container always-float-label="" disabled$="[[disabled]]" invalid$="[[invalid]]">
@@ -191,6 +191,12 @@ class EtoolsUpload extends RequestHelper(CommonMixin(PolymerElement)) {
         type: Boolean,
         value: false,
         reflectToAttribute: true
+      },
+      /**
+       * Used for Change/Edit
+       */
+      currentAttachmentId: {
+        type: Number
       }
     };
   }
@@ -244,6 +250,7 @@ class EtoolsUpload extends RequestHelper(CommonMixin(PolymerElement)) {
       this.success = true;
       this.uploadInProgress = false;
       this.resetRawFile();
+      this.currentAttachmentId = response.id;
       this.fireEvent('upload-finished', {success: response});
     }).catch((err) => {
       this.fail = true;

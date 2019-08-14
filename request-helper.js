@@ -32,8 +32,8 @@ export const RequestHelper = (baseClass) => class extends (baseClass) {
 
   upload(rawFile, requestKey) {
     let options = {
-      method: 'POST',
-      url: this._getEndpoint(),
+      method: this.currentAttachmentId ? 'PUT' : 'POST',
+      url: this._getEndpoint(this.currentAttachmentId),
       body: this._prepareBody(rawFile),
       headers: this._getHeaders()
     };
@@ -46,11 +46,11 @@ export const RequestHelper = (baseClass) => class extends (baseClass) {
              throw error;
            });
   }
-  _getEndpoint() {
+  _getEndpoint(currentAttachmentId) {
     if (this.endpointInfo && this.endpointInfo.endpoint) {
       return this.endpointInfo.endpoint;
     }
-    return this.uploadEndpoint;
+    return (this.uploadEndpoint + (currentAttachmentId ? currentAttachmentId + '/' : ''));
   }
   _prepareBody(rawFile) {
     let fd = new FormData()
