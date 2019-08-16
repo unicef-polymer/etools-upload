@@ -36,6 +36,8 @@ declare class EtoolsUpload {
   fail: boolean|null|undefined;
   showChange: boolean|null|undefined;
   allowMultilineFilename: boolean|null|undefined;
+  invalid: boolean|undefined;
+  currentAttachmentId: number|string|null|undefined;
   connectedCallback(): void;
   _thereIsAFileSelectedOrSaved(_filename: any): any;
   _fileSelected(e: any): void;
