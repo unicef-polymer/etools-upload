@@ -1,6 +1,11 @@
 {
-  "name": "etools-upload",
-  "version": "2.0.0",
+  "name": "@unicef-polymer/etools-upload",
+  "version": "3.0.1",
+  "homepage": "https://github.com/unicef-polymer/etools-upload",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/unicef-polymer/etools-upload.git"
+  },
   "description": "Upload files",
   "author": "The Polymer Authors",
   "license": "BSD-3-Clause",
@@ -14,14 +19,14 @@
     "gen-typings": "gen-typescript-declarations --deleteExisting --outDir './'"
   },
   "dependencies": {
-    "@polymer/polymer": "^3.0.5",
-    "@polymer/iron-ajax": "^3.0.0-pre.21",
-    "@polymer/iron-flex-layout": "^3.0.0-pre.21",
-    "@polymer/iron-icons": "^3.0.0-pre.21",
-    "@polymer/iron-icon": "^3.0.0-pre.21",
-    "@polymer/paper-button": "^3.0.0-pre.21",
-    "@polymer/paper-input": "^3.0.0-pre.21",
-    "@polymer/paper-spinner": "^3.0.0-pre.21",
+    "@polymer/polymer": "^3.2.0",
+    "@polymer/iron-ajax": "^3.0.0",
+    "@polymer/iron-flex-layout": "^3.0.0",
+    "@polymer/iron-icons": "^3.0.0",
+    "@polymer/iron-icon": "^3.0.0",
+    "@polymer/paper-button": "^3.0.0",
+    "@polymer/paper-input": "^3.0.0",
+    "@polymer/paper-spinner": "^3.0.0",
     "@webcomponents/webcomponentsjs": "^2.0.3",
     "web-animations-js": "^2.3.1"
   },
@@ -32,7 +37,7 @@
     "eslint-plugin-html": "^4.0.5",
     "polymer-cli": "^1.7.7",
     "wct-browser-legacy": "^1.0.0",
-    "@polymer/iron-demo-helpers": "^3.0.0-pre.21",
+    "@polymer/iron-demo-helpers": "^3.0.0",
     "@polymer/gen-typescript-declarations": "^1.6.0"
   },
   "engines": {

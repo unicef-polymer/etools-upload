@@ -30,7 +30,7 @@ class EtoolsUpload extends RequestHelper(CommonMixin(PolymerElement)) {
         @apply --layout-horizontal;
         @apply --layout-center;
       }
-      
+
       .filename-and-actions-container {
         @apply --layout-horizontal;
         @apply --layout-flex;
@@ -51,17 +51,17 @@ class EtoolsUpload extends RequestHelper(CommonMixin(PolymerElement)) {
         overflow-wrap: break-word;
         font-size: 16px;
       }
-      
+
       .filename {
         overflow: hidden;
         text-overflow: ellipsis;
         white-space: nowrap;
       }
-      
+
       :host([readonly]) .filename-container {
         border-bottom: none;
       }
-      
+
       :host([disabled]) .filename-container {
         border-bottom: 1px dashed var(--secondary-text-color, rgba(0, 0, 0, 0.54));
       }
@@ -72,19 +72,19 @@ class EtoolsUpload extends RequestHelper(CommonMixin(PolymerElement)) {
         margin-left: 8px;
         color: var(--etools-upload-primary-color, var(--primary-color));
       }
-      
+
       .dw-icon {
         margin-right: 8px;
       }
-      
+
       .change-button {
         color: var(--secondary-text-color, rgba(0, 0, 0, 0.54));
       }
-      
+
       .file-actions paper-button {
         vertical-align: middle;
       }
-      
+
     </style>
 
     <paper-input-container always-float-label="" disabled$="[[disabled]]" invalid$="[[invalid]]">
@@ -191,13 +191,20 @@ class EtoolsUpload extends RequestHelper(CommonMixin(PolymerElement)) {
         type: Boolean,
         value: false,
         reflectToAttribute: true
+      },
+      /**
+       * Used for Change/Edit
+       */
+      currentAttachmentId: {
+        type: Number
       }
     };
   }
 
   static get observers() {
     return [
-      'autoValidateHandler(rawFile, fileUrl)'
+      'autoValidateHandler(rawFile, fileUrl)',
+      '_invalidChanged(invalid)'
     ];
   }
 
@@ -244,14 +251,22 @@ class EtoolsUpload extends RequestHelper(CommonMixin(PolymerElement)) {
       this.success = true;
       this.uploadInProgress = false;
       this.resetRawFile();
+      this.currentAttachmentId = JSON.parse(response).id;
       this.fireEvent('upload-finished', {success: response});
     }).catch((err) => {
       this.fail = true;
-      this.serverErrorMsg = 'Error uploading file: ' + err.message;
+      this.serverErrorMsg = 'Error uploading file: ' + this._prepareErrorMessage(err);
       this.setInvalid(true, this.serverErrorMsg);
       this.uploadInProgress = false;
       this.fireEvent('upload-finished', {error: err});
     });
+  }
+
+  _prepareErrorMessage(error) {
+    if (error.message.includes('413')) {
+      return 'File too large.'
+    }
+    return error.message;
   }
 
   setInvalid(invalid, errMsg) {
@@ -339,11 +354,14 @@ class EtoolsUpload extends RequestHelper(CommonMixin(PolymerElement)) {
     let valid = true;
     let errMsg = this.originalErrorMessage;
     if (this.required) {
-      const uploadReqFailed = this.rawFile instanceof File && this.fail === true;
-      if ((!this.rawFile && !this.fileUrl) || uploadReqFailed) {
+      const uploadRequestFailed = this.rawFile instanceof File && this.fail === true;
+
+      if ((!this.rawFile && !this.fileUrl)) {
         valid = false;
+        errMsg = 'This field is required';
       }
-      if (uploadReqFailed) {
+      if (uploadRequestFailed) {
+        valid = false;
         errMsg = this.serverErrorMsg;
       }
     }
@@ -358,6 +376,16 @@ class EtoolsUpload extends RequestHelper(CommonMixin(PolymerElement)) {
     }
     if (this.autoValidate) {
       this.validate();
+    }
+  }
+
+  _invalidChanged() {
+    if (!this.invalid) {
+      if (this.fail) {// clean up after a failed upload
+        this._filename = null;
+      }
+      this.resetStatus();
+      this.resetValidations();
     }
   }
 }
