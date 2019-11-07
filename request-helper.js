@@ -32,30 +32,30 @@ export const RequestHelper = (baseClass) => class extends (baseClass) {
 
   upload(rawFile, requestKey) {
     let options = {
-      method: this.currentAttachmentId ? 'PUT' : 'POST',
-      url: this._getEndpoint(this.currentAttachmentId),
+      method: 'POST',
+      url: this._getEndpoint(),
       body: this._prepareBody(rawFile),
       headers: this._getHeaders()
     };
     return this.sendRequest(options, requestKey)
-           .then((response) => {
-             delete this.activeXhrRequests[requestKey];
-             return response;
-           }).catch((error) => {
-             delete this.activeXhrRequests[requestKey];
-             throw error;
-           });
+      .then((response) => {
+        delete this.activeXhrRequests[requestKey];
+        return response;
+      }).catch((error) => {
+        delete this.activeXhrRequests[requestKey];
+        throw error;
+      });
   }
-  _getEndpoint(currentAttachmentId) {
+  _getEndpoint() {
     if (this.endpointInfo && this.endpointInfo.endpoint) {
       return this.endpointInfo.endpoint;
     }
-    return (this.uploadEndpoint + (currentAttachmentId ? currentAttachmentId + '/' : ''));
+    return this.uploadEndpoint;
   }
   _prepareBody(rawFile) {
     let fd = new FormData()
 
-    let rawFileProperty =  this._getRawFilePropertyName();
+    let rawFileProperty = this._getRawFilePropertyName();
     fd.append(rawFileProperty, rawFile);
 
     if (this.endpointInfo && this.endpointInfo.extraInfo) {
@@ -70,7 +70,7 @@ export const RequestHelper = (baseClass) => class extends (baseClass) {
       }
     }
   }
-  _getRawFilePropertyName () {
+  _getRawFilePropertyName() {
     if (this.endpointInfo && this.endpointInfo.rawFilePropertyName) {
       return this.endpointInfo.rawFilePropertyName;
     }
@@ -94,7 +94,7 @@ export const RequestHelper = (baseClass) => class extends (baseClass) {
     return localStorage.getItem(this.jwtLocalStorageKey);
   }
 
-   _getCSRFToken() {
+  _getCSRFToken() {
     // check for a csrftoken cookie and return its value
     var csrfCookieName = 'csrftoken';
     var csrfToken = null;

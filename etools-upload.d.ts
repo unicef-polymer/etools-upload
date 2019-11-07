@@ -23,21 +23,20 @@ import {RequestHelper} from './request-helper.js';
  * Use to upload files
  */
 declare class EtoolsUpload {
-  uploadBtnLabel: string|null|undefined;
-  alwaysFloatLabel: boolean|null|undefined;
-  fileUrl: string|null|undefined;
-  _filename: string|null|undefined;
-  rawFile: object|null|undefined;
-  showDeleteBtn: boolean|null|undefined;
-  errorMessage: string|null|undefined;
-  originalErrorMessage: string|null|undefined;
-  serverErrorMsg: string|null|undefined;
-  success: boolean|null|undefined;
-  fail: boolean|null|undefined;
-  showChange: boolean|null|undefined;
-  allowMultilineFilename: boolean|null|undefined;
-  invalid: boolean|undefined;
-  currentAttachmentId: number|string|null|undefined;
+  uploadBtnLabel: string | null | undefined;
+  alwaysFloatLabel: boolean | null | undefined;
+  fileUrl: string | null | undefined;
+  _filename: string | null | undefined;
+  rawFile: object | null | undefined;
+  showDeleteBtn: boolean | null | undefined;
+  errorMessage: string | null | undefined;
+  originalErrorMessage: string | null | undefined;
+  serverErrorMsg: string | null | undefined;
+  success: boolean | null | undefined;
+  fail: boolean | null | undefined;
+  showChange: boolean | null | undefined;
+  allowMultilineFilename: boolean | null | undefined;
+  invalid: boolean | undefined;
   connectedCallback(): void;
   _thereIsAFileSelectedOrSaved(_filename: any): any;
   _fileSelected(e: any): void;
