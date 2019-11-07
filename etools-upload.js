@@ -1,4 +1,4 @@
-import { PolymerElement, html } from '@polymer/polymer';
+import {PolymerElement, html} from '@polymer/polymer';
 import '@polymer/polymer/lib/elements/dom-if.js';
 import '@polymer/paper-button/paper-button.js';
 import '@polymer/iron-icon/iron-icon.js';
@@ -9,8 +9,8 @@ import '@polymer/iron-flex-layout/iron-flex-layout.js';
 import '@polymer/paper-spinner/paper-spinner.js';
 import {CommonStyles} from "./common-styles.js";
 
-import { CommonMixin } from './common-mixin.js';
-import { RequestHelper } from './request-helper.js';
+import {CommonMixin} from './common-mixin.js';
+import {RequestHelper} from './request-helper.js';
 /**
  * `etools-upload`
  * Use to upload files
@@ -144,7 +144,7 @@ class EtoolsUpload extends RequestHelper(CommonMixin(PolymerElement)) {
 `;
   }
 
-  static get is() { return 'etools-upload'; }
+  static get is() {return 'etools-upload';}
   static get properties() {
     return {
       uploadBtnLabel: {
@@ -191,12 +191,6 @@ class EtoolsUpload extends RequestHelper(CommonMixin(PolymerElement)) {
         type: Boolean,
         value: false,
         reflectToAttribute: true
-      },
-      /**
-       * Used for Change/Edit
-       */
-      currentAttachmentId: {
-        type: Number
       }
     };
   }
@@ -251,7 +245,6 @@ class EtoolsUpload extends RequestHelper(CommonMixin(PolymerElement)) {
       this.success = true;
       this.uploadInProgress = false;
       this.resetRawFile();
-      this.currentAttachmentId = JSON.parse(response).id;
       this.fireEvent('upload-finished', {success: response});
     }).catch((err) => {
       this.fail = true;
