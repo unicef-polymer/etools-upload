@@ -1,4 +1,4 @@
-import { PolymerElement, html } from '@polymer/polymer';
+import {PolymerElement, html} from '@polymer/polymer';
 import '@polymer/polymer/lib/elements/dom-repeat.js';
 import '@polymer/paper-button/paper-button.js';
 import '@polymer/iron-icon/iron-icon.js';
@@ -8,8 +8,8 @@ import '@polymer/paper-input/paper-input-error.js';
 import '@polymer/iron-flex-layout/iron-flex-layout.js';
 import '@polymer/paper-spinner/paper-spinner.js';
 import {CommonStyles} from "./common-styles";
-import { CommonMixin } from './common-mixin.js';
-import { RequestHelperMulti } from './request-helper-multi.js';
+import {CommonMixin} from './common-mixin.js';
+import {RequestHelperMulti} from './request-helper-multi.js';
 /**
  * `etools-upload-multi` Description
  *
@@ -27,7 +27,6 @@ class EtoolsUploadMulti extends RequestHelperMulti(CommonMixin(PolymerElement)) 
         @apply --layout-horizontal;
         @apply --layout-center;
       }
-
       .filenames-container {
         padding-top: 4px;
         margin-top: 4px;
@@ -39,8 +38,10 @@ class EtoolsUploadMulti extends RequestHelperMulti(CommonMixin(PolymerElement)) 
       }
       .filename {
         padding: 0 16px 0 8px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
       }
-
       .delete-button {
         padding-left: 24px;
       }
@@ -137,18 +138,18 @@ class EtoolsUploadMulti extends RequestHelperMulti(CommonMixin(PolymerElement)) 
       // we don't have this situation yet
     } else {
       this._uploadAllFilesSequentially(files, this.upload.bind(this), this.set.bind(this))
-          .then((response) => {
-            this.uploadInProgress = false;
-            this.resetRawFiles();
-            if (response && !response.uploadCanceled) {
-              this.fireEvent('upload-finished', {
-                success: response.allSuccessResponses,
-                error: response.allErrorResponses
-              });
+        .then((response) => {
+          this.uploadInProgress = false;
+          this.resetRawFiles();
+          if (response && !response.uploadCanceled) {
+            this.fireEvent('upload-finished', {
+              success: response.allSuccessResponses,
+              error: response.allErrorResponses
+            });
 
-              setTimeout(this._clearDisplayOfUploadedFiles.bind(this), 2000);
-            }
-          });
+            setTimeout(this._clearDisplayOfUploadedFiles.bind(this), 2000);
+          }
+        });
     }
   }
   _clearDisplayOfUploadedFiles() {
@@ -156,13 +157,13 @@ class EtoolsUploadMulti extends RequestHelperMulti(CommonMixin(PolymerElement)) 
   }
 
   _uploadAllFilesSequentially(files, upload, set) {
-    return new Promise(function(resolve, reject) {
+    return new Promise(function (resolve, reject) {
       let allSuccessResponses = [];
       let allErrorResponses = [];
       let i;
       let counter = 0;
       for (i = 0; i < files.length; i++) {
-         upload(files[i], files[i].name).then((response) => {
+        upload(files[i], files[i].name).then((response) => {
           set(['_filenames', counter, 'uploadInProgress'], false);
           set(['_filenames', counter, 'success'], true);
 
