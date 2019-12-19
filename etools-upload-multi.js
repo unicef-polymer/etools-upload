@@ -35,7 +35,6 @@ class EtoolsUploadMulti extends RequestHelperMulti(CommonMixin(PolymerElement)) 
       .filename-line {
         @apply --layout-horizontal;
         @apply --layout-center;
-        word-break: break-all;
       }
       .filename {
         padding: 0 16px 0 8px;
