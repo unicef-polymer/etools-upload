@@ -140,6 +140,10 @@ class EtoolsUpload extends RequestHelper(CommonMixin(PolymerElement)) {
         <paper-input-error aria-live="assertive" slot="add-on">[[errorMessage]]</paper-input-error>
       </template>
 
+      <template is="dom-if" if="[[uploadProgressMessage]]">
+        <div slot="add-on">[[uploadProgressMessage]]</div>
+      </template>
+
     </paper-input-container>
 `;
   }
@@ -191,6 +195,10 @@ class EtoolsUpload extends RequestHelper(CommonMixin(PolymerElement)) {
         type: Boolean,
         value: false,
         reflectToAttribute: true
+      },
+      uploadProgressMessage: {
+        type: String,
+        value: ''
       }
     };
   }

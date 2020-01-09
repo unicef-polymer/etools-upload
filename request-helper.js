@@ -42,6 +42,7 @@ export const RequestHelper = (baseClass) => class extends (baseClass) {
         delete this.activeXhrRequests[requestKey];
         return response;
       }).catch((error) => {
+        this.uploadProgressMessage = '';
         delete this.activeXhrRequests[requestKey];
         throw error;
       });
@@ -127,12 +128,26 @@ export const RequestHelper = (baseClass) => class extends (baseClass) {
     }
   }
 
+  setUploadProgressMsg(event) {
+    let progress = event.detail && event.detail.value;
+    if (!progress || !progress.lengthComputable) {
+      this.uploadProgressMessage = '';
+    } else {
+      this.uploadProgressMessage = progress.loaded + 'kb out of ' + progress.total + 'kb uploaded';
+    }
+  }
+
   sendRequest(options, requestKey) {
     var request = document.createElement('iron-request');
+    document.querySelector('body').appendChild(request);
+    request.addEventListener('progress-changed', (data) => this.setUploadProgressMsg.bind(this, data)());
+
     this.activeXhrRequests[requestKey] = request;
     request.send(options);
     return request.completes.then((request) => {
-      return request.response
+      document.querySelector('body').removeChild(request);
+      setTimeout(() => this.uploadProgressMessage = '', 5000);
+      return request.response;
     });
   }
 }
