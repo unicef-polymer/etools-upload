@@ -34,7 +34,7 @@ export const RequestHelper = (baseClass) => class extends (baseClass) {
     let options = {
       method: 'POST',
       url: this._getEndpoint(),
-      body: this._prepareBody(rawFile),
+      body: this._prepareBody(rawFile, requestKey),
       headers: this._getHeaders()
     };
     return this.sendRequest(options, requestKey)
@@ -52,11 +52,11 @@ export const RequestHelper = (baseClass) => class extends (baseClass) {
     }
     return this.uploadEndpoint;
   }
-  _prepareBody(rawFile) {
+  _prepareBody(rawFile, filename) {
     let fd = new FormData()
 
     let rawFileProperty = this._getRawFilePropertyName();
-    fd.append(rawFileProperty, rawFile);
+    fd.append(rawFileProperty, rawFile, filename);
 
     if (this.endpointInfo && this.endpointInfo.extraInfo) {
       this._addAnyExtraInfoToBody(fd, this.endpointInfo.extraInfo);

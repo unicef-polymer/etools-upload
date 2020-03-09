@@ -10,6 +10,8 @@ import '@polymer/paper-spinner/paper-spinner.js';
 import {CommonStyles} from "./common-styles";
 import {CommonMixin} from './common-mixin.js';
 import {RequestHelperMulti} from './request-helper-multi.js';
+import {createAttachmentsDexie} from './offline/dexie-config';
+
 /**
  * `etools-upload-multi` Description
  *
@@ -101,8 +103,20 @@ class EtoolsUploadMulti extends RequestHelperMulti(CommonMixin(PolymerElement)) 
       _filenames: {
         type: Array,
         value: []
+      },
+      activateOffline: {
+        type: Boolean,
+        value: false,
+        reflectToAttribute: true
       }
     };
+  }
+
+  connectedCallback() {
+    super.connectedCallback();
+    if (this.activateOffline) {
+      createAttachmentsDexie();
+    }
   }
 
   _filesSelected(e) {
