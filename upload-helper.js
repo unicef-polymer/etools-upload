@@ -165,6 +165,7 @@ function uploadAllFilesSequentially(config, files) {
  */
 export async function uploadFilesStoredInIndexedDb(config, ids) {
   let files = getAtachmentsByIds(ids);
+  // files contain extraInfo, if needed this extraInfo cand be set on response also
   let response = await uploadAllFilesSequentially(config, files);
   return response;
 }
