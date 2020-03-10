@@ -11,6 +11,8 @@ import {CommonStyles} from "./common-styles";
 import {CommonMixin} from './common-mixin.js';
 import {RequestHelperMulti} from './request-helper-multi.js';
 import {createAttachmentsDexie} from './offline/dexie-config';
+import {getFileUrl, getBlob} from './offline/file-conversion';
+import {storeAttachmentInDb, generateRandomHash} from './offline/dexie-operations';
 
 /**
  * `etools-upload-multi` Description
@@ -146,8 +148,50 @@ class EtoolsUploadMulti extends RequestHelperMulti(CommonMixin(PolymerElement)) 
     return names;
   }
 
-  _handleUpload(files) {
+  async saveFilesInIndexedDb(files) {
+    let i;
+    let filesInfo = [];
+    let errors = [];
+    for (i = 0; i < files.length; i++) {
+      let tempUrl = getFileUrl(files[i]);
+      let blob = await getBlob(tempUrl);
+      let fileInfo = {
+        id: generateRandomHash(),
+        filetype: files[i].type,
+        filename: files[i].name,
+        extraInfo: this.endpointInfo ? this.endpointInfo.extraInfo : ''
+      }
+
+      let filesInfoForDb = JSON.parse(JSON.stringify(fileInfo));
+      filesInfoForDb.binaryData = blob;
+      try {
+        storeAttachmentInDb(filesInfoForDb);
+        filesInfo.push(fileInfo);
+      } catch (error) {
+        console.log(error, fileInfo);
+        errors.push('Error saving attachment' + fileInfo.filename + ' in IndexedDb');
+      }
+    }
+    return {
+      success: filesInfo,
+      errors: errors
+    };
+  }
+
+  async _handleUpload(files) {
     this.uploadInProgress = true;
+    if (this.activateOffline && navigator.onLine === false) {
+      let response = await this.saveFilesInIndexedDb(files);
+      this.uploadInProgress = false;
+      this.resetRawFiles();
+      this.fireEvent('upload-finished', {
+        success: response.filesInfo,
+        error: response.errors
+      });
+      setTimeout(this._clearDisplayOfUploadedFiles.bind(this), 2000);
+      return;
+    }
+
     if (this.endpointAcceptsMulti) {
       // we don't have this situation yet
     } else {
@@ -171,7 +215,7 @@ class EtoolsUploadMulti extends RequestHelperMulti(CommonMixin(PolymerElement)) 
   }
 
   _uploadAllFilesSequentially(files, upload, set) {
-    return new Promise(function (resolve, reject) {
+    return new Promise(function(resolve, reject) {
       let allSuccessResponses = [];
       let allErrorResponses = [];
       let i;

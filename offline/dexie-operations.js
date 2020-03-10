@@ -3,6 +3,16 @@ export async function storeAttachmentInDb(fileInfo) {
   //id, formId?, filename, filetype, extraInfo, binaryData
 }
 
-export async function getAtachment(id) {
+export async function getAtachmentFromDb(id) {
   await window.Etools.AttachmentsDb.attachments.get({id: id});
 }
+
+export const generateRandomHash = () => {
+  return Math.random().toString(36).substring(8);
+}
+
+export async function getAtachmentsByIds(ids) {
+  await window.Etools.AttachmentsDb.attachments
+    .filter(att => ids.includes(att.id)).toArray();
+}
+
