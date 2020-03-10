@@ -20,7 +20,7 @@ export function getArrayBuffer(blob) {
   });
 }
 
-export function getBlob(fileUrl) {
+export async function getBlob(fileUrl) {
   //** Using XHR */
   // return new Promise((resolve, reject) => {
   //   let xhr = new XMLHttpRequest();
