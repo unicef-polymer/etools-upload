@@ -13,6 +13,7 @@ import {RequestHelperMulti} from './request-helper-multi.js';
 import {createAttachmentsDexie} from './offline/dexie-config';
 import {getFileUrl, getBlob} from './offline/file-conversion';
 import {storeAttachmentInDb, generateRandomHash} from './offline/dexie-operations';
+import {abortActiveRequests} from './upload-helper';
 
 /**
  * `etools-upload-multi` Description
@@ -266,7 +267,7 @@ class EtoolsUploadMulti extends RequestHelperMulti(CommonMixin(PolymerElement)) 
     let activeReqKeys = Object.keys(this.activeXhrRequests);
     this._filenames = this._filenames.filter(f => activeReqKeys.indexOf(f.filename) < 0);
 
-    this.abortActiveRequests(activeReqKeys);
+    abortActiveRequests(activeReqKeys);
     this.uploadInProgress = false;
     this.resetRawFiles();
 

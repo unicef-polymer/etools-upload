@@ -3,7 +3,7 @@ export async function storeAttachmentInDb(fileInfo) {
   //id, formId?, filename, filetype, extraInfo, binaryData
 }
 
-export async function getAtachmentFromDb(id) {
+export async function getAtachmentById(id) {
   await window.Etools.AttachmentsDb.attachments.get({id: id});
 }
 
