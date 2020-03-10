@@ -163,10 +163,10 @@ class EtoolsUploadMulti extends RequestHelperMulti(CommonMixin(PolymerElement)) 
         extraInfo: this.endpointInfo ? this.endpointInfo.extraInfo : ''
       }
 
-      let filesInfoForDb = JSON.parse(JSON.stringify(fileInfo));
-      filesInfoForDb.binaryData = blob;
+      let fileInfoForDb = JSON.parse(JSON.stringify(fileInfo));
+      fileInfoForDb.binaryData = blob;
       try {
-        storeAttachmentInDb(filesInfoForDb);
+        storeAttachmentInDb(fileInfoForDb);
         filesInfo.push(fileInfo);
       } catch (error) {
         console.log(error, fileInfo);
