@@ -1,5 +1,5 @@
 import '@polymer/iron-ajax/iron-request.js';
-import {getAtachmentsByIds} from './offline/dexie-operations';
+import {getAtachmentsByIds, deleteUploadedFilesFromDb} from './offline/dexie-operations';
 
 let activeXhrRequests = {};
 
@@ -128,14 +128,14 @@ function uploadAllFilesSequentially(config, files) {
     let counter = 0;
 
     for (i = 0; i < files.length; i++) {
-      upload(config, files[i], files[i].name).then((response) => {
+      upload(config, files[i].binaryData, files[i].filename).then((response) => {
 
         allSuccessResponses.push(response);
 
         if ((counter + 1) === files.length) {
           resolve({
-            allSuccessResponses: allSuccessResponses,
-            allErrorResponses: allErrorResponses
+            success: allSuccessResponses,
+            error: allErrorResponses
           });
         }
         counter++;
@@ -145,8 +145,8 @@ function uploadAllFilesSequentially(config, files) {
 
         if ((counter + 1) === files.length) {
           resolve({
-            allSuccessResponses: allSuccessResponses,
-            allErrorResponses: allErrorResponses
+            success: allSuccessResponses,
+            error: allErrorResponses
           });
         }
         counter++;
@@ -164,9 +164,14 @@ function uploadAllFilesSequentially(config, files) {
  * }
  */
 export async function uploadFilesStoredInIndexedDb(config, ids) {
-  let files = getAtachmentsByIds(ids);
+  let files = await getAtachmentsByIds(ids);
   // files contain extraInfo, if needed this extraInfo cand be set on response also
   let response = await uploadAllFilesSequentially(config, files);
+  try {
+    // deleteUploadedFilesFromDb(response.success); //TODO
+  } catch (error) {
+    console.log(error);
+  }
   return response;
 }
 

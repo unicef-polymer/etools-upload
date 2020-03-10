@@ -154,8 +154,7 @@ class EtoolsUploadMulti extends RequestHelperMulti(CommonMixin(PolymerElement)) 
     let filesInfo = [];
     let errors = [];
     for (i = 0; i < files.length; i++) {
-      let tempUrl = getFileUrl(files[i]);
-      let blob = await getBlob(tempUrl);
+      let blob = await getBlob(getFileUrl(files[i]));
       let fileInfo = {
         id: generateRandomHash(),
         filetype: files[i].type,
@@ -175,7 +174,7 @@ class EtoolsUploadMulti extends RequestHelperMulti(CommonMixin(PolymerElement)) 
     }
     return {
       success: filesInfo,
-      errors: errors
+      error: errors
     };
   }
 
@@ -185,10 +184,7 @@ class EtoolsUploadMulti extends RequestHelperMulti(CommonMixin(PolymerElement)) 
       let response = await this.saveFilesInIndexedDb(files);
       this.uploadInProgress = false;
       this.resetRawFiles();
-      this.fireEvent('upload-finished', {
-        success: response.filesInfo,
-        error: response.errors
-      });
+      this.fireEvent('upload-finished', response);
       setTimeout(this._clearDisplayOfUploadedFiles.bind(this), 2000);
       return;
     }
