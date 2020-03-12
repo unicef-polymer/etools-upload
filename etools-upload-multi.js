@@ -12,7 +12,7 @@ import {CommonMixin} from './common-mixin.js';
 import {RequestHelperMulti} from './request-helper-multi.js';
 import {createAttachmentsDexie} from './offline/dexie-config';
 import {getFileUrl, getBlob} from './offline/file-conversion';
-import {storeAttachmentInDb, generateRandomHash} from './offline/dexie-operations';
+import {storeFileInDexie, generateRandomHash} from './offline/dexie-operations';
 import {abortActiveRequests} from './upload-helper';
 
 /**
@@ -159,13 +159,14 @@ class EtoolsUploadMulti extends RequestHelperMulti(CommonMixin(PolymerElement)) 
         id: generateRandomHash(),
         filetype: files[i].type,
         filename: files[i].name,
-        extraInfo: this.endpointInfo ? this.endpointInfo.extraInfo : ''
+        extraInfo: this.endpointInfo ? this.endpointInfo.extraInfo : '',
+        unsynced: true
       }
 
       let fileInfoForDb = JSON.parse(JSON.stringify(fileInfo));
       fileInfoForDb.binaryData = blob;
       try {
-        storeAttachmentInDb(fileInfoForDb);
+        await storeFileInDexie(fileInfoForDb);
         filesInfo.push(fileInfo);
       } catch (error) {
         console.log(error, fileInfo);

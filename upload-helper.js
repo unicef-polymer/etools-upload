@@ -1,5 +1,5 @@
 import '@polymer/iron-ajax/iron-request.js';
-import {getAtachmentsByIds, deleteUploadedFilesFromDb} from './offline/dexie-operations';
+import {getFilesFromDexieByIds, deleteFileFromDexie, getFileFromDexieById} from './offline/dexie-operations';
 
 let activeXhrRequests = {};
 
@@ -20,6 +20,9 @@ export function upload(config, rawFile, requestKey) {
   return sendRequest(options, requestKey)
     .then((response) => {
       delete activeXhrRequests[requestKey];
+      if (typeof response === 'string') {
+        response = JSON.parse(response);
+      }
       return response;
     }).catch((error) => {
       delete activeXhrRequests[requestKey];
@@ -164,7 +167,7 @@ function uploadAllFilesSequentially(config, files) {
  * }
  */
 export async function uploadFilesStoredInIndexedDb(config, ids) {
-  let files = await getAtachmentsByIds(ids);
+  let files = await getFilesFromDexieByIds(ids);
   // files contain extraInfo, if needed this extraInfo cand be set on response also
   let response = await uploadAllFilesSequentially(config, files);
   try {
@@ -174,4 +177,41 @@ export async function uploadFilesStoredInIndexedDb(config, ids) {
   }
   return response;
 }
+
+/**
+ * config = {
+ *  endpointInfo: {},
+ *  uploadEndpoint: '',
+ *  jwtLocalStorageKey: ''
+ * }
+ */
+export async function uploadFileStoredInDexie(config, id) {
+  let file = await getFileFromDexieById(id);
+
+  let response = {
+    success: null,
+    error: null
+  };
+
+  if (!file) {
+    response.error = 'File ' + id + ' not found in Dexie';
+    return response;
+  }
+
+  try {
+    response.success = await upload(config, file.binaryData, file.filename);
+  } catch (error) {
+    response.error = error;
+    return response;
+  }
+
+  try {
+    await deleteFileFromDexie(id);
+  } catch (error) {
+    response.error = error;
+  }
+
+  return response;
+}
+
 
