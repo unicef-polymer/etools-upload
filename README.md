@@ -24,6 +24,8 @@ When `autoUpload` is true and `uploadEndpoint` is set , it automatically uploads
 8. `auto-validate`: if set to true and control is required validate if control is set
 9. `error-message`: custom text to be displayed on upload error
 10. `auto-upload`: if `true` it automatically upload the file after selection. default is `true`.
+// TODO - add offline funct
+
 
 #Buttons
 

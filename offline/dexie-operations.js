@@ -16,7 +16,7 @@ export function getFilesFromDexieByIds(ids) {
     .filter(att => ids.includes(att.id)).toArray();
 }
 
-export async function deleteFileFromDexie(id) {
-  await window.Etools.AttachmentsDb.attachments.delete(id);
+export function deleteFileFromDexie(id) {
+  return window.Etools.AttachmentsDb.attachments.delete(id);
 }
 

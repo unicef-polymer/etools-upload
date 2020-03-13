@@ -10,22 +10,23 @@ let activeXhrRequests = {};
  *  jwtLocalStorageKey: ''
  * }
  */
-export function upload(config, rawFile, requestKey) {
+// TODO - handle 2 files with same filename
+export function upload(config, rawFile, filename) {
   let options = {
     method: 'POST',
     url: _getEndpoint(config.endpointInfo, config.uploadEndpoint),
-    body: _prepareBody(rawFile, requestKey, config.endpointInfo),
+    body: _prepareBody(rawFile, filename, config.endpointInfo),
     headers: _getHeaders(config.jwtLocalStorageKey)
   };
-  return sendRequest(options, requestKey)
+  return sendRequest(options, filename)
     .then((response) => {
-      delete activeXhrRequests[requestKey];
+      delete activeXhrRequests[filename];
       if (typeof response === 'string') {
         response = JSON.parse(response);
       }
       return response;
     }).catch((error) => {
-      delete activeXhrRequests[requestKey];
+      delete activeXhrRequests[filename];
       throw error;
     });
 }
@@ -123,7 +124,7 @@ function _getCSRFToken() {
   return csrfToken;
 }
 
-function uploadAllFilesSequentially(config, files) {
+export function uploadAllFilesSequentially(config, files) {
   return new Promise(function(resolve, reject) {
     let allSuccessResponses = [];
     let allErrorResponses = [];
@@ -157,25 +158,6 @@ function uploadAllFilesSequentially(config, files) {
     }
 
   });
-}
-
-/**
- * config = {
- *  endpointInfo: {},
- *  uploadEndpoint: '',
- *  jwtLocalStorageKey: ''
- * }
- */
-export async function uploadFilesStoredInIndexedDb(config, ids) {
-  let files = await getFilesFromDexieByIds(ids);
-  // files contain extraInfo, if needed this extraInfo cand be set on response also
-  let response = await uploadAllFilesSequentially(config, files);
-  try {
-    // deleteUploadedFilesFromDb(response.success); //TODO
-  } catch (error) {
-    console.log(error);
-  }
-  return response;
 }
 
 /**
