@@ -1,18 +1,18 @@
 
-declare interface UploadConfig {
+export interface UploadConfig {
   endpointInfo: {
     endpoint: string,
     extraInfo: any,
     rawFilePropertyName: string
   }
 }
-declare interface SequentialUploadFiles {
+export interface SequentialUploadFiles {
   binaryData: any,
   filename: string,
   [key: string]: any
 }
 
-declare interface OperationResponse {
+export interface OperationResponse {
   success: any[],
   error: any[]
 }
