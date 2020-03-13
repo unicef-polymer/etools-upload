@@ -4,7 +4,9 @@ export interface UploadConfig {
     endpoint: string,
     extraInfo: any,
     rawFilePropertyName: string
-  }
+  },
+  uploadEndpoint: string,
+  jwtLocalStorageKey: string
 }
 export interface SequentialUploadFiles {
   binaryData: any,

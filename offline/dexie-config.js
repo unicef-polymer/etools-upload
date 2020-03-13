@@ -5,12 +5,13 @@ export function createAttachmentsDexie() {
   if (!window.Etools.AttachmentsDbName) {
     console.log('window.Etools.AttachmentsDbName needs to be set!');
   } else {
+    if (!window.Etools.AttachmentsDb) {
+      let db = new Dexie(window.Etools.AttachmentsDbName);
+      db.version(1).stores({
+        attachments: "id, formId",
+      });
 
-    let db = new Dexie(window.Etools.AttachmentsDbName);
-    db.version(1).stores({
-      attachments: "id, formId",
-    });
-
-    window.Etools.AttachmentsDb = db;
+      window.Etools.AttachmentsDb = db;
+    }
   }
 }
