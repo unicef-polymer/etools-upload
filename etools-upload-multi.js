@@ -169,7 +169,6 @@ class EtoolsUploadMulti extends RequestHelperMulti(CommonMixin(PolymerElement)) 
         await storeFileInDexie(fileInfoForDb);
         filesInfo.push(fileInfo);
       } catch (error) {
-        console.log(error, fileInfo);
         errors.push('Error saving attachment' + fileInfo.filename + ' in IndexedDb');
       }
     }
