@@ -8,7 +8,7 @@ export function createAttachmentsDexie() {
     if (!window.Etools.AttachmentsDb) {
       let db = new Dexie(window.Etools.AttachmentsDbName);
       db.version(1).stores({
-        attachments: "id, formId",
+        attachments: "id, parentId",
       });
 
       window.Etools.AttachmentsDb = db;
