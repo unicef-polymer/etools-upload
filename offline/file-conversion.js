@@ -41,6 +41,12 @@ export async function getBlob(fileUrl) {
   return response.blob();
 }
 
-export function getFileUrl(file) {
-  return window.URL.createObjectURL(file);
+export function getFileUrl(file, doNotRevokeUrl) {
+  let tempUrl = window.URL.createObjectURL(file);
+  if (!doNotRevokeUrl) {
+    setTimeout(() => {
+      window.URL.revokeObjectURL(tempUrl);//For Memory management
+    }, 3000);
+  }
+  return tempUrl;
 }
