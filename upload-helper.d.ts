@@ -1,12 +1,16 @@
 
+/**
+ * endpointInfo.endpoint and uploadEndpoint are mutually exclusive ,
+ * but at least one of them has to be specified
+ */
 export interface UploadConfig {
-  endpointInfo: {
+  endpointInfo?: {
     endpoint: string,
     extraInfo: any,
-    rawFilePropertyName: string
+    rawFilePropertyName: string // Defaults to 'file'
   },
-  uploadEndpoint: string,
-  jwtLocalStorageKey: string
+  uploadEndpoint?: string,
+  jwtLocalStorageKey?: string
 }
 export interface SequentialUploadFiles {
   binaryData: any,

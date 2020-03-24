@@ -10,10 +10,10 @@ Polymer 3 component used for uploading files.
 When `autoUpload` is true and `uploadEndpoint` is set , it automatically uploads the file and returns an `id` stored in the `fileUrl` property.
 
 ### Offline functionality
-* If the `activateOffline` attribute is set on the <etools-upload-multi> component, if there is no internet connection during the upload, the file is saved in local IndexedDb with a temp id. 
+* If the `activateOffline` attribute is set on the <etools-upload-multi> component, if there is no internet connection during the upload, the file is saved in local IndexedDb with a temp id.
 * The component expects `window.Etools.AttachmentsDbName` to be set from the parent application.
 * The IndexedDb is created on  `connectedCallback`. If you need the db to exist prior to this you can call `createAttachmentsDexie` method directly from your code.
-* When the files have finished being saved in IndexedDb the same event as for online upload is fired - `upload-finished`. The event detail has the following format 
+* When the files have finished being saved in IndexedDb the same event as for online upload is fired - `upload-finished`. The event detail has the following format
 	-	{success:[{info about file}], error:[{error}]}
 * Any other extra information can be saved in IndexedDb along with the file by setting property `endpointInfo.extraInfo` :{} on the component.
 
@@ -24,13 +24,13 @@ When `autoUpload` is true and `uploadEndpoint` is set , it automatically uploads
 * \<etools-upload-multi\>
 
 ### Resusable Methods
-1. `dexie-operations` file: Methods to interact with Dexie db 
-2. `upload-helper` file exposes reusable methods that can upload files and receives a `config` object as param: 
+1. `dexie-operations` file: Methods to interact with Dexie db
+2. `upload-helper` file exposes reusable methods that can upload files and receives a `config` object as param:
  	- you can use `upload` method if you have the binary data of the file
  	- `uploadFileStoredInDexie` gets a file stored in IndexedDb , uploads it then deletes it from IndexedDb
-	 
+
 	 	```
-		 Config param expected format: 
+		 Config param expected format:
 		 config = {
 				endpointInfo?:  {
 						endpoint: 'url',
@@ -42,7 +42,7 @@ When `autoUpload` is true and `uploadEndpoint` is set , it automatically uploads
      }
 
 		```
-		
+
 
 ### Upload component features
 
@@ -61,10 +61,13 @@ When `autoUpload` is true and `uploadEndpoint` is set , it automatically uploads
 		-  Expected format:
         {
           endpoint: 'url',
+          /** Any extra properties with their values, that need to be set in the FormData on the upload request */
           extraInfo: {any: any},
-          rawFilePropertyName: 'attachment'
+
+          /**The name of the field that will hold the binary data in the FormData on the upload request. If not specified it defaults to `file*/
+          rawFilePropertyName: 'file'
         }
-      
+
 
 #Buttons
 
