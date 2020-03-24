@@ -1,6 +1,5 @@
 export function storeFileInDexie(fileInfo) {
-  return window.Etools.AttachmentsDb.attachments.put(fileInfo);
-  //id, formId?, filename, filetype, extraInfo, binaryData
+  return window.Etools.AttachmentsDb.attachments.put(fileInfo); 
 }
 
 export function getFileFromDexieById(id) {
