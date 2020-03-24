@@ -10,7 +10,9 @@ import '@polymer/paper-spinner/paper-spinner.js';
 import {CommonStyles} from "./common-styles.js";
 
 import {CommonMixin} from './common-mixin.js';
-import {RequestHelper} from './request-helper.js';
+import {RequestHelper} from './request-helper-mixin.js';
+import {abortActiveRequests} from './upload-helper';
+
 /**
  * `etools-upload`
  * Use to upload files
@@ -310,7 +312,7 @@ class EtoolsUpload extends RequestHelper(CommonMixin(PolymerElement)) {
   }
 
   _cancelUpload() {
-    this.abortActiveRequests();
+    abortActiveRequests();
 
     this.setProperties({
       uploadInProgress: false,

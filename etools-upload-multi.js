@@ -10,6 +10,11 @@ import '@polymer/paper-spinner/paper-spinner.js';
 import {CommonStyles} from "./common-styles";
 import {CommonMixin} from './common-mixin.js';
 import {RequestHelperMulti} from './request-helper-multi.js';
+import {createAttachmentsDexie} from './offline/dexie-config';
+import {getFileUrl, getBlob} from './offline/file-conversion';
+import {storeFileInDexie, generateRandomHash} from './offline/dexie-operations';
+import {abortActiveRequests} from './upload-helper';
+
 /**
  * `etools-upload-multi` Description
  *
@@ -101,8 +106,20 @@ class EtoolsUploadMulti extends RequestHelperMulti(CommonMixin(PolymerElement)) 
       _filenames: {
         type: Array,
         value: []
+      },
+      activateOffline: {
+        type: Boolean,
+        value: false,
+        reflectToAttribute: true
       }
     };
+  }
+
+  connectedCallback() {
+    super.connectedCallback();
+    if (this.activateOffline) {
+      createAttachmentsDexie();
+    }
   }
 
   _filesSelected(e) {
@@ -132,8 +149,46 @@ class EtoolsUploadMulti extends RequestHelperMulti(CommonMixin(PolymerElement)) 
     return names;
   }
 
-  _handleUpload(files) {
+  async saveFilesInIndexedDb(files) {
+    let i;
+    let filesInfo = [];
+    let errors = [];
+    for (i = 0; i < files.length; i++) {
+      let blob = await getBlob(getFileUrl(files[i]));
+      let fileInfo = {
+        id: generateRandomHash(),
+        filetype: files[i].type,
+        filename: files[i].name,
+        extraInfo: this.endpointInfo ? this.endpointInfo.extraInfo : '',
+        unsynced: true
+      }
+
+      let fileInfoForDb = JSON.parse(JSON.stringify(fileInfo));
+      fileInfoForDb.binaryData = blob;
+      try {
+        await storeFileInDexie(fileInfoForDb);
+        filesInfo.push(fileInfo);
+      } catch (error) {
+        errors.push('Error saving attachment' + fileInfo.filename + ' in IndexedDb');
+      }
+    }
+    return {
+      success: filesInfo,
+      error: errors
+    };
+  }
+
+  async _handleUpload(files) {
     this.uploadInProgress = true;
+    if (this.activateOffline && navigator.onLine === false) {
+      let response = await this.saveFilesInIndexedDb(files);
+      this.uploadInProgress = false;
+      this.resetRawFiles();
+      this.fireEvent('upload-finished', response);
+      setTimeout(this._clearDisplayOfUploadedFiles.bind(this), 2000);
+      return;
+    }
+
     if (this.endpointAcceptsMulti) {
       // we don't have this situation yet
     } else {
@@ -157,7 +212,7 @@ class EtoolsUploadMulti extends RequestHelperMulti(CommonMixin(PolymerElement)) 
   }
 
   _uploadAllFilesSequentially(files, upload, set) {
-    return new Promise(function (resolve, reject) {
+    return new Promise(function(resolve, reject) {
       let allSuccessResponses = [];
       let allErrorResponses = [];
       let i;
@@ -208,7 +263,7 @@ class EtoolsUploadMulti extends RequestHelperMulti(CommonMixin(PolymerElement)) 
     let activeReqKeys = Object.keys(this.activeXhrRequests);
     this._filenames = this._filenames.filter(f => activeReqKeys.indexOf(f.filename) < 0);
 
-    this.abortActiveRequests(activeReqKeys);
+    abortActiveRequests(activeReqKeys);
     this.uploadInProgress = false;
     this.resetRawFiles();
 
