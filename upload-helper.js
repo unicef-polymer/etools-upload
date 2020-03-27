@@ -90,7 +90,7 @@ function _getRawFilePropertyName(endpointInfo) {
   return 'file';
 }
 
-function _getHeaders(jwtLocalStorageKey) {
+async function _getHeaders(jwtLocalStorageKey) {
   let csrfToken = _getCSRFToken();
   let jwtToken = _getJwtToken(jwtLocalStorageKey);
   let headers = {};
@@ -98,6 +98,15 @@ function _getHeaders(jwtLocalStorageKey) {
     headers['x-csrftoken'] = csrfToken;
   }
   if (jwtToken) {
+    if (window.AppMsalInstance) {
+      if (!window.AppMsalInstance.tokenIsValid(token)) {
+        try {
+          jwtToken = await window.AppMsalInstance.acquireTokenSilent(endpoint.scopes);
+        } catch (err) {
+          window.location.reload(true);
+        }
+      }
+    }
     headers['authorization'] = 'JWT ' + jwtToken;
   }
   return headers;
