@@ -74,7 +74,7 @@ When `autoUpload` is true and `uploadEndpoint` is set , it automatically uploads
 10. `Download` button will be displayed after uploaded file was saved
 11. `show-delete-btn`:  if set to true, will display a 'Delete' button after file was selected, in order to be able to remove the file
 12. `show-change`: if set to true, will display a 'Change' button after file was selected, in order to be able to replace the file
-13. `jwtLocalStorageKey` To specify the local storage key where the token is stored. If `window.AppMsalInstance` is set , the component also check the expiration of the token and silently refreshes it if needed.
+13. `jwtLocalStorageKey` specifies the local storage key where the token is stored. If `window.AppMsalInstance` is set , the component also checks the expiration of the token and silently refreshes it if needed.
 
 #Events
 
