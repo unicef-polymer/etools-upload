@@ -11,12 +11,13 @@ let activeXhrRequests = {};
  * }
  */
 // TODO - handle 2 files with same filename
-export function upload(config, rawFile, filename) {
+export async function upload(config, rawFile, filename) {
+  let headers = await _getHeaders(config.jwtLocalStorageKey);
   let options = {
     method: 'POST',
     url: _getEndpoint(config.endpointInfo, config.uploadEndpoint),
     body: _prepareBody(rawFile, filename, config.endpointInfo),
-    headers: _getHeaders(config.jwtLocalStorageKey)
+    headers
   };
   return sendRequest(options, filename)
     .then((response) => {
@@ -90,7 +91,7 @@ function _getRawFilePropertyName(endpointInfo) {
   return 'file';
 }
 
-function _getHeaders(jwtLocalStorageKey) {
+async function _getHeaders(jwtLocalStorageKey) {
   let csrfToken = _getCSRFToken();
   let jwtToken = _getJwtToken(jwtLocalStorageKey);
   let headers = {};
@@ -98,6 +99,15 @@ function _getHeaders(jwtLocalStorageKey) {
     headers['x-csrftoken'] = csrfToken;
   }
   if (jwtToken) {
+    if (window.AppMsalInstance) {
+      if (!window.AppMsalInstance.tokenIsValid(jwtToken)) {
+        try {
+          jwtToken = await window.AppMsalInstance.acquireTokenSilent();
+        } catch (err) {
+          window.location.reload(true);
+        }
+      }
+    }
     headers['authorization'] = 'JWT ' + jwtToken;
   }
   return headers;
