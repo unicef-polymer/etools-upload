@@ -168,8 +168,12 @@ class EtoolsUploadMulti extends RequestHelperMulti(CommonMixin(PolymerElement)) 
       try {
         await storeFileInDexie(fileInfoForDb);
         filesInfo.push(fileInfo);
+        this.set(['_filenames', i, 'uploadInProgress'], false);
+        this.set(['_filenames', i, 'success'], true);
       } catch (error) {
         errors.push('Error saving attachment' + fileInfo.filename + ' in IndexedDb');
+        this.set(['_filenames', i, 'uploadInProgress'], false);
+        this.set(['_filenames', i, 'fail'], true);
       }
     }
     return {
