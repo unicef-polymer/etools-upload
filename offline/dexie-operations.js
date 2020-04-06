@@ -1,5 +1,5 @@
 export function storeFileInDexie(fileInfo) {
-  return window.Etools.AttachmentsDb.attachments.put(fileInfo); 
+  return window.Etools.AttachmentsDb.attachments.put(fileInfo);
 }
 
 export function getFileFromDexieById(id) {
@@ -7,7 +7,7 @@ export function getFileFromDexieById(id) {
 }
 
 export const generateRandomHash = () => {
-  return Math.random().toString(36).substring(8);
+  return Math.random().toString(36).substring(3).replace(/[^a-z]+/, 'q');
 }
 
 export function getFilesFromDexieByIds(ids) {
