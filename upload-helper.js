@@ -100,12 +100,10 @@ async function _getHeaders(jwtLocalStorageKey) {
   }
   if (jwtToken) {
     if (window.AppMsalInstance) {
-      if (!window.AppMsalInstance.tokenIsValid(jwtToken)) {
-        try {
-          jwtToken = await window.AppMsalInstance.acquireTokenSilent();
-        } catch (err) {
-          window.location.reload(true);
-        }
+      try {
+        jwtToken = await window.AppMsalInstance.acquireTokenSilent();
+      } catch (err) {
+        window.location.reload(true);
       }
     }
     headers['authorization'] = 'JWT ' + jwtToken;
