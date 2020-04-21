@@ -1,5 +1,5 @@
 
-import {upload} from './upload-helper';
+import {upload} from '@unicef-polymer/etools-ajax/upload-helper';
 
 export const RequestHelperMixin = (baseClass) => class extends (baseClass) {
   static get properties() {
@@ -27,7 +27,7 @@ export const RequestHelperMixin = (baseClass) => class extends (baseClass) {
     };
   }
 
-  upload(rawFile, requestKey) {
+  uploadRawFile(rawFile, requestKey) {
     let config = {
       endpointInfo: this.endpointInfo,
       uploadEndpoint: this.uploadEndpoint,

@@ -13,7 +13,8 @@ import {RequestHelperMulti} from './request-helper-multi.js';
 import {createAttachmentsDexie} from './offline/dexie-config';
 import {getFileUrl, getBlob} from './offline/file-conversion';
 import {storeFileInDexie, generateRandomHash} from './offline/dexie-operations';
-import {abortActiveRequests} from './upload-helper';
+import {getActiveXhrRequests, abortActiveRequests} from '@unicef-polymer/etools-ajax/upload-helper';
+import {uploadRawFile} from './request-helper-mixin';
 
 /**
  * `etools-upload-multi` Description
@@ -196,7 +197,7 @@ class EtoolsUploadMulti extends RequestHelperMulti(CommonMixin(PolymerElement)) 
     if (this.endpointAcceptsMulti) {
       // we don't have this situation yet
     } else {
-      this._uploadAllFilesSequentially(files, this.upload.bind(this), this.set.bind(this))
+      this._uploadAllFilesSequentially(files, uploadRawFile.bind(this), this.set.bind(this))
         .then((response) => {
           this.uploadInProgress = false;
           this.resetRawFiles();
@@ -215,14 +216,14 @@ class EtoolsUploadMulti extends RequestHelperMulti(CommonMixin(PolymerElement)) 
     this._filenames = [];
   }
 
-  _uploadAllFilesSequentially(files, upload, set) {
+  _uploadAllFilesSequentially(files, uploadFunction, set) {
     return new Promise(function(resolve, reject) {
       let allSuccessResponses = [];
       let allErrorResponses = [];
       let i;
       let counter = 0;
       for (i = 0; i < files.length; i++) {
-        upload(files[i], files[i].name).then((response) => {
+        uploadFunction(files[i], files[i].name).then((response) => {
           set(['_filenames', counter, 'uploadInProgress'], false);
           set(['_filenames', counter, 'success'], true);
 
@@ -264,7 +265,7 @@ class EtoolsUploadMulti extends RequestHelperMulti(CommonMixin(PolymerElement)) 
   }
 
   _cancelUpload() {
-    let activeReqKeys = Object.keys(this.activeXhrRequests);
+    let activeReqKeys = Object.keys(getActiveXhrRequests());
     this._filenames = this._filenames.filter(f => activeReqKeys.indexOf(f.filename) < 0);
 
     abortActiveRequests(activeReqKeys);
