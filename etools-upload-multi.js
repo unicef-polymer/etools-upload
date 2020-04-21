@@ -14,7 +14,6 @@ import {createAttachmentsDexie} from './offline/dexie-config';
 import {getFileUrl, getBlob} from './offline/file-conversion';
 import {storeFileInDexie, generateRandomHash} from './offline/dexie-operations';
 import {getActiveXhrRequests, abortActiveRequests} from '@unicef-polymer/etools-ajax/upload-helper';
-import {uploadRawFile} from './request-helper-mixin';
 
 /**
  * `etools-upload-multi` Description
@@ -197,7 +196,7 @@ class EtoolsUploadMulti extends RequestHelperMulti(CommonMixin(PolymerElement)) 
     if (this.endpointAcceptsMulti) {
       // we don't have this situation yet
     } else {
-      this._uploadAllFilesSequentially(files, uploadRawFile.bind(this), this.set.bind(this))
+      this._uploadAllFilesSequentially(files, this.uploadRawFile.bind(this), this.set.bind(this))
         .then((response) => {
           this.uploadInProgress = false;
           this.resetRawFiles();
