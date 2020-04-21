@@ -250,18 +250,11 @@ class EtoolsUpload extends RequestHelper(CommonMixin(PolymerElement)) {
       this.fireEvent('upload-finished', {success: response});
     }).catch((err) => {
       this.fail = true;
-      this.serverErrorMsg = 'Error uploading file: ' + this._prepareErrorMessage(err);
+      this.serverErrorMsg = 'Error uploading file: ' + this.prepareErrorMessage(err);
       this.setInvalid(true, this.serverErrorMsg);
       this.uploadInProgress = false;
       this.fireEvent('upload-finished', {error: err});
     });
-  }
-
-  _prepareErrorMessage(error) {
-    if (error.message.includes('413')) {
-      return 'File too large.'
-    }
-    return error.message;
   }
 
   setInvalid(invalid, errMsg) {

@@ -196,7 +196,8 @@ class EtoolsUploadMulti extends RequestHelperMulti(CommonMixin(PolymerElement)) 
     if (this.endpointAcceptsMulti) {
       // we don't have this situation yet
     } else {
-      this._uploadAllFilesSequentially(files, this.uploadRawFile.bind(this), this.set.bind(this))
+      this._uploadAllFilesSequentially(files, this.uploadRawFile.bind(this), this.set.bind(this),
+        this.prepareErrorMessage.bind(this))
         .then((response) => {
           this.uploadInProgress = false;
           this.resetRawFiles();
@@ -215,7 +216,7 @@ class EtoolsUploadMulti extends RequestHelperMulti(CommonMixin(PolymerElement)) 
     this._filenames = [];
   }
 
-  _uploadAllFilesSequentially(files, uploadFunction, set) {
+  _uploadAllFilesSequentially(files, uploadFunction, set, prepareErrorMessage) {
     return new Promise(function(resolve, reject) {
       let allSuccessResponses = [];
       let allErrorResponses = [];
@@ -240,7 +241,7 @@ class EtoolsUploadMulti extends RequestHelperMulti(CommonMixin(PolymerElement)) 
           set(['_filenames', counter, 'uploadInProgress'], false);
           set(['_filenames', counter, 'fail'], true);
 
-          allErrorResponses.push(err);
+          allErrorResponses.push(prepareErrorMessage(err));
 
           if ((counter + 1) === files.length) {
             resolve({

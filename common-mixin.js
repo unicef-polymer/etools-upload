@@ -80,5 +80,11 @@ export const CommonMixin = (baseClass) => class extends (baseClass) {
     window.URL.revokeObjectURL(url);
   }
 
+  prepareErrorMessage(error) {
+    if (error.message.includes('413')) {
+      return 'File too large.';
+    }
+    return error.message;
+  }
 
 }
