@@ -11,7 +11,7 @@ import {CommonStyles} from "./common-styles.js";
 
 import {CommonMixin} from './common-mixin.js';
 import {RequestHelper} from './request-helper-mixin.js';
-import {abortActiveRequests, upload} from '@unicef-polymer/etools-ajax/upload-helper';
+import {abortActiveRequests} from '@unicef-polymer/etools-ajax/upload-helper';
 
 /**
  * `etools-upload`
@@ -243,25 +243,18 @@ class EtoolsUpload extends RequestHelper(CommonMixin(PolymerElement)) {
     this.uploadInProgress = true;
     this.fireEvent('upload-started');
 
-    this.upload(this.rawFile).then((response) => {
+    this.uploadRawFile(this.rawFile).then((response) => {
       this.success = true;
       this.uploadInProgress = false;
       this.resetRawFile();
       this.fireEvent('upload-finished', {success: response});
     }).catch((err) => {
       this.fail = true;
-      this.serverErrorMsg = 'Error uploading file: ' + this._prepareErrorMessage(err);
+      this.serverErrorMsg = 'Error uploading file: ' + this.prepareErrorMessage(err);
       this.setInvalid(true, this.serverErrorMsg);
       this.uploadInProgress = false;
       this.fireEvent('upload-finished', {error: err});
     });
-  }
-
-  _prepareErrorMessage(error) {
-    if (error.message.includes('413')) {
-      return 'File too large.'
-    }
-    return error.message;
   }
 
   setInvalid(invalid, errMsg) {
