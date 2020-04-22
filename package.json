@@ -1,14 +1,47 @@
 {
-  "description": "Etools file upload component",
-  "name": "etools-upload",
-  "devDependencies": {
-    "eslint": "^3.19.0",
-    "eslint-config-google": "^0.7.0",
-    "eslint-plugin-html": "^2.0.0"
+  "name": "@unicef-polymer/etools-upload",
+  "version": "3.1.6",
+  "homepage": "https://github.com/unicef-polymer/etools-upload",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/unicef-polymer/etools-upload.git"
   },
+  "description": "Upload files",
+  "author": "The Polymer Authors",
+  "license": "BSD-3-Clause",
   "scripts": {
-    "lint": "npm run lint:javascript && polymer lint && exit 0",
-    "lint:javascript": "eslint . --ext js,html && exit 0"
+    "lint:javascript": "eslint . --ext js,html && exit 0",
+    "start": "polymer serve",
+    "build": "polymer build",
+    "lint": "polymer lint",
+    "test": "polymer test",
+    "test:integration": "polymer build # test that psk builds without error with the CLI",
+    "gen-typings": "gen-typescript-declarations --deleteExisting --outDir './'"
   },
-  "dependencies": {}
+  "dependencies": {
+    "@polymer/iron-flex-layout": "^3.0.1",
+    "@polymer/iron-icon": "^3.0.1",
+    "@polymer/iron-icons": "^3.0.1",
+    "@polymer/paper-button": "^3.0.1",
+    "@polymer/paper-input": "^3.0.2",
+    "@polymer/paper-spinner": "^3.0.2",
+    "@polymer/polymer": "^3.2.0",
+    "@unicef-polymer/etools-ajax": "^4.1.2",
+    "@webcomponents/webcomponentsjs": "^2.0.3",
+    "dexie": "^2.0.4",
+    "web-animations-js": "^2.3.1"
+  },
+  "devDependencies": {
+    "babel-eslint": "^8.2.6",
+    "eslint": "^6.6.0",
+    "eslint-config-google": "^0.14.0",
+    "eslint-plugin-html": "^6.0.0",
+    "polymer-cli": "^1.7.7",
+    "wct-browser-legacy": "^1.0.0",
+    "@polymer/iron-demo-helpers": "^3.0.0",
+    "@polymer/gen-typescript-declarations": "^1.6.0"
+  },
+  "engines": {
+    "node": ">=8.0"
+  }
 }
