@@ -27,6 +27,7 @@
     "@polymer/paper-input": "^3.0.2",
     "@polymer/paper-spinner": "^3.0.2",
     "@polymer/polymer": "^3.2.0",
+    "@unicef-polymer/etools-ajax": "^4.1.2-rc.1",
     "@webcomponents/webcomponentsjs": "^2.0.3",
     "dexie": "^2.0.4",
     "web-animations-js": "^2.3.1"

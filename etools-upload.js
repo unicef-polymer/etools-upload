@@ -11,7 +11,7 @@ import {CommonStyles} from "./common-styles.js";
 
 import {CommonMixin} from './common-mixin.js';
 import {RequestHelper} from './request-helper-mixin.js';
-import {abortActiveRequests} from './upload-helper';
+import {abortActiveRequests, upload} from '@unicef-polymer/etools-ajax/upload-helper';
 
 /**
  * `etools-upload`
