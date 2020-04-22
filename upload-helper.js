@@ -1,4 +1,3 @@
-import '@polymer/iron-ajax/iron-request.js';
 import {deleteFileFromDexie, getFileFromDexieById} from './offline/dexie-operations';
 import {upload} from '@unicef-polymer/etools-ajax/upload-helper';
 
