@@ -361,6 +361,7 @@ class EtoolsUpload extends RequestHelper(CommonMixin(PolymerElement)) {
     if (typeof this.fileUrl === 'undefined') {
       this.resetStatus();
       this.invalid = false;
+      return;
     }
     if (this.autoValidate) {
       this.validate();
