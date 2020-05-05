@@ -16,7 +16,7 @@ import {PolymerElement, html} from '@polymer/polymer';
 
 import {CommonMixin} from './common-mixin.js';
 
-import {RequestHelper} from './request-helper.js';
+import {RequestHelperMixin} from './request-helper-mixin';
 
 /**
  * `etools-upload`
