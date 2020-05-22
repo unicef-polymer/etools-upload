@@ -1,6 +1,6 @@
 {
   "name": "@unicef-polymer/etools-upload",
-  "version": "3.1.7",
+  "version": "3.1.9",
   "homepage": "https://github.com/unicef-polymer/etools-upload",
   "repository": {
     "type": "git",
@@ -26,10 +26,11 @@
     "@polymer/paper-input": "^3.0.2",
     "@polymer/paper-spinner": "^3.0.2",
     "@polymer/polymer": "^3.2.0",
-    "@unicef-polymer/etools-ajax": "^4.1.2",
+    "@unicef-polymer/etools-ajax": "^4.1.3",
     "@webcomponents/webcomponentsjs": "^2.0.3",
     "dexie": "^2.0.4",
-    "web-animations-js": "^2.3.1"
+    "web-animations-js": "^2.3.1",
+    "acorn": ">=5.7.4"
   },
   "devDependencies": {
     "babel-eslint": "^8.2.6",
