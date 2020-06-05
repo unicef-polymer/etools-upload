@@ -10,7 +10,7 @@ import '@polymer/paper-spinner/paper-spinner.js';
 import {CommonStyles} from "./common-styles.js";
 
 import {CommonMixin} from './common-mixin.js';
-import {RequestHelper} from './request-helper-mixin.js';
+import {RequestHelperMixin} from './request-helper-mixin.js';
 import {abortActiveRequests} from '@unicef-polymer/etools-ajax/upload-helper';
 
 /**
@@ -21,7 +21,7 @@ import {abortActiveRequests} from '@unicef-polymer/etools-ajax/upload-helper';
  * @polymer
  * @demo demo/index.html
  */
-class EtoolsUpload extends RequestHelper(CommonMixin(PolymerElement)) {
+class EtoolsUpload extends RequestHelperMixin(CommonMixin(PolymerElement)) {
   static get template() {
     // language=HTML
     return html`
@@ -361,6 +361,7 @@ class EtoolsUpload extends RequestHelper(CommonMixin(PolymerElement)) {
     if (typeof this.fileUrl === 'undefined') {
       this.resetStatus();
       this.invalid = false;
+      return;
     }
     if (this.autoValidate) {
       this.validate();
