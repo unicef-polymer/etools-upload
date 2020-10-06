@@ -240,6 +240,9 @@ class EtoolsUpload extends RequestHelperMixin(CommonMixin(PolymerElement)) {
   }
 
   _handleUpload() {
+    if (this.accept && !this.validFileType(this.rawFile.name)) {
+      return;
+    }
     this.uploadInProgress = true;
     this.fireEvent('upload-started');
 
@@ -376,6 +379,18 @@ class EtoolsUpload extends RequestHelperMixin(CommonMixin(PolymerElement)) {
       this.resetStatus();
       this.resetValidations();
     }
+  }
+
+  validFileType(fileName) {
+    const acceptedExtensions = this.accept.split(',');
+    const fileExtension = fileName.slice((fileName.lastIndexOf(".") - 1 >>> 0) + 2);
+    if (acceptedExtensions.indexOf('.' + fileExtension) > -1) {
+      return;
+    }
+    let valid = false;
+    let errMsg = 'Please change file. Accepted file types: ' + this.accept;
+    this.setInvalid(!valid, errMsg);
+    return valid;
   }
 }
 
