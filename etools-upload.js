@@ -403,7 +403,7 @@ class EtoolsUpload extends RequestHelperMixin(CommonMixin(PolymerElement)) {
     const acceptedExtensions = this.accept.split(',');
     const fileExtension = fileName.slice((fileName.lastIndexOf(".") - 1 >>> 0) + 2);
     if (acceptedExtensions.indexOf('.' + fileExtension) > -1) {
-      return;
+      return true;
     }
     let valid = false;
     let errMsg = 'Please change file. Accepted file types: ' + this.accept;
