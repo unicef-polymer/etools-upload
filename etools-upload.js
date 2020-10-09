@@ -240,10 +240,10 @@ class EtoolsUpload extends RequestHelperMixin(CommonMixin(PolymerElement)) {
   }
 
   _handleUpload() {
-    // need to double check file type
-    // when setting accept for file input, it will only show the accepted file types in the file selection dialog
-    // this can be bypassed if we change the file type dropdown from Custom Files to All Files,
-    // and any file type can be added
+    /**
+     * Doing the extra validFileType validation because `accept` functionality can be bypassed
+     * by selecting All Files from the File selection dialog
+     */
     if (this.accept && !this.validFileType(this.rawFile.name)) {
       return;
     }
@@ -385,9 +385,17 @@ class EtoolsUpload extends RequestHelperMixin(CommonMixin(PolymerElement)) {
     }
   }
 
+  validFileType(fileName) {
+    const acceptedExtensions = this.accept.split(',');
+    const fileExtension = this._getFileExtension(fileName);
+    if (acceptedExtensions.indexOf('.' + fileExtension) > -1) {
+      return true;
+    }
+    this.setInvalid(true, 'Please change file. Accepted file types: ' + this.accept);
+    return false;
+  }
+
   /* This solution also handles some edge cases
-  String.lastIndexOf() method returns the last occurrence of the specified value ('.' in this case).
-  Returns -1 if the value is not found.
   The return values of lastIndexOf for parameter 'filename' and '.hiddenfile' are -1 and 0 respectively.
   Zero-fill right shift operator(»>) will transform - 1 to 4294967295 and - 2 to 4294967294,
   here is one trick to insure the filename unchanged in those edge cases.
@@ -399,16 +407,8 @@ class EtoolsUpload extends RequestHelperMixin(CommonMixin(PolymerElement)) {
   'filename.txt' => 'txt'
   '.hiddenfile' => ''
   'filename.with.many.dots.ext'	=> 'ext'*/
-  validFileType(fileName) {
-    const acceptedExtensions = this.accept.split(',');
-    const fileExtension = fileName.slice((fileName.lastIndexOf(".") - 1 >>> 0) + 2);
-    if (acceptedExtensions.indexOf('.' + fileExtension) > -1) {
-      return true;
-    }
-    let valid = false;
-    let errMsg = 'Please change file. Accepted file types: ' + this.accept;
-    this.setInvalid(!valid, errMsg);
-    return valid;
+  _getFileExtension(fileName) {
+    return fileName.slice((fileName.lastIndexOf(".") - 1 >>> 0) + 2);
   }
 }
 
