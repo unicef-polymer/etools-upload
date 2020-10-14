@@ -240,6 +240,13 @@ class EtoolsUpload extends RequestHelperMixin(CommonMixin(PolymerElement)) {
   }
 
   _handleUpload() {
+    /**
+     * Doing the extra validFileType validation because `accept` functionality can be bypassed
+     * by selecting All Files from the File selection dialog
+     */
+    if (this.accept && !this.validFileType(this.rawFile.name)) {
+      return;
+    }
     this.uploadInProgress = true;
     this.fireEvent('upload-started');
 
@@ -376,6 +383,32 @@ class EtoolsUpload extends RequestHelperMixin(CommonMixin(PolymerElement)) {
       this.resetStatus();
       this.resetValidations();
     }
+  }
+
+  validFileType(fileName) {
+    const acceptedExtensions = this.accept.split(',');
+    const fileExtension = this._getFileExtension(fileName);
+    if (acceptedExtensions.indexOf('.' + fileExtension) > -1) {
+      return true;
+    }
+    this.setInvalid(true, 'Please change file. Accepted file types: ' + this.accept);
+    return false;
+  }
+
+  /* This solution also handles some edge cases
+  The return values of lastIndexOf for parameter 'filename' and '.hiddenfile' are -1 and 0 respectively.
+  Zero-fill right shift operator(»>) will transform - 1 to 4294967295 and - 2 to 4294967294,
+  here is one trick to insure the filename unchanged in those edge cases.
+  String.prototype.slice() extracts file extension from the index that was calculated above.
+  If the index is more than the length of the filename, the result is "".
+  Example of return values:
+  '' => ''
+  'filename' => ''
+  'filename.txt' => 'txt'
+  '.hiddenfile' => ''
+  'filename.with.many.dots.ext'	=> 'ext'*/
+  _getFileExtension(fileName) {
+    return fileName.slice((fileName.lastIndexOf(".") - 1 >>> 0) + 2);
   }
 }
 
