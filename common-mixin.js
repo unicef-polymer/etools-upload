@@ -81,10 +81,11 @@ export const CommonMixin = (baseClass) => class extends (baseClass) {
   }
 
   prepareErrorMessage(error) {
-    if (error.message.includes('413')) {
+    const message = (error.request ? error.error.message : error.message) || '';
+    if (message.includes('413')) {
       return 'File too large.';
     }
-    return error.message;
+    return message;
   }
 
 }
