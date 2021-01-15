@@ -142,6 +142,9 @@ class EtoolsUpload extends RequestHelperMixin(CommonMixin(PolymerElement)) {
         <paper-input-error aria-live="assertive" slot="add-on">[[errorMessage]]</paper-input-error>
       </template>
 
+      <template is="dom-if" if="[[uploadProgressMessage]]">
+        <div slot="add-on">[[uploadProgressMessage]]</div>
+      </template>
     </paper-input-container>
 `;
   }
@@ -193,6 +196,10 @@ class EtoolsUpload extends RequestHelperMixin(CommonMixin(PolymerElement)) {
         type: Boolean,
         value: false,
         reflectToAttribute: true
+      },
+      uploadProgressMessage: {
+        type: String,
+        value: ''
       }
     };
   }
@@ -250,16 +257,18 @@ class EtoolsUpload extends RequestHelperMixin(CommonMixin(PolymerElement)) {
     this.uploadInProgress = true;
     this.fireEvent('upload-started');
 
-    this.uploadRawFile(this.rawFile).then((response) => {
+    this.uploadRawFile(this.rawFile, Date.now(), this.setUploadProgressMsg.bind(this)).then((response) => {
       this.success = true;
       this.uploadInProgress = false;
       this.resetRawFile();
+      this.resetUploadProgressMsg();
       this.fireEvent('upload-finished', {success: response});
     }).catch((err) => {
       this.fail = true;
       this.serverErrorMsg = 'Error uploading file: ' + this.prepareErrorMessage(err);
       this.setInvalid(true, this.serverErrorMsg);
       this.uploadInProgress = false;
+      this.resetUploadProgressMsg();
       this.fireEvent('upload-finished', {error: err});
     });
   }
@@ -280,6 +289,18 @@ class EtoolsUpload extends RequestHelperMixin(CommonMixin(PolymerElement)) {
     this.success = null;
     this.fail = null;
     this.serverErrorMsg = null;
+  }
+
+  setUploadProgressMsg(requestData) {
+    if (!requestData) {
+      this.uploadProgressMessage = '';
+    } else {
+      this.uploadProgressMessage = `${Math.round(requestData.loaded/1024)} Kb out of ${Math.round(requestData.total/1024)}  Kb uploaded`;
+    }
+  }
+
+  resetUploadProgressMsg() {
+    setTimeout(() => this.uploadProgressMessage = '', 5000);
   }
 
   _fileUrlChanged(fileUrl) {
