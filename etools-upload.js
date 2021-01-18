@@ -7,6 +7,7 @@ import '@polymer/paper-input/paper-input-container.js';
 import '@polymer/paper-input/paper-input-error.js';
 import '@polymer/iron-flex-layout/iron-flex-layout.js';
 import '@polymer/paper-spinner/paper-spinner.js';
+import '@polymer/paper-progress/paper-progress.js';
 import {CommonStyles} from "./common-styles.js";
 
 import {CommonMixin} from './common-mixin.js';
@@ -52,6 +53,7 @@ class EtoolsUpload extends RequestHelperMixin(CommonMixin(PolymerElement)) {
         min-width: 145px;
         overflow-wrap: break-word;
         font-size: 16px;
+        position: relative;
       }
 
       .filename {
@@ -73,6 +75,14 @@ class EtoolsUpload extends RequestHelperMixin(CommonMixin(PolymerElement)) {
         padding: 0 0;
         margin-left: 8px;
         color: var(--etools-upload-primary-color, var(--primary-color));
+      }
+
+      paper-progress {
+        display: block;
+        --paper-progress-active-color: var(--primary-color);
+        width: 100%;
+        position: absolute;
+        top: 25px;
       }
 
       .dw-icon {
@@ -103,6 +113,10 @@ class EtoolsUpload extends RequestHelperMixin(CommonMixin(PolymerElement)) {
           <div class="filename-container" hidden$="[[!_thereIsAFileSelectedOrSaved(_filename)]]">
             <iron-icon class="file-icon" icon="attachment"></iron-icon>
             <span class="filename" title="[[_filename]]">[[_filename]]</span>
+
+            <template is="dom-if" if="[[uploadProgress]]">
+                <paper-progress value="{{uploadProgress}}"></paper-progress>
+            </template>
           </div>
           <div class="upload-status">
             <paper-spinner id="uploadingSpinner" hidden$="[[!uploadInProgress]]" active="[[uploadInProgress]]"></paper-spinner>
@@ -142,9 +156,6 @@ class EtoolsUpload extends RequestHelperMixin(CommonMixin(PolymerElement)) {
         <paper-input-error aria-live="assertive" slot="add-on">[[errorMessage]]</paper-input-error>
       </template>
 
-      <template is="dom-if" if="[[uploadProgressMessage]]">
-        <div slot="add-on">[[uploadProgressMessage]]</div>
-      </template>
     </paper-input-container>
 `;
   }
@@ -197,7 +208,7 @@ class EtoolsUpload extends RequestHelperMixin(CommonMixin(PolymerElement)) {
         value: false,
         reflectToAttribute: true
       },
-      uploadProgressMessage: {
+      uploadProgress: {
         type: String,
         value: ''
       }
@@ -257,18 +268,18 @@ class EtoolsUpload extends RequestHelperMixin(CommonMixin(PolymerElement)) {
     this.uploadInProgress = true;
     this.fireEvent('upload-started');
 
-    this.uploadRawFile(this.rawFile, Date.now(), this.setUploadProgressMsg.bind(this)).then((response) => {
+    this.uploadRawFile(this.rawFile, Date.now(), this.setUploadProgress.bind(this)).then((response) => {
       this.success = true;
       this.uploadInProgress = false;
       this.resetRawFile();
-      this.resetUploadProgressMsg();
+      this.resetUploadProgress();
       this.fireEvent('upload-finished', {success: response});
     }).catch((err) => {
       this.fail = true;
       this.serverErrorMsg = 'Error uploading file: ' + this.prepareErrorMessage(err);
       this.setInvalid(true, this.serverErrorMsg);
       this.uploadInProgress = false;
-      this.resetUploadProgressMsg();
+      this.resetUploadProgress();
       this.fireEvent('upload-finished', {error: err});
     });
   }
@@ -291,16 +302,16 @@ class EtoolsUpload extends RequestHelperMixin(CommonMixin(PolymerElement)) {
     this.serverErrorMsg = null;
   }
 
-  setUploadProgressMsg(requestData) {
+  setUploadProgress(requestData) {
     if (!requestData) {
-      this.uploadProgressMessage = '';
+      this.uploadProgress = '';
     } else {
-      this.uploadProgressMessage = `${Math.round(requestData.loaded/1024)} Kb out of ${Math.round(requestData.total/1024)}  Kb uploaded`;
+      this.uploadProgress = `${requestData.loaded * 100 / requestData.total}`;
     }
   }
 
-  resetUploadProgressMsg() {
-    setTimeout(() => this.uploadProgressMessage = '', 5000);
+  resetUploadProgress() {
+    setTimeout(() => this.uploadProgress = '', 1000);
   }
 
   _fileUrlChanged(fileUrl) {
