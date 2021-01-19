@@ -77,12 +77,23 @@ class EtoolsUpload extends RequestHelperMixin(CommonMixin(PolymerElement)) {
         color: var(--etools-upload-primary-color, var(--primary-color));
       }
 
-      paper-progress {
-        display: block;
-        --paper-progress-active-color: var(--primary-color);
+      .progress-container {
+        display: flex;
+        flex-direction: column;
+        flex-wrap: nowrap;
         width: 100%;
         position: absolute;
         top: 25px;
+      }
+
+      paper-progress {
+        --paper-progress-active-color: var(--primary-color);
+        width: 100%;
+      }
+
+      .progress-container span {
+        font-size: 11px;
+        margin: 0 auto;
       }
 
       .dw-icon {
@@ -114,12 +125,14 @@ class EtoolsUpload extends RequestHelperMixin(CommonMixin(PolymerElement)) {
             <iron-icon class="file-icon" icon="attachment"></iron-icon>
             <span class="filename" title="[[_filename]]">[[_filename]]</span>
 
-            <template is="dom-if" if="[[uploadProgress]]">
-                <paper-progress value="{{uploadProgress}}"></paper-progress>
+            <template is="dom-if" if="[[uploadProgressValue]]">
+              <div class='progress-container'>
+                <paper-progress value="{{uploadProgressValue}}"></paper-progress>
+                <span>{{uploadProgressMsg}}</span>
+              <div>
             </template>
           </div>
           <div class="upload-status">
-            <paper-spinner id="uploadingSpinner" hidden$="[[!uploadInProgress]]" active="[[uploadInProgress]]"></paper-spinner>
             <iron-icon title="Uploaded successfuly!" icon="done" hidden$="[[!success]]"></iron-icon>
             <iron-icon icon="error-outline" hidden$="[[!fail]]"></iron-icon>
           </div>
@@ -208,7 +221,11 @@ class EtoolsUpload extends RequestHelperMixin(CommonMixin(PolymerElement)) {
         value: false,
         reflectToAttribute: true
       },
-      uploadProgress: {
+      uploadProgressValue: {
+        type: String,
+        value: ''
+      },
+      uploadProgressMsg: {
         type: String,
         value: ''
       }
@@ -304,14 +321,18 @@ class EtoolsUpload extends RequestHelperMixin(CommonMixin(PolymerElement)) {
 
   setUploadProgress(requestData) {
     if (!requestData) {
-      this.uploadProgress = '';
+      this.uploadProgressValue = '';
     } else {
-      this.uploadProgress = `${requestData.loaded * 100 / requestData.total}`;
+      this.uploadProgressMsg = `${Math.round(requestData.loaded/1024)} kb of ${Math.round(requestData.total/1024)} kb`;
+      this.uploadProgressValue = `${requestData.loaded * 100 / requestData.total}`;
     }
   }
 
   resetUploadProgress() {
-    setTimeout(() => this.uploadProgress = '', 1000);
+    setTimeout(() => {
+      this.uploadProgressValue = '';
+      this.uploadProgressMsg = '';
+    }, 1000);
   }
 
   _fileUrlChanged(fileUrl) {
