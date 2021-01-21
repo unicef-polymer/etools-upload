@@ -332,7 +332,7 @@ class EtoolsUpload extends RequestHelperMixin(CommonMixin(PolymerElement)) {
     setTimeout(() => {
       this.uploadProgressValue = '';
       this.uploadProgressMsg = '';
-    }, 1000);
+    }, 100);
   }
 
   _fileUrlChanged(fileUrl) {
