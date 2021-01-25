@@ -288,7 +288,7 @@ class EtoolsUpload extends RequestHelperMixin(CommonMixin(PolymerElement)) {
     this.uploadInProgress = true;
     this.fireEvent('upload-started');
 
-    this.uploadRawFile(this.rawFile, Date.now(), this.setUploadProgress.bind(this)).then((response) => {
+    this.uploadRawFile(this.rawFile, this.rawFile.name, this.setUploadProgress.bind(this)).then((response) => {
       this.success = true;
       this.uploadInProgress = false;
       this.fireEvent('upload-finished', {success: response});
