@@ -45,15 +45,10 @@ class EtoolsUpload extends RequestHelperMixin(CommonMixin(PolymerElement)) {
         color: var(--secondary-text-color, rgba(0, 0, 0, 0.54));
       }
 
-      .filename-container {
+      .filename-row {
         @apply --layout-horizontal;
         @apply --layout-center;
         border-bottom: 1px solid var(--secondary-text-color, rgba(0, 0, 0, 0.54));
-        margin-right: 8px;
-        min-width: 145px;
-        overflow-wrap: break-word;
-        font-size: 16px;
-        position: relative;
       }
 
       .filename {
@@ -62,11 +57,11 @@ class EtoolsUpload extends RequestHelperMixin(CommonMixin(PolymerElement)) {
         white-space: nowrap;
       }
 
-      :host([readonly]) .filename-container {
+      :host([readonly]) .filename-row {
         border-bottom: none;
       }
 
-      :host([disabled]) .filename-container {
+      :host([disabled]) .filename-row {
         border-bottom: 1px dashed var(--secondary-text-color, rgba(0, 0, 0, 0.54));
       }
 
@@ -77,13 +72,20 @@ class EtoolsUpload extends RequestHelperMixin(CommonMixin(PolymerElement)) {
         color: var(--etools-upload-primary-color, var(--primary-color));
       }
 
+      .filename-container {
+        display: flex;
+        flex-direction: column;
+        margin-right: 8px;
+        min-width: 145px;
+        overflow-wrap: break-word;
+        font-size: 16px;
+      }
+
       .progress-container {
         display: flex;
         flex-direction: column;
         flex-wrap: nowrap;
         width: 100%;
-        position: absolute;
-        top: 25px;
       }
 
       paper-progress {
@@ -122,15 +124,16 @@ class EtoolsUpload extends RequestHelperMixin(CommonMixin(PolymerElement)) {
 
         <div class="filename-and-actions-container">
           <div class="filename-container" hidden$="[[!_thereIsAFileSelectedOrSaved(_filename)]]">
-            <iron-icon class="file-icon" icon="attachment"></iron-icon>
-            <span class="filename" title="[[_filename]]">[[_filename]]</span>
-
-            <template is="dom-if" if="[[uploadProgressValue]]">
-              <div class='progress-container'>
-                <paper-progress value="{{uploadProgressValue}}"></paper-progress>
-                <span>{{uploadProgressMsg}}</span>
-              <div>
-            </template>
+              <div class="filename-row">
+                <iron-icon class="file-icon" icon="attachment"></iron-icon>
+                <span class="filename" title="[[_filename]]">[[_filename]]</span>
+              </div>
+              <template is="dom-if" if="[[uploadProgressValue]]">
+                <div class='progress-container'>
+                  <paper-progress value="{{uploadProgressValue}}"></paper-progress>
+                  <span>{{uploadProgressMsg}}</span>
+                <div>
+              </template>
           </div>
           <div class="upload-status">
             <iron-icon title="Uploaded successfuly!" icon="done" hidden$="[[!success]]"></iron-icon>
@@ -288,9 +291,11 @@ class EtoolsUpload extends RequestHelperMixin(CommonMixin(PolymerElement)) {
     this.uploadRawFile(this.rawFile, Date.now(), this.setUploadProgress.bind(this)).then((response) => {
       this.success = true;
       this.uploadInProgress = false;
-      this.resetRawFile();
-      this.resetUploadProgress();
       this.fireEvent('upload-finished', {success: response});
+      setTimeout(() => {
+        this.resetRawFile();
+        this.resetUploadProgress();
+      }, 10);
     }).catch((err) => {
       this.fail = true;
       this.serverErrorMsg = 'Error uploading file: ' + this.prepareErrorMessage(err);
@@ -329,10 +334,8 @@ class EtoolsUpload extends RequestHelperMixin(CommonMixin(PolymerElement)) {
   }
 
   resetUploadProgress() {
-    setTimeout(() => {
-      this.uploadProgressValue = '';
-      this.uploadProgressMsg = '';
-    }, 100);
+    this.uploadProgressValue = '';
+    this.uploadProgressMsg = '';
   }
 
   _fileUrlChanged(fileUrl) {
