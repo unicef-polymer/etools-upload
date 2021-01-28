@@ -27,14 +27,13 @@ export const RequestHelperMixin = (baseClass) => class extends (baseClass) {
     };
   }
 
-  uploadRawFile(rawFile, requestKey) {
+  uploadRawFile(rawFile, requestKey, onProgressCallback) {
     let config = {
       endpointInfo: this.endpointInfo,
       uploadEndpoint: this.uploadEndpoint,
       jwtLocalStorageKey: this.jwtLocalStorageKey
     }
-    return upload(config, rawFile, requestKey);
+    return upload(config, rawFile, requestKey, onProgressCallback);
   }
-
 
 }
