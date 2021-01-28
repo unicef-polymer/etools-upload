@@ -194,6 +194,7 @@ class EtoolsUploadMulti extends RequestHelperMulti(CommonMixin(PolymerElement)) 
         filetype: files[i].type,
         filename: files[i].name,
         extraInfo: this.endpointInfo ? this.endpointInfo.extraInfo : '',
+        parentId: window.OfflineUploadParentId || ((this.endpointInfo && this.endpointInfo.extraInfo) ? this.endpointInfo.extraInfo.parentId : ''),
         unsynced: true
       }
 
