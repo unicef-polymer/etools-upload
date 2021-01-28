@@ -5,7 +5,6 @@ import '@polymer/iron-icon/iron-icon.js';
 import '@polymer/iron-icons/iron-icons.js';
 import '@polymer/paper-input/paper-input-container.js';
 import '@polymer/paper-input/paper-input-error.js';
-import '@polymer/iron-flex-layout/iron-flex-layout.js';
 import '@polymer/paper-spinner/paper-spinner.js';
 import '@polymer/paper-progress/paper-progress.js';
 import {CommonStyles} from "./common-styles.js";
@@ -30,13 +29,16 @@ class EtoolsUpload extends RequestHelperMixin(CommonMixin(PolymerElement)) {
     <style>
 
       #input-main-content {
-        @apply --layout-horizontal;
-        @apply --layout-center;
+        display: flex;
+        flex-direction: row;
+        align-items: center;
       }
 
       .filename-and-actions-container {
-        @apply --layout-horizontal;
-        @apply --layout-flex;
+        display: flex;
+        flex-direction: row;
+        flex: 1;
+        flex-basis: 0.000000001px;
         max-width: 100%;
       }
 
@@ -46,8 +48,9 @@ class EtoolsUpload extends RequestHelperMixin(CommonMixin(PolymerElement)) {
       }
 
       .filename-row {
-        @apply --layout-horizontal;
-        @apply --layout-center;
+        display: flex;
+        flex-direction: row;
+        align-items: center;
         border-bottom: 1px solid var(--secondary-text-color, rgba(0, 0, 0, 0.54));
       }
 
@@ -66,7 +69,7 @@ class EtoolsUpload extends RequestHelperMixin(CommonMixin(PolymerElement)) {
       }
 
       .download-button {
-        @apply --layout-center-justified;
+        justify-content: center;
         padding: 0 0;
         margin-left: 8px;
         color: var(--etools-upload-primary-color, var(--primary-color));
