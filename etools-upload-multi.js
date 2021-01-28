@@ -6,7 +6,7 @@ import '@polymer/iron-icons/iron-icons.js';
 import '@polymer/paper-input/paper-input-container.js';
 import '@polymer/paper-input/paper-input-error.js';
 import '@polymer/iron-flex-layout/iron-flex-layout.js';
-import '@polymer/paper-spinner/paper-spinner.js';
+import '@polymer/paper-progress/paper-progress.js';
 import {CommonStyles} from "./common-styles";
 import {CommonMixin} from './common-mixin.js';
 import {RequestHelperMulti} from './request-helper-multi.js';
@@ -40,15 +40,38 @@ class EtoolsUploadMulti extends RequestHelperMulti(CommonMixin(PolymerElement)) 
       .filename-line {
         @apply --layout-horizontal;
         @apply --layout-center;
+        display: block;
       }
       .filename {
         padding: 0 16px 0 8px;
         overflow: hidden;
         text-overflow: ellipsis;
         white-space: nowrap;
+        max-width: calc(100% - 100px);
+        display: inline-block;
+        vertical-align: middle;
       }
       .delete-button {
         padding-left: 24px;
+      }
+      .filename-container {
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+      .progress-container {
+        display: flex;
+        flex-direction: column;
+        flex-wrap: nowrap;
+        width: 180px;
+      }
+      paper-progress {
+        --paper-progress-active-color: var(--primary-color);
+        width: 100%;
+      }
+      .progress-container span {
+        font-size: 11px;
+        margin: 0 auto;
       }
 
     </style>
@@ -71,11 +94,20 @@ class EtoolsUploadMulti extends RequestHelperMulti(CommonMixin(PolymerElement)) 
       <div class="filenames-container" hidden$="[[!_thereAreFilesSelected(_filenames)]]">
         <template is="dom-repeat" items="{{_filenames}}" as="item">
           <div class="filename-line">
-            <iron-icon class="file-icon" icon="attachment"></iron-icon>
-            <span class="filename" title="[[item.filename]]">[[item.filename]]</span>
-            <paper-spinner title="Upload in progress.." id="uploadingSpinner" hidden$="[[!item.uploadInProgress]]" active="[[item.uploadInProgress]]"></paper-spinner>
-            <iron-icon title="Uploaded successfully!" icon="done" hidden$="[[!item.success]]"></iron-icon>
-            <iron-icon title="Upload failed!" icon="error-outline" hidden$="[[!item.fail]]"></iron-icon>
+            <div class="filename-container">
+              <iron-icon class="file-icon" icon="attachment"></iron-icon>
+              <span class="filename" title="[[item.filename]]">[[item.filename]]</span>
+
+              <iron-icon title="Uploaded successfully!" icon="done" hidden$="[[!item.success]]"></iron-icon>
+              <iron-icon title="Upload failed!" icon="error-outline" hidden$="[[!item.fail]]"></iron-icon>
+            </div>
+            <template is="dom-if" if="[[item.uploadProgressValue]]">
+              <div class='progress-container'>
+                <paper-progress value="[[item.uploadProgressValue]]"></paper-progress>
+                <span>[[item.uploadProgressMsg]]</span>
+              <div>
+            </template>
+
           </div>
         </template>
       </div>
@@ -143,7 +175,9 @@ class EtoolsUploadMulti extends RequestHelperMulti(CommonMixin(PolymerElement)) 
         filename: files.item(i).name,
         success: false,
         fail: false,
-        uploadInProgress: this.autoUpload
+        uploadInProgress: this.autoUpload,
+        uploadProgressValue: '',
+        uploadProgressMsg: ''
       });
     }
     return names;
@@ -217,15 +251,18 @@ class EtoolsUploadMulti extends RequestHelperMulti(CommonMixin(PolymerElement)) 
   }
 
   _uploadAllFilesSequentially(files, uploadFunction, set, prepareErrorMessage) {
+    const self = this;
     return new Promise(function(resolve, reject) {
       let allSuccessResponses = [];
       let allErrorResponses = [];
       let i;
       let counter = 0;
       for (i = 0; i < files.length; i++) {
-        uploadFunction(files[i], files[i].name).then((response) => {
-          set(['_filenames', counter, 'uploadInProgress'], false);
-          set(['_filenames', counter, 'success'], true);
+        (function(index) {
+        uploadFunction(files[index], files[index].name, self._computeUploadProgress.bind(self, set, index)).then((response) => {
+          set(['_filenames', index, 'success'], true);
+          set(['_filenames', index, 'uploadInProgress'], false);
+          self._setProgressProps(set, index, '', '');
 
           allSuccessResponses.push(response);
 
@@ -237,9 +274,9 @@ class EtoolsUploadMulti extends RequestHelperMulti(CommonMixin(PolymerElement)) 
           }
           counter++;
         }).catch((err) => {
-
-          set(['_filenames', counter, 'uploadInProgress'], false);
-          set(['_filenames', counter, 'fail'], true);
+          set(['_filenames', index, 'uploadInProgress'], false);
+          set(['_filenames', index, 'fail'], true);
+          self._setProgressProps(set, index, '', '');
 
           allErrorResponses.push(prepareErrorMessage(err));
 
@@ -251,9 +288,24 @@ class EtoolsUploadMulti extends RequestHelperMulti(CommonMixin(PolymerElement)) 
           }
           counter++;
         });
-      }
+      })(i);
 
-    });
+      }});
+  }
+
+  _computeUploadProgress(set, index, requestData) {
+    if (!requestData) {
+      this._setProgressProps(set, index, '', '');
+    } else {
+      const progressValue = `${requestData.loaded * 100 / requestData.total}`;
+      const progressMsg = `${Math.round(requestData.loaded/1024)} kb of ${Math.round(requestData.total/1024)} kb`;
+      this._setProgressProps(set, index, progressValue, progressMsg);
+    }
+  }
+
+  _setProgressProps(set, index, progressValue, progressMsg){
+    set(['_filenames', index, 'uploadProgressValue'], progressValue);
+    set(['_filenames', index, 'uploadProgressMsg'], progressMsg);
   }
 
   _shouldDisableUploadBtn(readonly, uploadInProgress) {
