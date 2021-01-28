@@ -19,3 +19,20 @@ export function deleteFileFromDexie(id) {
   return window.Etools.AttachmentsDb.attachments.delete(id);
 }
 
+export function updateParentIdInDexie(oldParentId, newParentId) {
+  return window.Etools.AttachmentsDb.attachments
+  .where({parentId: oldParentId}).modify({parentId: newParentId});
+}
+
+export function deleteByParentIdFromDexie(parentId) {
+  return window.Etools.AttachmentsDb.attachments
+  .where({parentId: parentId}).delete();
+}
+
+/**
+ * Avoid returning all files because they contain the binary data also and it's best to save memory
+ */
+export function getFileCountByParentIdFromDexie(parentId) {
+  return window.Etools.AttachmentsDb.attachments
+  .where({parentId: parentId}).count();
+}
