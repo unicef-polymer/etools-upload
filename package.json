@@ -15,6 +15,7 @@
     "build": "polymer build",
     "lint": "polymer lint",
     "test": "polymer test",
+    "publish": "git push --tags && npm publish",
     "test:integration": "polymer build # test that psk builds without error with the CLI",
     "gen-typings": "gen-typescript-declarations --deleteExisting --outDir './'"
   },
