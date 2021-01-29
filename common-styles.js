@@ -47,6 +47,12 @@ export const CommonStyles = html `
         color: var(--etools-upload-primary-color, var(--primary-color));
         margin-right: 8px;
       }
+
+       paper-button:focus {
+           outline: 0;
+           box-shadow: 0 0 5px 5px rgba(170, 165, 165, 0.2);
+           background-color: rgba(170, 165, 165, 0.2);
+       }
       
       :host([readonly]) .upload-button {
         color: var(--secondary-text-color, rgba(0, 0, 0, 0.54));
