@@ -24,6 +24,11 @@ export function updateParentIdInDexie(oldParentId, newParentId) {
   .where({parentId: oldParentId}).modify({parentId: newParentId});
 }
 
+export function updateProvidedPropertyNameInDexie(attId, propName, val) {
+  return window.Etools.AttachmentsDb.attachments
+  .where({id: attId}).modify({[propName]: val});
+}
+
 export function deleteByParentIdFromDexie(parentId) {
   return window.Etools.AttachmentsDb.attachments
   .where({parentId: parentId}).delete();
@@ -36,3 +41,4 @@ export function getFileCountByParentIdFromDexie(parentId) {
   return window.Etools.AttachmentsDb.attachments
   .where({parentId: parentId}).count();
 }
+
