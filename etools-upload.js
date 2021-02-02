@@ -37,8 +37,6 @@ class EtoolsUpload extends RequestHelperMixin(CommonMixin(PolymerElement)) {
       .filename-and-actions-container {
         display: flex;
         flex-direction: row;
-        flex: 1;
-        flex-basis: 0.000000001px;
         max-width: 100%;
       }
 
