@@ -1,6 +1,6 @@
 {
   "name": "@unicef-polymer/etools-upload",
-  "version": "3.3.0",
+  "version": "3.3.1",
   "homepage": "https://github.com/unicef-polymer/etools-upload",
   "repository": {
     "type": "git",
@@ -15,6 +15,7 @@
     "build": "polymer build",
     "lint": "polymer lint",
     "test": "polymer test",
+    "publish": "git push --tags && npm publish",
     "test:integration": "polymer build # test that psk builds without error with the CLI",
     "gen-typings": "gen-typescript-declarations --deleteExisting --outDir './'"
   },

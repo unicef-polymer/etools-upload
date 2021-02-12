@@ -5,7 +5,6 @@ import '@polymer/iron-icon/iron-icon.js';
 import '@polymer/iron-icons/iron-icons.js';
 import '@polymer/paper-input/paper-input-container.js';
 import '@polymer/paper-input/paper-input-error.js';
-import '@polymer/iron-flex-layout/iron-flex-layout.js';
 import '@polymer/paper-progress/paper-progress.js';
 import {CommonStyles} from "./common-styles";
 import {CommonMixin} from './common-mixin.js';
@@ -29,8 +28,9 @@ class EtoolsUploadMulti extends RequestHelperMulti(CommonMixin(PolymerElement)) 
         ${CommonStyles}
     <style>
       .upload-btn-and-actions {
-        @apply --layout-horizontal;
-        @apply --layout-center;
+        display: flex;
+        flex-direction: row;
+        align-items: center;
       }
       .filenames-container {
         padding-top: 4px;
@@ -38,8 +38,8 @@ class EtoolsUploadMulti extends RequestHelperMulti(CommonMixin(PolymerElement)) 
         margin-bottom: 16px;
       }
       .filename-line {
-        @apply --layout-horizontal;
-        @apply --layout-center;
+        flex-direction: row;
+        align-items: center;
         display: block;
       }
       .filename {
