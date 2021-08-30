@@ -21,7 +21,7 @@ export function getArrayBuffer(blob) {
 }
 
 export async function getBlob(fileUrl) {
-  //** Using XHR */
+  //* * Using XHR */
   // return new Promise((resolve, reject) => {
   //   let xhr = new XMLHttpRequest();
   //   let blob;
@@ -36,16 +36,16 @@ export async function getBlob(fileUrl) {
   //   xhr.send();
   // });
 
-  //** Using fetch */
-  let response = await fetch(fileUrl);
+  //* * Using fetch */
+  const response = await fetch(fileUrl);
   return response.blob();
 }
 
 export function getFileUrl(file, doNotRevokeUrl) {
-  let tempUrl = window.URL.createObjectURL(file);
+  const tempUrl = window.URL.createObjectURL(file);
   if (!doNotRevokeUrl) {
     setTimeout(() => {
-      window.URL.revokeObjectURL(tempUrl);//For Memory management
+      window.URL.revokeObjectURL(tempUrl); // For Memory management
     }, 3000);
   }
   return tempUrl;
