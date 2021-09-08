@@ -1,4 +1,4 @@
-import {PolymerElement, html} from '@polymer/polymer';
+import { PolymerElement, html } from '@polymer/polymer';
 import '@polymer/polymer/lib/elements/dom-if.js';
 import '@polymer/paper-button/paper-button.js';
 import '@polymer/iron-icon/iron-icon.js';
@@ -7,11 +7,11 @@ import '@polymer/paper-input/paper-input-container.js';
 import '@polymer/paper-input/paper-input-error.js';
 import '@polymer/paper-spinner/paper-spinner.js';
 import '@polymer/paper-progress/paper-progress.js';
-import {CommonStyles} from "./common-styles.js";
+import { CommonStyles } from './common-styles.js';
 
-import {CommonMixin} from './common-mixin.js';
-import {RequestHelperMixin} from './request-helper-mixin.js';
-import {abortActiveRequests} from '@unicef-polymer/etools-ajax/upload-helper';
+import { CommonMixin } from './common-mixin.js';
+import { RequestHelperMixin } from './request-helper-mixin.js';
+import { abortActiveRequests } from '@unicef-polymer/etools-ajax/upload-helper';
 
 /**
  * `etools-upload`
@@ -21,7 +21,9 @@ import {abortActiveRequests} from '@unicef-polymer/etools-ajax/upload-helper';
  * @polymer
  * @demo demo/index.html
  */
-export class EtoolsUpload extends RequestHelperMixin(CommonMixin(PolymerElement)) {
+export class EtoolsUpload extends RequestHelperMixin(
+  CommonMixin(PolymerElement)
+) {
   static get template() {
     // language=HTML
     return html`
@@ -177,69 +179,71 @@ export class EtoolsUpload extends RequestHelperMixin(CommonMixin(PolymerElement)
 `;
   }
 
-  static get is() {return 'etools-upload';}
+  static get is() {
+    return 'etools-upload';
+  }
   static get properties() {
     return {
       uploadBtnLabel: {
         type: String,
-        value: 'Upload file'
+        value: 'Upload file',
       },
       alwaysFloatLabel: {
         type: Boolean,
-        value: true
+        value: true,
       },
       fileUrl: {
         type: String,
         value: null,
-        observer: '_fileUrlChanged'
+        observer: '_fileUrlChanged',
       },
       _filename: {
         type: String,
-        value: null
+        value: null,
       },
       rawFile: {
         type: Object,
-        value: null
+        value: null,
       },
       showDeleteBtn: {
         type: Boolean,
-        value: true
+        value: true,
       },
       errorMessage: String,
       originalErrorMessage: String,
       serverErrorMsg: String,
       success: {
         type: Boolean,
-        value: false
+        value: false,
       },
       fail: {
         type: Boolean,
-        value: false
+        value: false,
       },
       showChange: {
         type: Boolean,
-        value: true
+        value: true,
       },
       allowMultilineFilename: {
         type: Boolean,
         value: false,
-        reflectToAttribute: true
+        reflectToAttribute: true,
       },
       uploadProgressValue: {
         type: String,
-        value: ''
+        value: '',
       },
       uploadProgressMsg: {
         type: String,
-        value: ''
-      }
+        value: '',
+      },
     };
   }
 
   static get observers() {
     return [
       'autoValidateHandler(rawFile, fileUrl)',
-      '_invalidChanged(invalid)'
+      '_invalidChanged(invalid)',
     ];
   }
 
@@ -289,22 +293,29 @@ export class EtoolsUpload extends RequestHelperMixin(CommonMixin(PolymerElement)
     this.uploadInProgress = true;
     this.fireEvent('upload-started');
 
-    this.uploadRawFile(this.rawFile, this.rawFile.name, this.setUploadProgress.bind(this)).then((response) => {
-      this.success = true;
-      this.uploadInProgress = false;
-      this.fireEvent('upload-finished', {success: response});
-      setTimeout(() => {
-        this.resetRawFile();
+    this.uploadRawFile(
+      this.rawFile,
+      this.rawFile.name,
+      this.setUploadProgress.bind(this)
+    )
+      .then((response) => {
+        this.success = true;
+        this.uploadInProgress = false;
+        this.fireEvent('upload-finished', { success: response });
+        setTimeout(() => {
+          this.resetRawFile();
+          this.resetUploadProgress();
+        }, 10);
+      })
+      .catch((err) => {
+        this.fail = true;
+        this.serverErrorMsg =
+          'Error uploading file: ' + this.prepareErrorMessage(err);
+        this.setInvalid(true, this.serverErrorMsg);
+        this.uploadInProgress = false;
         this.resetUploadProgress();
-      }, 10);
-    }).catch((err) => {
-      this.fail = true;
-      this.serverErrorMsg = 'Error uploading file: ' + this.prepareErrorMessage(err);
-      this.setInvalid(true, this.serverErrorMsg);
-      this.uploadInProgress = false;
-      this.resetUploadProgress();
-      this.fireEvent('upload-finished', {error: err});
-    });
+        this.fireEvent('upload-finished', { error: err });
+      });
   }
 
   setInvalid(invalid, errMsg) {
@@ -329,8 +340,12 @@ export class EtoolsUpload extends RequestHelperMixin(CommonMixin(PolymerElement)
     if (!requestData) {
       this.uploadProgressValue = '';
     } else {
-      this.uploadProgressMsg = `${Math.round(requestData.loaded/1024)} kb of ${Math.round(requestData.total/1024)} kb`;
-      this.uploadProgressValue = `${requestData.loaded * 100 / requestData.total}`;
+      this.uploadProgressMsg = `${Math.round(
+        requestData.loaded / 1024
+      )} kb of ${Math.round(requestData.total / 1024)} kb`;
+      this.uploadProgressValue = `${
+        (requestData.loaded * 100) / requestData.total
+      }`;
     }
   }
 
@@ -365,7 +380,7 @@ export class EtoolsUpload extends RequestHelperMixin(CommonMixin(PolymerElement)
   }
 
   _showDeleteBtn(readonly, _filename, showDeleteBtn, uploadInProgress) {
-    return (!readonly && _filename && !uploadInProgress && showDeleteBtn);
+    return !readonly && _filename && !uploadInProgress && showDeleteBtn;
   }
 
   _cancelUpload() {
@@ -373,10 +388,11 @@ export class EtoolsUpload extends RequestHelperMixin(CommonMixin(PolymerElement)
 
     this.setProperties({
       uploadInProgress: false,
-      _filename: null
+      _filename: null,
     });
 
     this.resetRawFile();
+    this.fireEvent('upload-cancelled');
   }
 
   _deleteFile(e) {
@@ -386,7 +402,7 @@ export class EtoolsUpload extends RequestHelperMixin(CommonMixin(PolymerElement)
     this._filename = null;
     this.resetStatus();
     // TODO: should delete req be implemented here?
-    this.fireEvent('delete-file', {file: this.fileUrl});
+    this.fireEvent('delete-file', { file: this.fileUrl });
     this.fileUrl = null;
   }
 
@@ -406,9 +422,10 @@ export class EtoolsUpload extends RequestHelperMixin(CommonMixin(PolymerElement)
     let valid = true;
     let errMsg = this.originalErrorMessage;
     if (this.required) {
-      const uploadRequestFailed = this.rawFile instanceof File && this.fail === true;
+      const uploadRequestFailed =
+        this.rawFile instanceof File && this.fail === true;
 
-      if ((!this.rawFile && !this.fileUrl)) {
+      if (!this.rawFile && !this.fileUrl) {
         valid = false;
         errMsg = 'This field is required';
       }
@@ -434,7 +451,8 @@ export class EtoolsUpload extends RequestHelperMixin(CommonMixin(PolymerElement)
 
   _invalidChanged() {
     if (!this.invalid) {
-      if (this.fail) {// clean up after a failed upload
+      if (this.fail) {
+        // clean up after a failed upload
         this._filename = null;
       }
       this.resetStatus();
@@ -448,7 +466,10 @@ export class EtoolsUpload extends RequestHelperMixin(CommonMixin(PolymerElement)
     if (acceptedExtensions.indexOf('.' + fileExtension) > -1) {
       return true;
     }
-    this.setInvalid(true, 'Please change file. Accepted file types: ' + this.accept);
+    this.setInvalid(
+      true,
+      'Please change file. Accepted file types: ' + this.accept
+    );
     return false;
   }
 
@@ -465,6 +486,6 @@ export class EtoolsUpload extends RequestHelperMixin(CommonMixin(PolymerElement)
   '.hiddenfile' => ''
   'filename.with.many.dots.ext'	=> 'ext'*/
   _getFileExtension(fileName) {
-    return fileName.slice((fileName.lastIndexOf(".") - 1 >>> 0) + 2);
+    return fileName.slice(((fileName.lastIndexOf('.') - 1) >>> 0) + 2);
   }
 }

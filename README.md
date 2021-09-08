@@ -83,10 +83,11 @@ When `autoUpload` is true and `uploadEndpoint` is set , it automatically uploads
 
 #Events
 
-13. `on-upload-started`: triggered when upload started
-14. `on-upload-finished`: triggered when upload finished with the result of the action (information about the uploaded files) (Ex: {success: response} or {error: err}). This same event is triggered when offline and the files were saved in IndexedDb.
-15. `on-change-unsaved-file`: triggered on file selection if previous upload was not saved
-16. `on-delete-file`: triggered on file delete with the file url as parameter (Ex: {file: fileUrl})
+13. `upload-started`: triggered when upload started
+14. `upload-finished`: triggered when upload finished with the result of the action (information about the uploaded files) (Ex: {success: response} or {error: err}). This same event is triggered when offline and the files were saved in IndexedDb.
+15. `change-unsaved-file`: triggered on file selection if previous upload was not saved
+16. `delete-file`: triggered on file delete with the file url as parameter (Ex: {file: fileUrl})
+17. `upload-cancelled`
 
 ## Usage example
 
