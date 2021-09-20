@@ -111,6 +111,9 @@ export class EtoolsUpload extends RequestHelperMixin(CommonMixin(PolymerElement)
         vertical-align: middle;
       }
 
+      .upload-button[disabled] {
+        justify-content: flex-start;
+      }
     </style>
 
     <paper-input-container always-float-label="" disabled$="[[disabled]]" invalid$="[[invalid]]">
@@ -119,8 +122,11 @@ export class EtoolsUpload extends RequestHelperMixin(CommonMixin(PolymerElement)
 
       <div slot="input">
         <paper-button class="upload-button" on-tap="_openFileChooser" title="[[uploadBtnLabel]]" disabled$="[[readonly]]" hidden$="[[_thereIsAFileSelectedOrSaved(_filename)]]">
-                      <iron-icon icon="file-upload"></iron-icon>
-                      [[uploadBtnLabel]]
+            <span hidden$="[[readonly]]">
+              <iron-icon icon="file-upload"></iron-icon>
+              [[uploadBtnLabel]]
+            </span>
+            <label hidden$="[[!readonly]]">—</label>
         </paper-button>
 
         <div class="filename-and-actions-container">
@@ -329,7 +335,7 @@ export class EtoolsUpload extends RequestHelperMixin(CommonMixin(PolymerElement)
     if (!requestData) {
       this.uploadProgressValue = '';
     } else {
-      this.uploadProgressMsg = `${Math.round(requestData.loaded/1024)} kb of ${Math.round(requestData.total/1024)} kb`;
+      this.uploadProgressMsg = `${Math.round(requestData.loaded / 1024)} kb of ${Math.round(requestData.total / 1024)} kb`;
       this.uploadProgressValue = `${requestData.loaded * 100 / requestData.total}`;
     }
   }
