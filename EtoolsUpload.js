@@ -111,6 +111,9 @@ export class EtoolsUpload extends RequestHelperMixin(CommonMixin(PolymerElement)
         vertical-align: middle;
       }
 
+      .upload-button[disabled] {
+        justify-content: flex-start;
+      }
     </style>
 
     <paper-input-container always-float-label="" disabled$="[[disabled]]" invalid$="[[invalid]]">
@@ -118,14 +121,12 @@ export class EtoolsUpload extends RequestHelperMixin(CommonMixin(PolymerElement)
       <label slot="label" id="element-label" hidden$="[[!_showLabel(label)]]" aria-hidden="true">[[label]]</label>
 
       <div slot="input">
-        <paper-button 
-          class="upload-button" 
-          on-tap="_openFileChooser" 
-          title="[[uploadBtnLabel]]" 
-          disabled$="[[readonly]]" 
-          hidden$="[[_thereIsAFileSelectedOrSaved(_filename)]]">
-                      <iron-icon icon="file-upload"></iron-icon>
-                      [[uploadBtnLabel]]
+        <paper-button class="upload-button" on-tap="_openFileChooser" title="[[uploadBtnLabel]]" disabled$="[[readonly]]" hidden$="[[_thereIsAFileSelectedOrSaved(_filename)]]">
+            <span hidden$="[[readonly]]">
+              <iron-icon icon="file-upload"></iron-icon>
+              [[uploadBtnLabel]]
+            </span>
+            <label hidden$="[[!readonly]]">—</label>
         </paper-button>
 
         <div class="filename-and-actions-container">
