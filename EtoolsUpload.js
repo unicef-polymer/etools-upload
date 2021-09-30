@@ -121,7 +121,9 @@ export class EtoolsUpload extends RequestHelperMixin(CommonMixin(PolymerElement)
       <label slot="label" id="element-label" hidden$="[[!_showLabel(label)]]" aria-hidden="true">[[label]]</label>
 
       <div slot="input">
-        <paper-button class="upload-button" on-tap="_openFileChooser" title="[[uploadBtnLabel]]" disabled$="[[readonly]]" hidden$="[[_thereIsAFileSelectedOrSaved(_filename)]]">
+        <paper-button class="upload-button" on-tap="_openFileChooser" 
+         title="[[uploadBtnLabel]]" disabled$="[[readonly]]"
+         hidden$="[[_thereIsAFileSelectedOrSaved(_filename)]]">
             <span hidden$="[[readonly]]">
               <iron-icon icon="file-upload"></iron-icon>
               [[uploadBtnLabel]]
