@@ -7,7 +7,7 @@
     "url": "https://github.com/unicef-polymer/etools-upload.git"
   },
   "description": "Upload files",
-  "author": "The Polymer Authors",
+  "author": "eTools Team",
   "license": "BSD-3-Clause",
   "main": "index.js",
   "module": "index.js",
@@ -27,14 +27,13 @@
     "@unicef-polymer/etools-ajax": "^4.2.0",
     "@webcomponents/webcomponentsjs": "^2.5.0",
     "dexie": "^3.0.3",
-    "lodash": "^4.17.20",
+    "lodash": "^4.17.21",
     "web-animations-js": "^2.3.1"
   },
   "devDependencies": {
     "@polymer/gen-typescript-declarations": "^1.6.0",
     "@polymer/iron-demo-helpers": "^3.0.0",
     "acorn": "^7.4.1",
-    "babel-eslint": "^8.2.6",
     "eslint": "^7.20.0",
     "eslint-config-google": "^0.13.0",
     "eslint-config-prettier": "^6.15.0",
