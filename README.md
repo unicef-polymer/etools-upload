@@ -118,7 +118,7 @@ $ polymer serve
 
 ## Circle CI
 
-Package will be automatically published after tag push (`git tag 1.2.3` , `git push --tags`). Tag name must correspond SemVer (Semantic Versioning) rules.  
+Package will be automatically published after tag push (`git tag 1.2.3` , `git push --tags`). Tag name must correspond to SemVer (Semantic Versioning) rules.  
 Examples:
 
 | Version match      | Result   |
