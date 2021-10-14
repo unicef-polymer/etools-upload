@@ -7,7 +7,7 @@ import '@polymer/paper-input/paper-input-container.js';
 import '@polymer/paper-input/paper-input-error.js';
 import '@polymer/paper-spinner/paper-spinner.js';
 import '@polymer/paper-progress/paper-progress.js';
-import {CommonStyles} from "./common-styles.js";
+import {CommonStyles} from './common-styles.js';
 
 import {CommonMixin} from './common-mixin.js';
 import {RequestHelperMixin} from './request-helper-mixin.js';
@@ -121,7 +121,9 @@ export class EtoolsUpload extends RequestHelperMixin(CommonMixin(PolymerElement)
       <label slot="label" id="element-label" hidden$="[[!_showLabel(label)]]" aria-hidden="true">[[label]]</label>
 
       <div slot="input">
-        <paper-button class="upload-button" on-tap="_openFileChooser" title="[[uploadBtnLabel]]" disabled$="[[readonly]]" hidden$="[[_thereIsAFileSelectedOrSaved(_filename)]]">
+        <paper-button class="upload-button" on-tap="_openFileChooser" 
+         title="[[uploadBtnLabel]]" disabled$="[[readonly]]"
+         hidden$="[[_thereIsAFileSelectedOrSaved(_filename)]]">
             <span hidden$="[[readonly]]">
               <iron-icon icon="file-upload"></iron-icon>
               [[uploadBtnLabel]]
@@ -149,20 +151,36 @@ export class EtoolsUpload extends RequestHelperMixin(CommonMixin(PolymerElement)
 
           <!-- File actions -->
           <div class="file-actions">
-            <paper-button class="download-button" on-tap="_downloadFile" disabled="[[!_showDownloadBtn(fileUrl)]]" hidden$="[[!_showDownloadBtn(fileUrl)]]" title="Download">
+            <paper-button class="download-button"
+              on-tap="_downloadFile"
+              disabled="[[!_showDownloadBtn(fileUrl)]]"
+              hidden$="[[!_showDownloadBtn(fileUrl)]]"
+              title="Download">
               <iron-icon icon="cloud-download" class="dw-icon"></iron-icon>
               Download
             </paper-button>
 
-            <paper-button class="change-button" on-tap="_openFileChooser" disabled$="[[!_showChange(readonly, _filename, uploadInProgress)]]" hidden$="[[!_showChange(readonly, _filename, uploadInProgress)]]">
+            <paper-button
+              class="change-button"
+              on-tap="_openFileChooser" 
+              disabled$="[[!_showChange(readonly, _filename, uploadInProgress)]]" 
+              hidden$="[[!_showChange(readonly, _filename, uploadInProgress)]]">
               Change
             </paper-button>
 
-            <paper-button class="delete-button" on-tap="_deleteFile" disabled$="[[readonly]]" hidden$="[[!_showDeleteBtn(readonly, _filename, showDeleteBtn, uploadInProgress)]]">
+            <paper-button
+              class="delete-button"
+              on-tap="_deleteFile" 
+              disabled$="[[readonly]]" 
+              hidden$="[[!_showDeleteBtn(readonly, _filename, showDeleteBtn, uploadInProgress)]]">
               Delete
             </paper-button>
 
-            <paper-button class="delete-button" on-tap="_cancelUpload" disabled$="[[!uploadInProgress]]" hidden$="[[!uploadInProgress]]">
+            <paper-button
+              class="delete-button"
+              on-tap="_cancelUpload" 
+              disabled$="[[!uploadInProgress]]" 
+              hidden$="[[!uploadInProgress]]">
               Cancel
             </paper-button>
           </div>
@@ -183,7 +201,9 @@ export class EtoolsUpload extends RequestHelperMixin(CommonMixin(PolymerElement)
 `;
   }
 
-  static get is() {return 'etools-upload';}
+  static get is() {
+    return 'etools-upload';
+  }
   static get properties() {
     return {
       uploadBtnLabel: {
@@ -243,10 +263,7 @@ export class EtoolsUpload extends RequestHelperMixin(CommonMixin(PolymerElement)
   }
 
   static get observers() {
-    return [
-      'autoValidateHandler(rawFile, fileUrl)',
-      '_invalidChanged(invalid)'
-    ];
+    return ['autoValidateHandler(rawFile, fileUrl)', '_invalidChanged(invalid)'];
   }
 
   connectedCallback() {
@@ -259,7 +276,7 @@ export class EtoolsUpload extends RequestHelperMixin(CommonMixin(PolymerElement)
   }
 
   _fileSelected(e) {
-    let file = e.target.files ? e.target.files[0] : null;
+    const file = e.target.files ? e.target.files[0] : null;
     if (!file) {
       return;
     }
@@ -295,22 +312,24 @@ export class EtoolsUpload extends RequestHelperMixin(CommonMixin(PolymerElement)
     this.uploadInProgress = true;
     this.fireEvent('upload-started');
 
-    this.uploadRawFile(this.rawFile, this.rawFile.name, this.setUploadProgress.bind(this)).then((response) => {
-      this.success = true;
-      this.uploadInProgress = false;
-      this.fireEvent('upload-finished', {success: response});
-      setTimeout(() => {
-        this.resetRawFile();
+    this.uploadRawFile(this.rawFile, this.rawFile.name, this.setUploadProgress.bind(this))
+      .then((response) => {
+        this.success = true;
+        this.uploadInProgress = false;
+        this.fireEvent('upload-finished', {success: response});
+        setTimeout(() => {
+          this.resetRawFile();
+          this.resetUploadProgress();
+        }, 10);
+      })
+      .catch((err) => {
+        this.fail = true;
+        this.serverErrorMsg = 'Error uploading file: ' + this.prepareErrorMessage(err);
+        this.setInvalid(true, this.serverErrorMsg);
+        this.uploadInProgress = false;
         this.resetUploadProgress();
-      }, 10);
-    }).catch((err) => {
-      this.fail = true;
-      this.serverErrorMsg = 'Error uploading file: ' + this.prepareErrorMessage(err);
-      this.setInvalid(true, this.serverErrorMsg);
-      this.uploadInProgress = false;
-      this.resetUploadProgress();
-      this.fireEvent('upload-finished', {error: err});
-    });
+        this.fireEvent('upload-finished', {error: err});
+      });
   }
 
   setInvalid(invalid, errMsg) {
@@ -335,8 +354,10 @@ export class EtoolsUpload extends RequestHelperMixin(CommonMixin(PolymerElement)
     if (!requestData) {
       this.uploadProgressValue = '';
     } else {
-      this.uploadProgressMsg = `${Math.round(requestData.loaded / 1024)} kb of ${Math.round(requestData.total / 1024)} kb`;
-      this.uploadProgressValue = `${requestData.loaded * 100 / requestData.total}`;
+      this.uploadProgressMsg = `${Math.round(requestData.loaded / 1024)} kb of ${Math.round(
+        requestData.total / 1024
+      )} kb`;
+      this.uploadProgressValue = `${(requestData.loaded * 100) / requestData.total}`;
     }
   }
 
@@ -371,7 +392,7 @@ export class EtoolsUpload extends RequestHelperMixin(CommonMixin(PolymerElement)
   }
 
   _showDeleteBtn(readonly, _filename, showDeleteBtn, uploadInProgress) {
-    return (!readonly && _filename && !uploadInProgress && showDeleteBtn);
+    return !readonly && _filename && !uploadInProgress && showDeleteBtn;
   }
 
   _cancelUpload() {
@@ -414,7 +435,7 @@ export class EtoolsUpload extends RequestHelperMixin(CommonMixin(PolymerElement)
     if (this.required) {
       const uploadRequestFailed = this.rawFile instanceof File && this.fail === true;
 
-      if ((!this.rawFile && !this.fileUrl)) {
+      if (!this.rawFile && !this.fileUrl) {
         valid = false;
         errMsg = 'This field is required';
       }
@@ -440,7 +461,8 @@ export class EtoolsUpload extends RequestHelperMixin(CommonMixin(PolymerElement)
 
   _invalidChanged() {
     if (!this.invalid) {
-      if (this.fail) {// clean up after a failed upload
+      if (this.fail) {
+        // clean up after a failed upload
         this._filename = null;
       }
       this.resetStatus();
@@ -471,6 +493,6 @@ export class EtoolsUpload extends RequestHelperMixin(CommonMixin(PolymerElement)
   '.hiddenfile' => ''
   'filename.with.many.dots.ext'	=> 'ext'*/
   _getFileExtension(fileName) {
-    return fileName.slice((fileName.lastIndexOf(".") - 1 >>> 0) + 2);
+    return fileName.slice(((fileName.lastIndexOf('.') - 1) >>> 0) + 2);
   }
 }
