@@ -1,39 +1,38 @@
-
 import {upload} from '@unicef-polymer/etools-ajax/upload-helper';
 
-export const RequestHelperMixin = (baseClass) => class extends (baseClass) {
-  static get properties() {
-    return {
-      uploadEndpoint: {
-        type: String,
-        value: null
-      },
-      /* Expected format:
+export const RequestHelperMixin = (baseClass) =>
+  class extends baseClass {
+    static get properties() {
+      return {
+        uploadEndpoint: {
+          type: String,
+          value: null
+        },
+        /* Expected format:
         {
           endpoint: 'url',
           extraInfo: {itemid: 1},
           rawFilePropertyName: 'attachment'
         }
       */
-      endpointInfo: {
-        type: Object,
-        value: null
-      },
+        endpointInfo: {
+          type: Object,
+          value: null
+        },
 
-      jwtLocalStorageKey: {
-        type: String,
-        value: ''
-      }
-    };
-  }
-
-  uploadRawFile(rawFile, requestKey, onProgressCallback) {
-    let config = {
-      endpointInfo: this.endpointInfo,
-      uploadEndpoint: this.uploadEndpoint,
-      jwtLocalStorageKey: this.jwtLocalStorageKey
+        jwtLocalStorageKey: {
+          type: String,
+          value: ''
+        }
+      };
     }
-    return upload(config, rawFile, requestKey, onProgressCallback);
-  }
 
-}
+    uploadRawFile(rawFile, requestKey, onProgressCallback) {
+      const config = {
+        endpointInfo: this.endpointInfo,
+        uploadEndpoint: this.uploadEndpoint,
+        jwtLocalStorageKey: this.jwtLocalStorageKey
+      };
+      return upload(config, rawFile, requestKey, onProgressCallback);
+    }
+  };

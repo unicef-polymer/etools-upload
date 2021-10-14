@@ -6,7 +6,7 @@ import '@polymer/iron-icons/iron-icons.js';
 import '@polymer/paper-input/paper-input-container.js';
 import '@polymer/paper-input/paper-input-error.js';
 import '@polymer/paper-progress/paper-progress.js';
-import {CommonStyles} from "./common-styles";
+import {CommonStyles} from './common-styles';
 import {CommonMixin} from './common-mixin.js';
 import {RequestHelperMulti} from './request-helper-multi.js';
 import {createAttachmentsDexie} from './offline/dexie-config';
@@ -78,13 +78,20 @@ export class EtoolsUploadMulti extends RequestHelperMulti(CommonMixin(PolymerEle
 
     <div>
       <div class="upload-btn-and-actions">
-        <paper-button class="upload-button" on-tap="_openFileChooser" title="[[uploadBtnLabel]]" disabled$="[[_shouldDisableUploadBtn(readonly, uploadInProgress)]]">
+        <paper-button class="upload-button"
+          on-tap="_openFileChooser" 
+          title="[[uploadBtnLabel]]" 
+          disabled$="[[_shouldDisableUploadBtn(readonly, uploadInProgress)]]">
                       <iron-icon icon="file-upload"></iron-icon>
                       [[uploadBtnLabel]]
         </paper-button>
 
         <div class="file-actions">
-            <paper-button class="delete-button" on-tap="_cancelUpload" disabled$="[[!uploadInProgress]]" hidden$="[[!uploadInProgress]]">
+            <paper-button 
+              class="delete-button" 
+              on-tap="_cancelUpload" 
+              disabled$="[[!uploadInProgress]]" 
+              hidden$="[[!uploadInProgress]]">
               <iron-icon icon="clear"></iron-icon>
               Cancel Upload
             </paper-button>
@@ -155,7 +162,7 @@ export class EtoolsUploadMulti extends RequestHelperMulti(CommonMixin(PolymerEle
   }
 
   _filesSelected(e) {
-    let files = e.target.files ? e.target.files : null;
+    const files = e.target.files ? e.target.files : null;
     if (!files || !files.length) {
       return;
     }
@@ -169,7 +176,7 @@ export class EtoolsUploadMulti extends RequestHelperMulti(CommonMixin(PolymerEle
   }
 
   _extractFilenames(files) {
-    let names = [];
+    const names = [];
     for (let i = 0; i < files.length; i++) {
       names.push({
         filename: files.item(i).name,
@@ -185,20 +192,22 @@ export class EtoolsUploadMulti extends RequestHelperMulti(CommonMixin(PolymerEle
 
   async saveFilesInIndexedDb(files) {
     let i;
-    let filesInfo = [];
-    let errors = [];
+    const filesInfo = [];
+    const errors = [];
     for (i = 0; i < files.length; i++) {
-      let blob = await getBlob(getFileUrl(files[i]));
-      let fileInfo = {
+      const blob = await getBlob(getFileUrl(files[i]));
+      const fileInfo = {
         id: generateRandomHash(),
         filetype: files[i].type,
         filename: files[i].name,
         extraInfo: this.endpointInfo ? this.endpointInfo.extraInfo : '',
-        parentId: window.OfflineUploadParentId || ((this.endpointInfo && this.endpointInfo.extraInfo) ? this.endpointInfo.extraInfo.parentId : ''),
+        parentId:
+          window.OfflineUploadParentId ||
+          (this.endpointInfo && this.endpointInfo.extraInfo ? this.endpointInfo.extraInfo.parentId : ''),
         unsynced: true
-      }
+      };
 
-      let fileInfoForDb = JSON.parse(JSON.stringify(fileInfo));
+      const fileInfoForDb = JSON.parse(JSON.stringify(fileInfo));
       fileInfoForDb.binaryData = blob;
       try {
         await storeFileInDexie(fileInfoForDb);
@@ -220,7 +229,7 @@ export class EtoolsUploadMulti extends RequestHelperMulti(CommonMixin(PolymerEle
   async _handleUpload(files) {
     this.uploadInProgress = true;
     if (this.activateOffline && navigator.onLine === false) {
-      let response = await this.saveFilesInIndexedDb(files);
+      const response = await this.saveFilesInIndexedDb(files);
       this.uploadInProgress = false;
       this.resetRawFiles();
       this.fireEvent('upload-finished', response);
@@ -231,20 +240,23 @@ export class EtoolsUploadMulti extends RequestHelperMulti(CommonMixin(PolymerEle
     if (this.endpointAcceptsMulti) {
       // we don't have this situation yet
     } else {
-      this._uploadAllFilesSequentially(files, this.uploadRawFile.bind(this), this.set.bind(this),
-        this.prepareErrorMessage.bind(this))
-        .then((response) => {
-          this.uploadInProgress = false;
-          this.resetRawFiles();
-          if (response && !response.uploadCanceled) {
-            this.fireEvent('upload-finished', {
-              success: response.allSuccessResponses,
-              error: response.allErrorResponses
-            });
+      this._uploadAllFilesSequentially(
+        files,
+        this.uploadRawFile.bind(this),
+        this.set.bind(this),
+        this.prepareErrorMessage.bind(this)
+      ).then((response) => {
+        this.uploadInProgress = false;
+        this.resetRawFiles();
+        if (response && !response.uploadCanceled) {
+          this.fireEvent('upload-finished', {
+            success: response.allSuccessResponses,
+            error: response.allErrorResponses
+          });
 
-            setTimeout(this._clearDisplayOfUploadedFiles.bind(this), 2000);
-          }
-        });
+          setTimeout(this._clearDisplayOfUploadedFiles.bind(this), 2000);
+        }
+      });
     }
   }
   _clearDisplayOfUploadedFiles() {
@@ -253,58 +265,60 @@ export class EtoolsUploadMulti extends RequestHelperMulti(CommonMixin(PolymerEle
 
   _uploadAllFilesSequentially(files, uploadFunction, set, prepareErrorMessage) {
     const self = this;
-    return new Promise(function(resolve, reject) {
-      let allSuccessResponses = [];
-      let allErrorResponses = [];
+    return new Promise(function (resolve, reject) {
+      const allSuccessResponses = [];
+      const allErrorResponses = [];
       let i;
       let counter = 0;
       for (i = 0; i < files.length; i++) {
-        (function(index) {
-        uploadFunction(files[index], files[index].name, self._computeUploadProgress.bind(self, set, index)).then((response) => {
-          set(['_filenames', index, 'success'], true);
-          set(['_filenames', index, 'uploadInProgress'], false);
-          self._setProgressProps(set, index, '', '');
+        (function (index) {
+          uploadFunction(files[index], files[index].name, self._computeUploadProgress.bind(self, set, index))
+            .then((response) => {
+              set(['_filenames', index, 'success'], true);
+              set(['_filenames', index, 'uploadInProgress'], false);
+              self._setProgressProps(set, index, '', '');
 
-          allSuccessResponses.push(response);
+              allSuccessResponses.push(response);
 
-          if ((counter + 1) === files.length) {
-            resolve({
-              allSuccessResponses: allSuccessResponses,
-              allErrorResponses: allErrorResponses
+              if (counter + 1 === files.length) {
+                resolve({
+                  allSuccessResponses: allSuccessResponses,
+                  allErrorResponses: allErrorResponses
+                });
+              }
+              counter++;
+            })
+            .catch((err) => {
+              set(['_filenames', index, 'uploadInProgress'], false);
+              set(['_filenames', index, 'fail'], true);
+              self._setProgressProps(set, index, '', '');
+
+              allErrorResponses.push(prepareErrorMessage(err));
+
+              if (counter + 1 === files.length) {
+                resolve({
+                  allSuccessResponses: allSuccessResponses,
+                  allErrorResponses: allErrorResponses
+                });
+              }
+              counter++;
             });
-          }
-          counter++;
-        }).catch((err) => {
-          set(['_filenames', index, 'uploadInProgress'], false);
-          set(['_filenames', index, 'fail'], true);
-          self._setProgressProps(set, index, '', '');
-
-          allErrorResponses.push(prepareErrorMessage(err));
-
-          if ((counter + 1) === files.length) {
-            resolve({
-              allSuccessResponses: allSuccessResponses,
-              allErrorResponses: allErrorResponses
-            });
-          }
-          counter++;
-        });
-      })(i);
-
-      }});
+        })(i);
+      }
+    });
   }
 
   _computeUploadProgress(set, index, requestData) {
     if (!requestData) {
       this._setProgressProps(set, index, '', '');
     } else {
-      const progressValue = `${requestData.loaded * 100 / requestData.total}`;
-      const progressMsg = `${Math.round(requestData.loaded/1024)} kb of ${Math.round(requestData.total/1024)} kb`;
+      const progressValue = `${(requestData.loaded * 100) / requestData.total}`;
+      const progressMsg = `${Math.round(requestData.loaded / 1024)} kb of ${Math.round(requestData.total / 1024)} kb`;
       this._setProgressProps(set, index, progressValue, progressMsg);
     }
   }
 
-  _setProgressProps(set, index, progressValue, progressMsg){
+  _setProgressProps(set, index, progressValue, progressMsg) {
     set(['_filenames', index, 'uploadProgressValue'], progressValue);
     set(['_filenames', index, 'uploadProgressMsg'], progressMsg);
   }
@@ -314,12 +328,12 @@ export class EtoolsUploadMulti extends RequestHelperMulti(CommonMixin(PolymerEle
   }
 
   _thereAreFilesSelected(_filenames) {
-    return (_filenames && _filenames.length);
+    return _filenames && _filenames.length;
   }
 
   _cancelUpload() {
-    let activeReqKeys = Object.keys(getActiveXhrRequests());
-    this._filenames = this._filenames.filter(f => activeReqKeys.indexOf(f.filename) < 0);
+    const activeReqKeys = Object.keys(getActiveXhrRequests());
+    this._filenames = this._filenames.filter((f) => activeReqKeys.indexOf(f.filename) < 0);
 
     abortActiveRequests(activeReqKeys);
     this.uploadInProgress = false;
