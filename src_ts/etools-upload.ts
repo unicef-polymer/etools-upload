@@ -37,6 +37,9 @@ export class EtoolsUpload extends RequestHelperMixin(CommonMixin(LitElement)) {
   }
 
   set invalid(invalid: boolean) {
+    if (this._invalid === invalid) {
+      return;
+    }
     this._invalid = invalid;
     if (!invalid) {
       if (this.fail) {
@@ -178,7 +181,7 @@ export class EtoolsUpload extends RequestHelperMixin(CommonMixin(LitElement)) {
           </paper-button>
 
           <div class="filename-and-actions-container">
-            <div class="filename-container" ?hidden="${this._thereIsAFileSelectedOrSaved(this._filename)}">
+            <div class="filename-container" ?hidden="${!this._thereIsAFileSelectedOrSaved(this._filename)}">
               <div class="filename-row">
                 <iron-icon class="file-icon" icon="attachment"></iron-icon>
                 <span class="filename" ?title="${this._filename}">${this._filename}</span>
@@ -402,7 +405,7 @@ export class EtoolsUpload extends RequestHelperMixin(CommonMixin(LitElement)) {
 
   resetRawFile(): void {
     this.rawFile = null;
-    const input: HTMLInputElement = this.shadowRoot!.querySelector('file-input') as HTMLInputElement;
+    const input: HTMLInputElement = this.shadowRoot!.querySelector('#file-input') as HTMLInputElement;
     input.value = '';
   }
 

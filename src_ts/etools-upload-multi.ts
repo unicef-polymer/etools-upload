@@ -339,7 +339,7 @@ export class EtoolsUploadMulti extends CommonMixin(RequestHelperMultiMixin(LitEl
 
   resetRawFiles(): void {
     this.rawFiles = [];
-    const input: HTMLInputElement = this.shadowRoot!.querySelector('file-input') as HTMLInputElement;
+    const input: HTMLInputElement = this.shadowRoot!.querySelector('#file-input') as HTMLInputElement;
     input.value = '';
   }
 }
