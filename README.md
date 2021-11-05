@@ -13,7 +13,7 @@ When `autoUpload` is true and `uploadEndpoint` is set , it automatically uploads
 
 ### Offline functionality
 
-- If the `activateOffline` attribute is set on the <etools-upload-multi> component, if there is no internet connection during the upload, the file is saved in local IndexedDb with a temp id.
+- If the `activate-offline` attribute is set on the <etools-upload-multi> component, if there is no internet connection during the upload, the file is saved in local IndexedDb with a temp id.
 - The component expects `window.Etools.AttachmentsDbName` to be set from the parent application.
 - The IndexedDb is created on `connectedCallback`. If you need the db to exist prior to this you can call `createAttachmentsDexie` method directly from your code.
 - When the files have finished being saved in IndexedDb the same event as for online upload is fired - `upload-finished`. The event detail has the following format
@@ -55,12 +55,12 @@ When `autoUpload` is true and `uploadEndpoint` is set , it automatically uploads
 1.  `label`: text to be displayed on top of the control
 2.  `uploadBtnLabel`: text to be displayed on the button, default is 'Upload file'
 3.  `accept`: accepted file types (Ex: ".doc,.docx,.pdf,.jpg,.png")
-4.  `file-url`: When a new file is uploaded and the upload has finished it holds the id of the file. After the id is saved on the entity for which the upload was made, it will hold the url to the file.
-5.  `upload-endpoint`: url for the upload
+4.  `fileUrl`: When a new file is uploaded and the upload has finished it holds the id of the file. After the id is saved on the entity for which the upload was made, it will hold the url to the file.
+5.  `uploadEndpoint`: url for the upload
 6.  `readonly`: can be used as html attribute or polymer property (Ex: readonly$="[[!permissions.allowEdit]]"), enable/disable upload control
 7.  `required`: can be used as html attribute or polymer property (Ex: required$="[[permissions.allowEdit]]"), specifies if control must be filled out
 8.  `auto-validate`: if set to true and control is required validate if control is set
-9.  `error-message`: custom text to be displayed on upload error
+9.  `errorMessage`: custom text to be displayed on upload error
 10. `auto-upload`: if `true` it automatically upload the file after selection. default is `true`.
 11. `endpointInfo`: can be used to set any other information needed by the upload online or offline. If endpointInfo.endpoint is specified , uploadEndpoint is no longer needed.
 
@@ -87,34 +87,6 @@ When `autoUpload` is true and `uploadEndpoint` is set , it automatically uploads
 14. `on-upload-finished`: triggered when upload finished with the result of the action (information about the uploaded files) (Ex: {success: response} or {error: err}). This same event is triggered when offline and the files were saved in IndexedDb.
 15. `on-change-unsaved-file`: triggered on file selection if previous upload was not saved
 16. `on-delete-file`: triggered on file delete with the file url as parameter (Ex: {file: fileUrl})
-
-## Usage example
-
-<etools-upload
-label="Upload Example"
-accept=".doc,.docx,.pdf,.jpg,.png"
-file-url="{{data.file_attachment}}"
-upload-endpoint="[[uploadEndpoint]]"
-on-upload-finished="\_onUploadFinished"
-on-upload-started="\_onUploadStarted"
-show-delete-btn="[[showDeleteBtn(data.status, data.permissions.allowEdit)]]"
-on-delete-file="\_onAttachDelete"
-accept=".doc,.docx,.pdf,.jpg,.png"
-readonly$="[[!data.permissions.allowEdit]]"
-		required$="[[data.attach_required]]"
-auto-validate
-on-change-unsaved-file="\_onChangeUnsavedFile">
-</etools-upload>
-
-## Install the Polymer-CLI
-
-First, make sure you have the [Polymer CLI](https://www.npmjs.com/package/polymer-cli) installed. Then run `polymer serve` to serve your element locally.
-
-## Viewing Your Element
-
-```
-$ polymer serve
-```
 
 ## Circle CI
 

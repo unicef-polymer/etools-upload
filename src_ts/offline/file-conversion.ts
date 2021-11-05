@@ -1,7 +1,7 @@
-export function getBlobAsText(file) {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.addEventListener('loadend', (e) => {
+export function getBlobAsText(file: File): Promise<string> {
+  return new Promise((resolve: (arg: any) => void, reject: () => void) => {
+    const reader: FileReader = new FileReader();
+    reader.addEventListener('loadend', () => {
       resolve(reader.result);
     });
     reader.addEventListener('error', reject);
@@ -9,10 +9,10 @@ export function getBlobAsText(file) {
   });
 }
 
-export function getArrayBuffer(blob) {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.addEventListener('loadend', (e) => {
+export function getArrayBuffer(blob: File): Promise<ArrayBuffer> {
+  return new Promise((resolve: (arg: any) => void, reject: () => void) => {
+    const reader: FileReader = new FileReader();
+    reader.addEventListener('loadend', () => {
       resolve(reader.result);
     });
     reader.addEventListener('error', reject);
@@ -20,7 +20,7 @@ export function getArrayBuffer(blob) {
   });
 }
 
-export async function getBlob(fileUrl) {
+export async function getBlob(fileUrl: string): Promise<Blob> {
   //* * Using XHR */
   // return new Promise((resolve, reject) => {
   //   let xhr = new XMLHttpRequest();
@@ -37,12 +37,12 @@ export async function getBlob(fileUrl) {
   // });
 
   //* * Using fetch */
-  const response = await fetch(fileUrl);
+  const response: Body = await fetch(fileUrl);
   return response.blob();
 }
 
-export function getFileUrl(file, doNotRevokeUrl) {
-  const tempUrl = window.URL.createObjectURL(file);
+export function getFileUrl(file: File, doNotRevokeUrl?: boolean): string {
+  const tempUrl: string = window.URL.createObjectURL(file);
   if (!doNotRevokeUrl) {
     setTimeout(() => {
       window.URL.revokeObjectURL(tempUrl); // For Memory management

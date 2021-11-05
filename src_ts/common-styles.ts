@@ -1,5 +1,5 @@
-import {html} from '@polymer/polymer/polymer-element.js';
-export const CommonStyles = html` <style>
+import {html, TemplateResult} from 'lit-element';
+export const CommonStyles: TemplateResult = html` <style>
   *[hidden] {
     display: none !important;
   }

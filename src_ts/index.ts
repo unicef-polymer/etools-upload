@@ -1,5 +1,5 @@
-export {EtoolsUpload} from './EtoolsUpload.js';
-export {EtoolsUploadMulti} from './EtoolsUploadMulti.js';
+export {EtoolsUpload} from './etools-upload';
+export {EtoolsUploadMulti} from './etools-upload-multi';
 export {uploadFileStoredInDexie} from './upload-helper.js';
 export {
   storeFileInDexie,
