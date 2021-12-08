@@ -1,6 +1,6 @@
 {
   "name": "@unicef-polymer/etools-upload",
-  "version": "3.5.2",
+  "version": "3.5.3",
   "homepage": "https://github.com/unicef-polymer/etools-upload",
   "repository": {
     "type": "git",
@@ -24,24 +24,24 @@
     "@polymer/paper-input": "^3.0.2",
     "@polymer/paper-progress": "^3.0.1",
     "@polymer/polymer": "^3.4.1",
-    "@unicef-polymer/etools-ajax": "^4.2.0",
-    "@webcomponents/webcomponentsjs": "^2.5.0",
-    "dexie": "^3.0.3",
+    "@unicef-polymer/etools-ajax": "^4.3.4",
+    "@webcomponents/webcomponentsjs": "^2.6.0",
+    "dexie": "^3.2.0",
     "lodash": ">=4.17.21",
-    "web-animations-js": "^2.3.1"
+    "web-animations-js": "^2.3.2"
   },
   "devDependencies": {
-    "@polymer/gen-typescript-declarations": "^1.6.0",
-    "@polymer/iron-demo-helpers": "^3.0.0",
-    "acorn": "^7.4.1",
+    "@polymer/gen-typescript-declarations": "^1.6.2",
+    "@polymer/iron-demo-helpers": "^3.1.0",
+    "acorn": "^8.6.0",
     "eslint": "^7.20.0",
     "eslint-config-google": "^0.13.0",
     "eslint-config-prettier": "^6.15.0",
     "eslint-plugin-html": "^6.1.1",
     "eslint-plugin-prettier": "^3.2.0",
-    "prettier": "^2.3.2",
-    "polymer-cli": "^1.7.7",
-    "wct-browser-legacy": "^1.0.0"
+    "prettier": "^2.5.1",
+    "polymer-cli": "^1.9.11",
+    "wct-browser-legacy": "^1.0.2"
   },
   "engines": {
     "node": ">=8.0"
