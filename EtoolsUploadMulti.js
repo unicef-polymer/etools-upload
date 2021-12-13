@@ -8,12 +8,12 @@ import '@polymer/paper-progress/paper-progress.js';
 import {CommonStyles} from './common-styles';
 import {CommonMixin} from './common-mixin.js';
 import {RequestHelperMulti} from './request-helper-multi.js';
-import {createAttachmentsDexie} from './offline/dexie-config';
 import {getBlob, getFileUrl} from './offline/file-conversion';
-import {generateRandomHash, storeFileInDexie} from './offline/dexie-operations';
+import {storeFileInDexie} from './offline/dexie-operations';
 import {abortActiveRequests, getActiveXhrRequests} from '@unicef-polymer/etools-ajax/upload-helper';
+import {OfflineMixin} from './offline/offline-mixin';
 
-export class EtoolsUploadMulti extends RequestHelperMulti(CommonMixin(LitElement)) {
+export class EtoolsUploadMulti extends OfflineMixin(RequestHelperMulti(CommonMixin(LitElement))) {
   render() {
     // language=HTML
     return html`
@@ -147,12 +147,7 @@ export class EtoolsUploadMulti extends RequestHelperMulti(CommonMixin(LitElement
         type: Array,
         attribute: 'raw-files'
       },
-      _filenames: Array,
-      activateOffline: {
-        type: Boolean,
-        reflect: true,
-        attribute: 'activate-offline'
-      }
+      _filenames: Array
     };
   }
 
@@ -161,14 +156,6 @@ export class EtoolsUploadMulti extends RequestHelperMulti(CommonMixin(LitElement
     this.uploadBtnLabel = 'Upload files';
     this.rawFiles = [];
     this._filenames = [];
-    this.activateOffline = false;
-  }
-
-  connectedCallback() {
-    super.connectedCallback();
-    if (this.activateOffline) {
-      createAttachmentsDexie();
-    }
   }
 
   _filesSelected(e) {
@@ -205,18 +192,8 @@ export class EtoolsUploadMulti extends RequestHelperMulti(CommonMixin(LitElement
     const filesInfo = [];
     const errors = [];
     for (i = 0; i < files.length; i++) {
+      const fileInfo = this.getFileInfo(files[i]);
       const blob = await getBlob(getFileUrl(files[i]));
-      const fileInfo = {
-        id: generateRandomHash(),
-        filetype: files[i].type,
-        filename: files[i].name,
-        extraInfo: this.endpointInfo ? this.endpointInfo.extraInfo : '',
-        parentId:
-          window.OfflineUploadParentId ||
-          (this.endpointInfo && this.endpointInfo.extraInfo ? this.endpointInfo.extraInfo.parentId : ''),
-        unsynced: true
-      };
-
       const fileInfoForDb = JSON.parse(JSON.stringify(fileInfo));
       fileInfoForDb.binaryData = blob;
       try {
