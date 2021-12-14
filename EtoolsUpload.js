@@ -179,8 +179,8 @@ export class EtoolsUpload extends RequestHelperMixin(CommonMixin(PolymerElement)
             <paper-button
               class="delete-button"
               on-tap="_cancelUpload" 
-              disabled$="[[!uploadInProgress]]" 
-              hidden$="[[!uploadInProgress]]">
+              disabled$="[[!(_showCancelBtn(uploadInProgress, fileUrl, fail))]]" 
+              hidden$="[[!_showCancelBtn(uploadInProgress, fileUrl, fail)]]">
               Cancel
             </paper-button>
           </div>
@@ -221,6 +221,10 @@ export class EtoolsUpload extends RequestHelperMixin(CommonMixin(PolymerElement)
       },
       _filename: {
         type: String,
+        value: null
+      },
+      _cancelTriggered: {
+        type: Boolean,
         value: null
       },
       rawFile: {
@@ -288,6 +292,7 @@ export class EtoolsUpload extends RequestHelperMixin(CommonMixin(PolymerElement)
 
     this._filename = file.name;
     this.rawFile = file;
+    e.target.value = null;
 
     if (this.autoUpload) {
       this._handleUpload();
@@ -309,6 +314,7 @@ export class EtoolsUpload extends RequestHelperMixin(CommonMixin(PolymerElement)
     if (this.accept && !this.validFileType(this.rawFile.name)) {
       return;
     }
+    this._cancelTriggered = false;
     this.uploadInProgress = true;
     this.fireEvent('upload-started');
 
@@ -323,12 +329,21 @@ export class EtoolsUpload extends RequestHelperMixin(CommonMixin(PolymerElement)
         }, 10);
       })
       .catch((err) => {
-        this.fail = true;
-        this.serverErrorMsg = 'Error uploading file: ' + this.prepareErrorMessage(err);
-        this.setInvalid(true, this.serverErrorMsg);
+        if(!this._cancelTriggered){
+          this.fail = true;
+          const errorMessage = this.prepareErrorMessage(err);
+          this.serverErrorMsg = 'Error uploading file' + (errorMessage ? ': ' + errorMessage : '');
+          this.setInvalid(true, this.serverErrorMsg);
+        } else {
+          this.serverErrorMsg = 'Upload process canceled';
+          this.setInvalid(false, this.serverErrorMsg);
+        }
+
+        this.fireEvent('upload-finished', {error: err});
+        
+        this._cancelTriggered = false;
         this.uploadInProgress = false;
         this.resetUploadProgress();
-        this.fireEvent('upload-finished', {error: err});
       });
   }
 
@@ -395,26 +410,37 @@ export class EtoolsUpload extends RequestHelperMixin(CommonMixin(PolymerElement)
     return !readonly && _filename && !uploadInProgress && showDeleteBtn;
   }
 
+  _showCancelBtn(uploadInProgress, fileUrl, fail){
+    return uploadInProgress || (fileUrl && fail);
+  }
+
   _cancelUpload() {
-    abortActiveRequests();
+    this._resetFilename();
+    this._cancelTriggered = true;
 
-    this.setProperties({
-      uploadInProgress: false,
-      _filename: null
-    });
-
+    if(this.uploadInProgress){
+      this.uploadInProgress = false;
+      abortActiveRequests();
+    }
+   
     this.resetRawFile();
+    this.resetValidations();
   }
 
   _deleteFile(e) {
     if (this.rawFile) {
       this.resetRawFile();
     }
-    this._filename = null;
+
+    this._resetFilename();
     this.resetStatus();
     // TODO: should delete req be implemented here?
     this.fireEvent('delete-file', {file: this.fileUrl});
     this.fileUrl = null;
+  }
+
+  _resetFilename(){
+    this._filename = this.fileUrl ? this.getFilenameFromURL(this.fileUrl) : null
   }
 
   resetRawFile() {
@@ -463,7 +489,7 @@ export class EtoolsUpload extends RequestHelperMixin(CommonMixin(PolymerElement)
     if (!this.invalid) {
       if (this.fail) {
         // clean up after a failed upload
-        this._filename = null;
+        this._resetFilename();
       }
       this.resetStatus();
       this.resetValidations();
