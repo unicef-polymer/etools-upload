@@ -329,7 +329,7 @@ export class EtoolsUpload extends RequestHelperMixin(CommonMixin(PolymerElement)
         }, 10);
       })
       .catch((err) => {
-        if(!this._cancelTriggered){
+        if (!this._cancelTriggered) {
           this.fail = true;
           const errorMessage = this.prepareErrorMessage(err);
           this.serverErrorMsg = 'Error uploading file' + (errorMessage ? ': ' + errorMessage : '');
@@ -340,7 +340,7 @@ export class EtoolsUpload extends RequestHelperMixin(CommonMixin(PolymerElement)
         }
 
         this.fireEvent('upload-finished', {error: err});
-        
+
         this._cancelTriggered = false;
         this.uploadInProgress = false;
         this.resetUploadProgress();
@@ -410,7 +410,7 @@ export class EtoolsUpload extends RequestHelperMixin(CommonMixin(PolymerElement)
     return !readonly && _filename && !uploadInProgress && showDeleteBtn;
   }
 
-  _showCancelBtn(uploadInProgress, fileUrl, fail){
+  _showCancelBtn(uploadInProgress, fileUrl, fail) {
     return uploadInProgress || (fileUrl && fail);
   }
 
@@ -418,11 +418,11 @@ export class EtoolsUpload extends RequestHelperMixin(CommonMixin(PolymerElement)
     this._resetFilename();
     this._cancelTriggered = true;
 
-    if(this.uploadInProgress){
+    if (this.uploadInProgress) {
       this.uploadInProgress = false;
       abortActiveRequests();
     }
-   
+
     this.resetRawFile();
     this.resetValidations();
   }
@@ -439,8 +439,8 @@ export class EtoolsUpload extends RequestHelperMixin(CommonMixin(PolymerElement)
     this.fileUrl = null;
   }
 
-  _resetFilename(){
-    this._filename = this.fileUrl ? this.getFilenameFromURL(this.fileUrl) : null
+  _resetFilename() {
+    this._filename = this.fileUrl ? this.getFilenameFromURL(this.fileUrl) : null;
   }
 
   resetRawFile() {
