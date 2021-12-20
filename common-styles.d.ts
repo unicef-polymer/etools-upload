@@ -7,8 +7,3 @@
  * To modify these typings, edit the source file(s):
  *   common-styles.js
  */
-
-
-// tslint:disable:variable-name Describing an API that's defined elsewhere.
-
-import {html} from '@polymer/polymer/polymer-element.js';

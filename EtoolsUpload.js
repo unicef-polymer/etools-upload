@@ -1,5 +1,4 @@
-import {PolymerElement, html} from '@polymer/polymer';
-import '@polymer/polymer/lib/elements/dom-if.js';
+import {LitElement, html} from 'lit-element';
 import '@polymer/paper-button/paper-button.js';
 import '@polymer/iron-icon/iron-icon.js';
 import '@polymer/iron-icons/iron-icons.js';
@@ -21,258 +20,318 @@ import {abortActiveRequests} from '@unicef-polymer/etools-ajax/upload-helper';
  * @polymer
  * @demo demo/index.html
  */
-export class EtoolsUpload extends RequestHelperMixin(CommonMixin(PolymerElement)) {
-  static get template() {
+export class EtoolsUpload extends RequestHelperMixin(CommonMixin(LitElement)) {
+  render() {
     // language=HTML
     return html`
-        ${CommonStyles}
-    <style>
+      ${CommonStyles}
+      <style>
+        #input-main-content {
+          display: flex;
+          flex-direction: row;
+          align-items: center;
+        }
 
-      #input-main-content {
-        display: flex;
-        flex-direction: row;
-        align-items: center;
-      }
+        .filename-and-actions-container {
+          display: flex;
+          flex-direction: row;
+          max-width: 100%;
+        }
 
-      .filename-and-actions-container {
-        display: flex;
-        flex-direction: row;
-        max-width: 100%;
-      }
+        .file-icon {
+          padding-right: 8px;
+          color: var(--secondary-text-color, rgba(0, 0, 0, 0.54));
+        }
 
-      .file-icon {
-        padding-right: 8px;
-        color: var(--secondary-text-color, rgba(0, 0, 0, 0.54));
-      }
+        .filename-row {
+          display: flex;
+          flex-direction: row;
+          align-items: center;
+          border-bottom: 1px solid var(--secondary-text-color, rgba(0, 0, 0, 0.54));
+        }
 
-      .filename-row {
-        display: flex;
-        flex-direction: row;
-        align-items: center;
-        border-bottom: 1px solid var(--secondary-text-color, rgba(0, 0, 0, 0.54));
-      }
+        .filename {
+          overflow: hidden;
+          text-overflow: ellipsis;
+          white-space: nowrap;
+        }
 
-      .filename {
-        overflow: hidden;
-        text-overflow: ellipsis;
-        white-space: nowrap;
-      }
+        :host([readonly]) .filename-row {
+          border-bottom: none;
+        }
 
-      :host([readonly]) .filename-row {
-        border-bottom: none;
-      }
+        :host([disabled]) .filename-row {
+          border-bottom: 1px dashed var(--secondary-text-color, rgba(0, 0, 0, 0.54));
+        }
 
-      :host([disabled]) .filename-row {
-        border-bottom: 1px dashed var(--secondary-text-color, rgba(0, 0, 0, 0.54));
-      }
+        .download-button {
+          justify-content: center;
+          padding: 0 0;
+          margin-left: 8px;
+          color: var(--etools-upload-primary-color, var(--primary-color));
+        }
 
-      .download-button {
-        justify-content: center;
-        padding: 0 0;
-        margin-left: 8px;
-        color: var(--etools-upload-primary-color, var(--primary-color));
-      }
+        .filename-container {
+          display: flex;
+          flex-direction: column;
+          margin-right: 8px;
+          min-width: 145px;
+          overflow-wrap: break-word;
+          font-size: 16px;
+        }
 
-      .filename-container {
-        display: flex;
-        flex-direction: column;
-        margin-right: 8px;
-        min-width: 145px;
-        overflow-wrap: break-word;
-        font-size: 16px;
-      }
+        .progress-container {
+          display: flex;
+          flex-direction: column;
+          flex-wrap: nowrap;
+          width: 100%;
+        }
 
-      .progress-container {
-        display: flex;
-        flex-direction: column;
-        flex-wrap: nowrap;
-        width: 100%;
-      }
+        paper-progress {
+          --paper-progress-active-color: var(--primary-color);
+          width: 100%;
+        }
 
-      paper-progress {
-        --paper-progress-active-color: var(--primary-color);
-        width: 100%;
-      }
+        .progress-container span {
+          font-size: 11px;
+          margin: 0 auto;
+        }
 
-      .progress-container span {
-        font-size: 11px;
-        margin: 0 auto;
-      }
+        .dw-icon {
+          margin-right: 8px;
+        }
 
-      .dw-icon {
-        margin-right: 8px;
-      }
+        .change-button {
+          color: var(--secondary-text-color, rgba(0, 0, 0, 0.54));
+        }
 
-      .change-button {
-        color: var(--secondary-text-color, rgba(0, 0, 0, 0.54));
-      }
+        .file-actions paper-button {
+          vertical-align: middle;
+        }
 
-      .file-actions paper-button {
-        vertical-align: middle;
-      }
+        .upload-button[disabled] {
+          justify-content: flex-start;
+        }
+      </style>
 
-      .upload-button[disabled] {
-        justify-content: flex-start;
-      }
-    </style>
+      <paper-input-container always-float-label="" ?disabled="${this.disabled}" ?invalid="${this.invalid}">
+        <label slot="label" id="element-label" ?hidden="${!this._showLabel(this.label)}" aria-hidden="true"
+          >${this.label}</label
+        >
 
-    <paper-input-container always-float-label="" disabled$="[[disabled]]" invalid$="[[invalid]]">
-
-      <label slot="label" id="element-label" hidden$="[[!_showLabel(label)]]" aria-hidden="true">[[label]]</label>
-
-      <div slot="input">
-        <paper-button class="upload-button" on-tap="_openFileChooser" 
-         title="[[uploadBtnLabel]]" disabled$="[[readonly]]"
-         hidden$="[[_thereIsAFileSelectedOrSaved(_filename)]]">
-            <span hidden$="[[readonly]]">
+        <div slot="input">
+          <paper-button
+            class="upload-button"
+            @tap="${this._openFileChooser}"
+            title="${this.uploadBtnLabel}"
+            ?disabled="${this.readonly}"
+            ?hidden="${this._thereIsAFileSelectedOrSaved(this._filename)}"
+          >
+            <span ?hidden="${this.readonly}">
               <iron-icon icon="file-upload"></iron-icon>
-              [[uploadBtnLabel]]
+              ${this.uploadBtnLabel}
             </span>
-            <label hidden$="[[!readonly]]">—</label>
-        </paper-button>
+            <label ?hidden="${!this.readonly}">—</label>
+          </paper-button>
 
-        <div class="filename-and-actions-container">
-          <div class="filename-container" hidden$="[[!_thereIsAFileSelectedOrSaved(_filename)]]">
+          <div class="filename-and-actions-container">
+            <div class="filename-container" ?hidden="${!this._thereIsAFileSelectedOrSaved(this._filename)}">
               <div class="filename-row">
                 <iron-icon class="file-icon" icon="attachment"></iron-icon>
-                <span class="filename" title="[[_filename]]">[[_filename]]</span>
+                <span class="filename" title="${this._filename}">${this._filename}</span>
               </div>
-              <template is="dom-if" if="[[uploadProgressValue]]">
-                <div class='progress-container'>
-                  <paper-progress value="{{uploadProgressValue}}"></paper-progress>
-                  <span>{{uploadProgressMsg}}</span>
-                <div>
-              </template>
+              ${this.uploadProgressValue
+                ? html`
+                    <div class="progress-container">
+                      <paper-progress .value="${this.uploadProgressValue}"></paper-progress>
+                      <span>${this.uploadProgressMsg}</span>
+                      <div></div>
+                    </div>
+                  `
+                : ''}
+            </div>
+            <div class="upload-status">
+              <iron-icon title="Uploaded successfuly!" icon="done" ?hidden="${!this.success}"></iron-icon>
+              <iron-icon icon="error-outline" ?hidden="${!this.fail}"></iron-icon>
+            </div>
+
+            <!-- File actions -->
+            <div class="file-actions">
+              <paper-button
+                class="download-button"
+                @tap="${this._downloadFile}"
+                ?disabled="${!this._showDownloadBtn(this.fileUrl)}"
+                ?hidden="${!this._showDownloadBtn(this.fileUrl)}"
+                title="Download"
+              >
+                <iron-icon icon="cloud-download" class="dw-icon"></iron-icon>
+                Download
+              </paper-button>
+
+              <paper-button
+                class="change-button"
+                @tap="${this._openFileChooser}"
+                ?disabled="${!this._showChange(this.readonly, this._filename, this.uploadInProgress)}"
+                ?hidden="${!this._showChange(this.readonly, this._filename, this.uploadInProgress)}"
+              >
+                Change
+              </paper-button>
+
+              <paper-button
+                class="delete-button"
+                @tap="${this._deleteFile}"
+                ?disabled="${this.readonly}"
+                ?hidden="${!this._showDeleteBtn(
+                  this.readonly,
+                  this._filename,
+                  this.showDeleteBtn,
+                  this.uploadInProgress
+                )}"
+              >
+                Delete
+              </paper-button>
+
+              <paper-button
+                class="delete-button"
+                @tap="${this._cancelUpload}"
+                ?disabled="${!this._showCancelBtn(this.uploadInProgress, this.fileUrl, this.fail)}"
+                ?hidden="${!this._showCancelBtn(this.uploadInProgress, this.fileUrl, this.fail)}"
+              >
+                Cancel
+              </paper-button>
+            </div>
+            <!-- ------------------ -->
           </div>
-          <div class="upload-status">
-            <iron-icon title="Uploaded successfuly!" icon="done" hidden$="[[!success]]"></iron-icon>
-            <iron-icon icon="error-outline" hidden$="[[!fail]]"></iron-icon>
-          </div>
 
-          <!-- File actions -->
-          <div class="file-actions">
-            <paper-button class="download-button"
-              on-tap="_downloadFile"
-              disabled="[[!_showDownloadBtn(fileUrl)]]"
-              hidden$="[[!_showDownloadBtn(fileUrl)]]"
-              title="Download">
-              <iron-icon icon="cloud-download" class="dw-icon"></iron-icon>
-              Download
-            </paper-button>
+          <!-- Props -->
+          <input hidden="" type="file" id="fileInput" @change="${this._fileSelected}" .accept="${this.accept}" />
 
-            <paper-button
-              class="change-button"
-              on-tap="_openFileChooser" 
-              disabled$="[[!_showChange(readonly, _filename, uploadInProgress)]]" 
-              hidden$="[[!_showChange(readonly, _filename, uploadInProgress)]]">
-              Change
-            </paper-button>
-
-            <paper-button
-              class="delete-button"
-              on-tap="_deleteFile" 
-              disabled$="[[readonly]]" 
-              hidden$="[[!_showDeleteBtn(readonly, _filename, showDeleteBtn, uploadInProgress)]]">
-              Delete
-            </paper-button>
-
-            <paper-button
-              class="delete-button"
-              on-tap="_cancelUpload" 
-              disabled$="[[!(_showCancelBtn(uploadInProgress, fileUrl, fail))]]" 
-              hidden$="[[!_showCancelBtn(uploadInProgress, fileUrl, fail)]]">
-              Cancel
-            </paper-button>
-          </div>
-          <!-- ------------------ -->
+          <a id="downloader" hidden=""></a>
         </div>
 
-        <!-- Props -->
-        <input hidden="" type="file" id="fileInput" on-change="_fileSelected" accept="{{accept}}">
-
-        <a id="downloader" hidden=""></a>
-      </div>
-
-      <template is="dom-if" if="[[invalid]]">
-        <paper-input-error aria-live="assertive" slot="add-on">[[errorMessage]]</paper-input-error>
-      </template>
-
-    </paper-input-container>
-`;
+        ${this.invalid
+          ? html`<paper-input-error aria-live="assertive" slot="add-on">${this.errorMessage}</paper-input-error>`
+          : ''}
+      </paper-input-container>
+    `;
   }
 
   static get is() {
     return 'etools-upload';
   }
+
   static get properties() {
     return {
       uploadBtnLabel: {
         type: String,
-        value: 'Upload file'
+        reflect: true,
+        attribute: 'upload-btn-label'
       },
       alwaysFloatLabel: {
         type: Boolean,
-        value: true
+        reflect: true,
+        attribute: 'always-float-label'
       },
       fileUrl: {
         type: String,
-        value: null,
-        observer: '_fileUrlChanged'
-      },
-      _filename: {
-        type: String,
-        value: null
+        reflect: true,
+        attribute: 'file-url'
       },
       _cancelTriggered: {
-        type: Boolean,
-        value: null
+        type: Boolean
       },
+      _filename: String,
       rawFile: {
         type: Object,
-        value: null
+        attribute: 'raw-file'
       },
       showDeleteBtn: {
         type: Boolean,
-        value: true
+        reflect: true,
+        attribute: 'show-delete-btn'
       },
-      errorMessage: String,
-      originalErrorMessage: String,
-      serverErrorMsg: String,
+      originalErrorMessage: {
+        type: String,
+        attribute: 'original-error-message'
+      },
+      serverErrorMsg: {
+        type: String,
+        attribute: 'server-error-msg'
+      },
       success: {
         type: Boolean,
-        value: false
+        reflect: true
       },
       fail: {
         type: Boolean,
-        value: false
+        reflect: true
       },
       showChange: {
         type: Boolean,
-        value: true
+        reflect: true,
+        attribute: 'show-change'
       },
       allowMultilineFilename: {
         type: Boolean,
-        value: false,
-        reflectToAttribute: true
+        reflect: true,
+        attribute: 'allow-multiline-filename'
       },
       uploadProgressValue: {
         type: String,
-        value: ''
+        reflect: true,
+        attribute: 'upload-progress-value'
       },
       uploadProgressMsg: {
         type: String,
-        value: ''
+        reflect: true,
+        attribute: 'upload-progress-msg'
       }
     };
   }
 
-  static get observers() {
-    return ['autoValidateHandler(rawFile, fileUrl)', '_invalidChanged(invalid)'];
+  set fileUrl(url) {
+    this._fileUrl = url;
+    this._fileUrlChanged(url);
+    this.autoValidateHandler();
+  }
+
+  get fileUrl() {
+    return this._fileUrl;
+  }
+
+  set rawFile(file) {
+    this._rawFile = file;
+    this.autoValidateHandler();
+  }
+
+  get rawFile() {
+    return this._rawFile;
+  }
+
+  constructor() {
+    super();
+    this.initializeProperties();
+  }
+
+  initializeProperties() {
+    this.uploadBtnLabel = 'Upload file';
+    this.alwaysFloatLabel = true;
+    this._fileUrl = null;
+    this._filename = null;
+    this._rawFile = null;
+    this._cancelTriggered = null;
+    this.showDeleteBtn = true;
+    this.success = false;
+    this.fail = false;
+    this.showChange = true;
+    this.allowMultilineFilename = false;
+    this.uploadProgressValue = '';
+    this.uploadProgressMsg = '';
   }
 
   connectedCallback() {
     super.connectedCallback();
-    this.set('originalErrorMessage', this.errorMessage);
+    this.originalErrorMessage = this.errorMessage;
   }
 
   _thereIsAFileSelectedOrSaved(_filename) {
@@ -427,7 +486,7 @@ export class EtoolsUpload extends RequestHelperMixin(CommonMixin(PolymerElement)
     this.resetValidations();
   }
 
-  _deleteFile(e) {
+  _deleteFile() {
     if (this.rawFile) {
       this.resetRawFile();
     }
@@ -445,7 +504,7 @@ export class EtoolsUpload extends RequestHelperMixin(CommonMixin(PolymerElement)
 
   resetRawFile() {
     this.rawFile = null;
-    this.$.fileInput.value = null;
+    this.shadowRoot.querySelector('#fileInput').value = null;
   }
 
   _downloadFile(e) {
@@ -486,6 +545,7 @@ export class EtoolsUpload extends RequestHelperMixin(CommonMixin(PolymerElement)
   }
 
   _invalidChanged() {
+    super._invalidChanged();
     if (!this.invalid) {
       if (this.fail) {
         // clean up after a failed upload

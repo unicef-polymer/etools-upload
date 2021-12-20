@@ -1,6 +1,6 @@
 {
   "name": "@unicef-polymer/etools-upload",
-  "version": "3.6.0",
+  "version": "4.2.3-rc.1",
   "homepage": "https://github.com/unicef-polymer/etools-upload",
   "repository": {
     "type": "git",
@@ -28,6 +28,7 @@
     "@unicef-polymer/etools-ajax": "^4.3.4",
     "@webcomponents/webcomponentsjs": "^2.6.0",
     "dexie": "^3.2.0",
+    "lit-element": "^2.5.1",
     "lodash": ">=4.17.21",
     "web-animations-js": "^2.3.2"
   },
@@ -40,8 +41,8 @@
     "eslint-config-prettier": "^8.3.0",
     "eslint-plugin-html": "^6.2.0",
     "eslint-plugin-prettier": "^4.0.0",
-    "prettier": "^2.5.1",
     "polymer-cli": "^1.9.11",
+    "prettier": "^2.5.1",
     "wct-browser-legacy": "^1.0.2"
   },
   "engines": {

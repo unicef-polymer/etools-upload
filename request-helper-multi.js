@@ -7,12 +7,20 @@ export const RequestHelperMulti = (baseClass) =>
         // True if you can upload more than one file at a time
         endpointAcceptsMulti: {
           type: Boolean,
-          value: false
+          reflect: true,
+          attribute: 'endpoint-accepts-multi'
         },
         cancelUpload: {
           type: Boolean,
-          value: false
+          reflect: true,
+          attribute: 'cancel-upload'
         }
       };
+    }
+
+    constructor() {
+      super();
+      this.endpointAcceptsMulti = false;
+      this.cancelUpload = false;
     }
   };
