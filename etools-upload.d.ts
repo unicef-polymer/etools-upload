@@ -12,17 +12,13 @@
 // tslint:disable:variable-name Describing an API that's defined elsewhere.
 // tslint:disable:no-any describes the API as best we are able today
 
-import {PolymerElement, html} from '@polymer/polymer';
-
-import {CommonMixin} from './common-mixin.js';
-
-import {RequestHelperMixin} from './request-helper-mixin';
+import {LitElement} from 'lit-element';
 
 /**
  * `etools-upload`
  * Use to upload files
  */
-declare class EtoolsUpload {
+declare class EtoolsUpload extends LitElement {
   uploadBtnLabel: string | null | undefined;
   alwaysFloatLabel: boolean | null | undefined;
   fileUrl: string | null | undefined;
