@@ -487,19 +487,17 @@ export class EtoolsUpload extends RequestHelperMixin(CommonMixin(LitElement)) {
   }
 
   _deleteFile() {
-    if (this.rawFile) {
-      this.resetRawFile();
-    }
-
-    this._resetFilename();
-    this.resetStatus();
-    // TODO: should delete req be implemented here?
-    this.fireEvent('delete-file', {file: this.fileUrl});
     this.fileUrl = null;
+
+    this.resetStatus();
+    this._resetFilename();
+    this.resetRawFile();
+
+    this.fireEvent('delete-file', {file: this.fileUrl});
   }
 
   _resetFilename() {
-    this._filename = this.fileUrl ? this.getFilenameFromURL(this.fileUrl) : null;
+    this._filename = this.fileUrl && !isNaN(this.fileUrl) ? this.getFilenameFromURL(this.fileUrl) : null;
   }
 
   resetRawFile() {
