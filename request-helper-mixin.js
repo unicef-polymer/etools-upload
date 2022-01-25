@@ -6,7 +6,8 @@ export const RequestHelperMixin = (baseClass) =>
       return {
         uploadEndpoint: {
           type: String,
-          value: null
+          reflect: true,
+          attribute: 'upload-endpoint'
         },
         /* Expected format:
         {
@@ -17,14 +18,22 @@ export const RequestHelperMixin = (baseClass) =>
       */
         endpointInfo: {
           type: Object,
-          value: null
+          attribute: 'endpoint-info'
         },
 
         jwtLocalStorageKey: {
           type: String,
-          value: ''
+          reflect: true,
+          attribute: 'jwt-local-storage-key'
         }
       };
+    }
+
+    constructor() {
+      super();
+      this.uploadEndpoint = null;
+      this.endpointInfo = null;
+      this.jwtLocalStorageKey = '';
     }
 
     uploadRawFile(rawFile, requestKey, onProgressCallback) {
