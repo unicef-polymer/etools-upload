@@ -115,8 +115,8 @@ export class EtoolsUpload extends RequestHelperMixin(CommonMixin(LitElement)) {
       </style>
 
       <paper-input-container
-        always-float-label="${this._showLabel(this.label)}"
-        no-label-float="${!this._showLabel(this.label)}"
+        ?always-float-label="${this._showLabel(this.label)}"
+        ?no-label-float="${!this._showLabel(this.label)}"
         ?disabled="${this.disabled}"
         ?invalid="${this.invalid}"
       >
