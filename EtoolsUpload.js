@@ -459,7 +459,7 @@ export class EtoolsUpload extends RequestHelperMixin(CommonMixin(LitElement)) {
     if (!url) {
       return '';
     }
-    return url.split('?')[0].split('/').pop();
+    return String(url).split('?')[0].split('/').pop();
   }
 
   _showDownloadBtn(fileUrl) {
