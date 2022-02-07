@@ -459,6 +459,7 @@ export class EtoolsUpload extends RequestHelperMixin(CommonMixin(LitElement)) {
     if (!url) {
       return '';
     }
+    // after upload, url might be a number, need to convert
     return String(url).split('?')[0].split('/').pop();
   }
 
