@@ -500,7 +500,8 @@ export class EtoolsUpload extends OfflineMixin(RequestHelperMixin(CommonMixin(Li
     if (!url) {
       return '';
     }
-    return url.split('?')[0].split('/').pop();
+    // after upload, url might be a number, need to convert
+    return String(url).split('?')[0].split('/').pop();
   }
 
   _showDownloadBtn(fileUrl) {
