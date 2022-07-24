@@ -178,7 +178,7 @@ export class EtoolsUpload extends OfflineMixin(RequestHelperMixin(CommonMixin(Li
 
               <paper-button
                 class="change-button"
-                @tap="${this._openFileChooser}"
+                @tap="${this._changeFile}"
                 ?disabled="${!this._showChange(this.readonly, this._filename, this.uploadInProgress)}"
                 ?hidden="${!this._showChange(this.readonly, this._filename, this.uploadInProgress)}"
               >
@@ -293,11 +293,22 @@ export class EtoolsUpload extends OfflineMixin(RequestHelperMixin(CommonMixin(Li
         type: String,
         reflect: true,
         attribute: 'upload-progress-msg'
+      },
+      /* Needed for Change functionality,
+       * to restore previous value on Cancel
+       */
+      _savedFileUrl: {
+        type: String
       }
     };
   }
 
   set fileUrl(url) {
+    // previous is unsaved (number or null),
+    // incomming is a valid url of an uploaded and SAVED file
+    if (!isNaN(this._fileUrl) && isNaN(url)) {
+      this._savedFileUrl = null;
+    }
     this._fileUrl = url;
     this._fileUrlChanged(url);
     this.autoValidateHandler();
@@ -543,8 +554,13 @@ export class EtoolsUpload extends OfflineMixin(RequestHelperMixin(CommonMixin(Li
     this.fireEvent('delete-file', {file: this.fileUrl});
   }
 
+  _changeFile() {
+    this._savedFileUrl = isNaN(this.fileUrl) ? this.fileUrl : null;
+    this._openFileChooser();
+  }
+
   _resetFilename() {
-    this._filename = this.fileUrl && !isNaN(this.fileUrl) ? this.getFilenameFromURL(this.fileUrl) : null;
+    this._filename = this.fileUrl && isNaN(this.fileUrl) ? this.getFilenameFromURL(this.fileUrl) : null;
   }
 
   resetRawFile() {
