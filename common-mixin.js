@@ -4,59 +4,89 @@ export const CommonMixin = (baseClass) =>
       return {
         uploadInProgress: {
           type: Boolean,
-          value: false
+          reflect: true,
+          attribute: 'upload-in-progress'
         },
         label: {
           type: String,
-          value: ''
+          reflect: true
         },
         required: {
           type: Boolean,
-          value: false,
-          reflectToAttribute: true
+          reflect: true
         },
         readonly: {
           type: Boolean,
-          value: false,
-          reflectToAttribute: true
+          reflect: true
         },
         accept: String,
         autoUpload: {
           type: Boolean,
-          value: true
+          reflect: true,
+          attribute: 'auto-upload'
         },
         disabled: {
           type: Boolean,
-          value: false,
-          reflectToAttribute: true
+          reflect: true
         },
         invalid: {
           type: Boolean,
-          value: false,
-          reflectToAttribute: true
+          reflect: true
         },
         autoValidate: {
           type: Boolean,
-          value: false,
-          reflectToAttribute: true
+          reflect: true,
+          attribute: 'auto-validate'
         },
         errorMessage: {
           type: String,
-          value: ''
+          reflect: true,
+          attribute: 'error-message'
         },
         openInNewTab: {
           type: Boolean,
-          value: true
+          reflect: true,
+          attribute: 'open-in-new-tab'
         }
       };
     }
+
+    set invalid(invalid) {
+      const old = this._invalid;
+      this._invalid = invalid;
+      if (this._invalid !== old) {
+        this._invalidChanged();
+      }
+      this.requestUpdate();
+    }
+
+    get invalid() {
+      return this._invalid;
+    }
+
+    constructor() {
+      super();
+      this.uploadInProgress = false;
+      this.label = '';
+      this.required = false;
+      this.readonly = false;
+      this.autoUpload = true;
+      this.disabled = false;
+      this._invalid = false;
+      this.autoValidate = false;
+      this.errorMessage = '';
+      this.openInNewTab = true;
+    }
+
+    // abstract method
+    _invalidChanged() {}
 
     _showLabel(label) {
       return label !== '';
     }
 
     _openFileChooser() {
-      const fileEl = this.$.fileInput;
+      const fileEl = this.shadowRoot.querySelector('#fileInput');
       if (fileEl) {
         fileEl.dispatchEvent(new MouseEvent('click', {bubbles: true, cancelable: true, view: window}));
       }

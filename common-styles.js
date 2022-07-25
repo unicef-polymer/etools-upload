@@ -1,4 +1,4 @@
-import {html} from '@polymer/polymer/polymer-element.js';
+import {html} from 'lit-element';
 export const CommonStyles = html` <style>
   *[hidden] {
     display: none !important;
@@ -16,6 +16,12 @@ export const CommonStyles = html` <style>
     --paper-input-container-underline-disabled: {
       display: none;
     }
+  }
+
+  :host {
+    --paper-input-container-underline_-_display: none;
+    --paper-input-container-underline-focus_-_display: none;
+    --paper-input-container-underline-disabled_-_display: none;
   }
 
   paper-button {

@@ -1,5 +1,4 @@
-import {PolymerElement, html} from '@polymer/polymer';
-import '@polymer/polymer/lib/elements/dom-repeat.js';
+import {html, LitElement} from 'lit-element';
 import '@polymer/paper-button/paper-button.js';
 import '@polymer/iron-icon/iron-icon.js';
 import '@polymer/iron-icons/iron-icons.js';
@@ -9,123 +8,128 @@ import '@polymer/paper-progress/paper-progress.js';
 import {CommonStyles} from './common-styles';
 import {CommonMixin} from './common-mixin.js';
 import {RequestHelperMulti} from './request-helper-multi.js';
-import {createAttachmentsDexie} from './offline/dexie-config';
-import {getFileUrl, getBlob} from './offline/file-conversion';
-import {storeFileInDexie, generateRandomHash} from './offline/dexie-operations';
-import {getActiveXhrRequests, abortActiveRequests} from '@unicef-polymer/etools-ajax/upload-helper';
+import {getBlob, getFileUrl} from './offline/file-conversion';
+import {storeFileInDexie} from './offline/dexie-operations';
+import {abortActiveRequests, getActiveXhrRequests} from '@unicef-polymer/etools-ajax/upload-helper';
+import {OfflineMixin} from './offline/offline-mixin';
 
-/**
- * `etools-upload-multi` Description
- *
- * @customElement
- * @polymer
- * @extends {Polymer.Element}
- */
-export class EtoolsUploadMulti extends RequestHelperMulti(CommonMixin(PolymerElement)) {
-  static get template() {
+export class EtoolsUploadMulti extends OfflineMixin(RequestHelperMulti(CommonMixin(LitElement))) {
+  render() {
     // language=HTML
     return html`
-        ${CommonStyles}
-    <style>
-      .upload-btn-and-actions {
-        display: flex;
-        flex-direction: row;
-        align-items: center;
-      }
-      .filenames-container {
-        padding-top: 4px;
-        margin-top: 4px;
-        margin-bottom: 16px;
-      }
-      .filename-line {
-        flex-direction: row;
-        align-items: center;
-        display: block;
-      }
-      .filename {
-        padding: 0 16px 0 8px;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        white-space: nowrap;
-        max-width: calc(100% - 100px);
-        display: inline-block;
-        vertical-align: middle;
-      }
-      .delete-button {
-        padding-left: 24px;
-      }
-      .filename-container {
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-      }
-      .progress-container {
-        display: flex;
-        flex-direction: column;
-        flex-wrap: nowrap;
-        width: 180px;
-      }
-      paper-progress {
-        --paper-progress-active-color: var(--primary-color);
-        width: 100%;
-      }
-      .progress-container span {
-        font-size: 11px;
-        margin: 0 auto;
-      }
+      ${CommonStyles}
+      <style>
+        .upload-btn-and-actions {
+          display: flex;
+          flex-direction: row;
+          align-items: center;
+        }
+        .filenames-container {
+          padding-top: 4px;
+          margin-top: 4px;
+          margin-bottom: 16px;
+        }
+        .filename-line {
+          flex-direction: row;
+          align-items: center;
+          display: block;
+        }
+        .filename {
+          padding: 0 16px 0 8px;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          white-space: nowrap;
+          max-width: calc(100% - 100px);
+          display: inline-block;
+          vertical-align: middle;
+        }
+        .delete-button {
+          padding-left: 24px;
+        }
+        .filename-container {
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
+        }
+        .progress-container {
+          display: flex;
+          flex-direction: column;
+          flex-wrap: nowrap;
+          width: 180px;
+        }
+        paper-progress {
+          --paper-progress-active-color: var(--primary-color);
+          width: 100%;
+        }
+        .progress-container span {
+          font-size: 11px;
+          margin: 0 auto;
+        }
+      </style>
 
-    </style>
+      <div>
+        <div class="upload-btn-and-actions">
+          <paper-button
+            class="upload-button"
+            @tap="${this._openFileChooser}"
+            title="${this.uploadBtnLabel}"
+            ?disabled="${this._shouldDisableUploadBtn(this.readonly, this.uploadInProgress)}"
+          >
+            <iron-icon icon="file-upload"></iron-icon>
+            ${this.uploadBtnLabel}
+          </paper-button>
 
-    <div>
-      <div class="upload-btn-and-actions">
-        <paper-button class="upload-button"
-          on-tap="_openFileChooser" 
-          title="[[uploadBtnLabel]]" 
-          disabled$="[[_shouldDisableUploadBtn(readonly, uploadInProgress)]]">
-                      <iron-icon icon="file-upload"></iron-icon>
-                      [[uploadBtnLabel]]
-        </paper-button>
-
-        <div class="file-actions">
-            <paper-button 
-              class="delete-button" 
-              on-tap="_cancelUpload" 
-              disabled$="[[!uploadInProgress]]" 
-              hidden$="[[!uploadInProgress]]">
+          <div class="file-actions">
+            <paper-button
+              class="delete-button"
+              @tap="${this._cancelUpload}"
+              ?disabled="${!this.uploadInProgress}"
+              ?hidden="${!this.uploadInProgress}"
+            >
               <iron-icon icon="clear"></iron-icon>
               Cancel Upload
             </paper-button>
-        </div>
-      </div>
-
-      <div class="filenames-container" hidden$="[[!_thereAreFilesSelected(_filenames)]]">
-        <template is="dom-repeat" items="{{_filenames}}" as="item">
-          <div class="filename-line">
-            <div class="filename-container">
-              <iron-icon class="file-icon" icon="attachment"></iron-icon>
-              <span class="filename" title="[[item.filename]]">[[item.filename]]</span>
-
-              <iron-icon title="Uploaded successfully!" icon="done" hidden$="[[!item.success]]"></iron-icon>
-              <iron-icon title="Upload failed!" icon="error-outline" hidden$="[[!item.fail]]"></iron-icon>
-            </div>
-            <template is="dom-if" if="[[item.uploadProgressValue]]">
-              <div class='progress-container'>
-                <paper-progress value="[[item.uploadProgressValue]]"></paper-progress>
-                <span>[[item.uploadProgressMsg]]</span>
-              <div>
-            </template>
-
           </div>
-        </template>
+        </div>
+
+        <div class="filenames-container" ?hidden="${!this._thereAreFilesSelected(this._filenames)}">
+          ${this._filenames.map(
+            (item) => html`
+              <div class="filename-line">
+                <div class="filename-container">
+                  <iron-icon class="file-icon" icon="attachment"></iron-icon>
+                  <span class="filename" title="${item.filename}">${item.filename}</span>
+
+                  <iron-icon title="Uploaded successfully!" icon="done" ?hidden="${!item.success}"></iron-icon>
+                  <iron-icon title="Upload failed!" icon="error-outline" ?hidden="${!item.fail}"></iron-icon>
+                </div>
+                ${item.uploadProgressValue
+                  ? html`
+                      <div class="progress-container">
+                        <paper-progress .value="${item.uploadProgressValue}"></paper-progress>
+                        <span>${item.uploadProgressMsg}</span>
+                        <div></div>
+                      </div>
+                    `
+                  : ''}
+              </div>
+            `
+          )}
+        </div>
+
+        <!-- Props -->
+        <input
+          hidden=""
+          type="file"
+          id="fileInput"
+          @change="${this._filesSelected}"
+          multiple=""
+          accept="${this.accept}"
+        />
+
+        <a id="downloader" hidden=""></a>
       </div>
-
-      <!-- Props -->
-      <input hidden="" type="file" id="fileInput" on-change="_filesSelected" multiple="" accept="{{accept}}">
-
-      <a id="downloader" hidden=""></a>
-    </div>
-
-`;
+    `;
   }
 
   static get is() {
@@ -136,29 +140,22 @@ export class EtoolsUploadMulti extends RequestHelperMulti(CommonMixin(PolymerEle
     return {
       uploadBtnLabel: {
         type: String,
-        value: 'Upload files'
+        reflect: true,
+        attribute: 'upload-btn-label'
       },
       rawFiles: {
         type: Array,
-        value: []
+        attribute: 'raw-files'
       },
-      _filenames: {
-        type: Array,
-        value: []
-      },
-      activateOffline: {
-        type: Boolean,
-        value: false,
-        reflectToAttribute: true
-      }
+      _filenames: Array
     };
   }
 
-  connectedCallback() {
-    super.connectedCallback();
-    if (this.activateOffline) {
-      createAttachmentsDexie();
-    }
+  constructor() {
+    super();
+    this.uploadBtnLabel = 'Upload files';
+    this.rawFiles = [];
+    this._filenames = [];
   }
 
   _filesSelected(e) {
@@ -195,29 +192,23 @@ export class EtoolsUploadMulti extends RequestHelperMulti(CommonMixin(PolymerEle
     const filesInfo = [];
     const errors = [];
     for (i = 0; i < files.length; i++) {
+      const fileInfo = this.getFileInfo(files[i]);
       const blob = await getBlob(getFileUrl(files[i]));
-      const fileInfo = {
-        id: generateRandomHash(),
-        filetype: files[i].type,
-        filename: files[i].name,
-        extraInfo: this.endpointInfo ? this.endpointInfo.extraInfo : '',
-        parentId:
-          window.OfflineUploadParentId ||
-          (this.endpointInfo && this.endpointInfo.extraInfo ? this.endpointInfo.extraInfo.parentId : ''),
-        unsynced: true
-      };
-
       const fileInfoForDb = JSON.parse(JSON.stringify(fileInfo));
       fileInfoForDb.binaryData = blob;
       try {
         await storeFileInDexie(fileInfoForDb);
         filesInfo.push(fileInfo);
-        this.set(['_filenames', i, 'uploadInProgress'], false);
-        this.set(['_filenames', i, 'success'], true);
+        this._updateFilename(i, {
+          success: true,
+          uploadInProgress: false
+        });
       } catch (error) {
         errors.push('Error saving attachment' + fileInfo.filename + ' in IndexedDb');
-        this.set(['_filenames', i, 'uploadInProgress'], false);
-        this.set(['_filenames', i, 'fail'], true);
+        this._updateFilename(i, {
+          fail: true,
+          uploadInProgress: false
+        });
       }
     }
     return {
@@ -240,12 +231,7 @@ export class EtoolsUploadMulti extends RequestHelperMulti(CommonMixin(PolymerEle
     if (this.endpointAcceptsMulti) {
       // we don't have this situation yet
     } else {
-      this._uploadAllFilesSequentially(
-        files,
-        this.uploadRawFile.bind(this),
-        this.set.bind(this),
-        this.prepareErrorMessage.bind(this)
-      ).then((response) => {
+      this._uploadAllFilesSequentially(files).then((response) => {
         this.uploadInProgress = false;
         this.resetRawFiles();
         if (response && !response.uploadCanceled) {
@@ -259,68 +245,76 @@ export class EtoolsUploadMulti extends RequestHelperMulti(CommonMixin(PolymerEle
       });
     }
   }
+
   _clearDisplayOfUploadedFiles() {
     this._filenames = [];
   }
 
-  _uploadAllFilesSequentially(files, uploadFunction, set, prepareErrorMessage) {
-    const self = this;
-    return new Promise(function (resolve, reject) {
+  _uploadAllFilesSequentially(files) {
+    return new Promise((resolve) => {
       const allSuccessResponses = [];
       const allErrorResponses = [];
-      let i;
       let counter = 0;
-      for (i = 0; i < files.length; i++) {
-        (function (index) {
-          uploadFunction(files[index], files[index].name, self._computeUploadProgress.bind(self, set, index))
-            .then((response) => {
-              set(['_filenames', index, 'success'], true);
-              set(['_filenames', index, 'uploadInProgress'], false);
-              self._setProgressProps(set, index, '', '');
-
-              allSuccessResponses.push(response);
-
-              if (counter + 1 === files.length) {
-                resolve({
-                  allSuccessResponses: allSuccessResponses,
-                  allErrorResponses: allErrorResponses
-                });
-              }
-              counter++;
-            })
-            .catch((err) => {
-              set(['_filenames', index, 'uploadInProgress'], false);
-              set(['_filenames', index, 'fail'], true);
-              self._setProgressProps(set, index, '', '');
-
-              allErrorResponses.push(prepareErrorMessage(err));
-
-              if (counter + 1 === files.length) {
-                resolve({
-                  allSuccessResponses: allSuccessResponses,
-                  allErrorResponses: allErrorResponses
-                });
-              }
-              counter++;
+      for (let index = 0; index < files.length; index++) {
+        this.uploadRawFile(files[index], files[index].name, (data) => this._computeUploadProgress(index, data))
+          .then((response) => {
+            this._updateFilename(index, {
+              success: true,
+              uploadInProgress: false,
+              uploadProgressValue: '',
+              uploadProgressMsg: ''
             });
-        })(i);
+
+            allSuccessResponses.push(response);
+
+            if (counter + 1 === files.length) {
+              resolve({
+                allSuccessResponses: allSuccessResponses,
+                allErrorResponses: allErrorResponses
+              });
+            }
+            counter++;
+          })
+          .catch((err) => {
+            this._updateFilename(index, {
+              fail: true,
+              uploadInProgress: false,
+              uploadProgressValue: '',
+              uploadProgressMsg: ''
+            });
+
+            allErrorResponses.push(this.prepareErrorMessage(err));
+
+            if (counter + 1 === files.length) {
+              resolve({
+                allSuccessResponses: allSuccessResponses,
+                allErrorResponses: allErrorResponses
+              });
+            }
+            counter++;
+          });
       }
     });
   }
 
-  _computeUploadProgress(set, index, requestData) {
+  _computeUploadProgress(index, requestData) {
     if (!requestData) {
-      this._setProgressProps(set, index, '', '');
+      this._updateFilename(index, {uploadProgressValue: '', uploadProgressMsg: ''});
     } else {
-      const progressValue = `${(requestData.loaded * 100) / requestData.total}`;
-      const progressMsg = `${Math.round(requestData.loaded / 1024)} kb of ${Math.round(requestData.total / 1024)} kb`;
-      this._setProgressProps(set, index, progressValue, progressMsg);
+      const uploadProgressValue = `${(requestData.loaded * 100) / requestData.total}`;
+      const uploadProgressMsg = `${Math.round(requestData.loaded / 1024)} kb of ${Math.round(
+        requestData.total / 1024
+      )} kb`;
+      this._updateFilename(index, {uploadProgressValue, uploadProgressMsg});
     }
   }
 
-  _setProgressProps(set, index, progressValue, progressMsg) {
-    set(['_filenames', index, 'uploadProgressValue'], progressValue);
-    set(['_filenames', index, 'uploadProgressMsg'], progressMsg);
+  _updateFilename(index, mergeObj) {
+    if (!this._filenames[index]) {
+      return;
+    }
+    this._filenames[index] = Object.assign({}, this._filenames[index], mergeObj);
+    this.requestUpdate();
   }
 
   _shouldDisableUploadBtn(readonly, uploadInProgress) {
@@ -348,6 +342,6 @@ export class EtoolsUploadMulti extends RequestHelperMulti(CommonMixin(PolymerEle
 
   resetRawFiles() {
     this.rawFiles = [];
-    this.$.fileInput.value = null;
+    this.shadowRoot.querySelector('#fileInput').value = null;
   }
 }
