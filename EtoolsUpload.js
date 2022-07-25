@@ -11,6 +11,9 @@ import {CommonStyles} from './common-styles.js';
 import {CommonMixin} from './common-mixin.js';
 import {RequestHelperMixin} from './request-helper-mixin.js';
 import {abortActiveRequests} from '@unicef-polymer/etools-ajax/upload-helper';
+import {OfflineMixin} from './offline/offline-mixin';
+import {getBlob, getFileUrl} from './offline/file-conversion';
+import {storeFileInDexie} from './offline/dexie-operations';
 
 /**
  * `etools-upload`
@@ -20,7 +23,7 @@ import {abortActiveRequests} from '@unicef-polymer/etools-ajax/upload-helper';
  * @polymer
  * @demo demo/index.html
  */
-export class EtoolsUpload extends RequestHelperMixin(CommonMixin(LitElement)) {
+export class EtoolsUpload extends OfflineMixin(RequestHelperMixin(CommonMixin(LitElement))) {
   render() {
     // language=HTML
     return html`
@@ -175,7 +178,7 @@ export class EtoolsUpload extends RequestHelperMixin(CommonMixin(LitElement)) {
 
               <paper-button
                 class="change-button"
-                @tap="${this._openFileChooser}"
+                @tap="${this._changeFile}"
                 ?disabled="${!this._showChange(this.readonly, this._filename, this.uploadInProgress)}"
                 ?hidden="${!this._showChange(this.readonly, this._filename, this.uploadInProgress)}"
               >
@@ -290,11 +293,22 @@ export class EtoolsUpload extends RequestHelperMixin(CommonMixin(LitElement)) {
         type: String,
         reflect: true,
         attribute: 'upload-progress-msg'
+      },
+      /* Needed for Change functionality,
+       * to restore previous value on Cancel
+       */
+      _savedFileUrl: {
+        type: String
       }
     };
   }
 
   set fileUrl(url) {
+    // previous is unsaved (number or null),
+    // incomming is a valid url of an uploaded and SAVED file
+    if (!isNaN(this._fileUrl) && isNaN(url)) {
+      this._savedFileUrl = null;
+    }
     this._fileUrl = url;
     this._fileUrlChanged(url);
     this.autoValidateHandler();
@@ -311,6 +325,19 @@ export class EtoolsUpload extends RequestHelperMixin(CommonMixin(LitElement)) {
 
   get rawFile() {
     return this._rawFile;
+  }
+
+  set uploadedFileInfo(info) {
+    if (!info) {
+      return;
+    }
+    if (info.url) {
+      this._fileUrl = info.url;
+    }
+    if (info.filename) {
+      this._filename = info.filename;
+    }
+    this.requestUpdate();
   }
 
   constructor() {
@@ -370,7 +397,7 @@ export class EtoolsUpload extends RequestHelperMixin(CommonMixin(LitElement)) {
     }
   }
 
-  _handleUpload() {
+  async _handleUpload() {
     /**
      * Doing the extra validFileType validation because `accept` functionality can be bypassed
      * by selecting All Files from the File selection dialog
@@ -381,6 +408,16 @@ export class EtoolsUpload extends RequestHelperMixin(CommonMixin(LitElement)) {
     this._cancelTriggered = false;
     this.uploadInProgress = true;
     this.fireEvent('upload-started');
+    if (this.activateOffline && navigator.onLine === false) {
+      const response = await this.saveFileInIndexedDb(this.rawFile);
+      this.uploadInProgress = false;
+      this.fireEvent('upload-finished', response);
+      setTimeout(() => {
+        this.resetRawFile();
+        this.resetUploadProgress();
+      }, 10);
+      return;
+    }
 
     this.uploadRawFile(this.rawFile, this.rawFile.name, this.setUploadProgress.bind(this))
       .then((response) => {
@@ -409,6 +446,21 @@ export class EtoolsUpload extends RequestHelperMixin(CommonMixin(LitElement)) {
         this.uploadInProgress = false;
         this.resetUploadProgress();
       });
+  }
+
+  async saveFileInIndexedDb(file) {
+    const fileInfo = this.getFileInfo(file);
+    const blob = await getBlob(getFileUrl(file));
+    const fileInfoForDb = JSON.parse(JSON.stringify(fileInfo));
+    fileInfoForDb.binaryData = blob;
+    try {
+      await storeFileInDexie(fileInfoForDb);
+      this.success = true;
+      return {success: fileInfo};
+    } catch (err) {
+      this.fail = true;
+      return {error: err};
+    }
   }
 
   setInvalid(invalid, errMsg) {
@@ -502,8 +554,13 @@ export class EtoolsUpload extends RequestHelperMixin(CommonMixin(LitElement)) {
     this.fireEvent('delete-file', {file: this.fileUrl});
   }
 
+  _changeFile() {
+    this._savedFileUrl = isNaN(this.fileUrl) ? this.fileUrl : null;
+    this._openFileChooser();
+  }
+
   _resetFilename() {
-    this._filename = this.fileUrl && !isNaN(this.fileUrl) ? this.getFilenameFromURL(this.fileUrl) : null;
+    this._filename = this.fileUrl && isNaN(this.fileUrl) ? this.getFilenameFromURL(this.fileUrl) : null;
   }
 
   resetRawFile() {
