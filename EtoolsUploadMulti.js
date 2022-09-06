@@ -12,6 +12,7 @@ import {getBlob, getFileUrl} from './offline/file-conversion';
 import {storeFileInDexie} from './offline/dexie-operations';
 import {abortActiveRequests, getActiveXhrRequests} from '@unicef-polymer/etools-ajax/upload-helper';
 import {OfflineMixin} from './offline/offline-mixin';
+import {getTranslation} from './translate';
 
 export class EtoolsUploadMulti extends OfflineMixin(RequestHelperMulti(CommonMixin(LitElement))) {
   render() {
@@ -87,7 +88,7 @@ export class EtoolsUploadMulti extends OfflineMixin(RequestHelperMulti(CommonMix
               ?hidden="${!this.uploadInProgress}"
             >
               <iron-icon icon="clear"></iron-icon>
-              Cancel Upload
+              ${getTranslation(this.language, 'CANCEL')}
             </paper-button>
           </div>
         </div>
@@ -100,18 +101,25 @@ export class EtoolsUploadMulti extends OfflineMixin(RequestHelperMulti(CommonMix
                   <iron-icon class="file-icon" icon="attachment"></iron-icon>
                   <span class="filename" title="${item.filename}">${item.filename}</span>
 
-                  <iron-icon title="Uploaded successfully!" icon="done" ?hidden="${!item.success}"></iron-icon>
-                  <iron-icon title="Upload failed!" icon="error-outline" ?hidden="${!item.fail}"></iron-icon>
+                  <iron-icon
+                    title="${getTranslation(this.language, 'UPLOADED_SUCCESSFULY')}"
+                    icon="done"
+                    ?hidden="${!item.success}"
+                  ></iron-icon>
+                  <iron-icon title="${getTranslation(this.language, 'UPLOAD_FAILED')}"
+                  ?hidden="${!item.fail}"}"></iron-icon>
                 </div>
-                ${item.uploadProgressValue
-                  ? html`
-                      <div class="progress-container">
-                        <paper-progress .value="${item.uploadProgressValue}"></paper-progress>
-                        <span>${item.uploadProgressMsg}</span>
-                        <div></div>
-                      </div>
-                    `
-                  : ''}
+                ${
+                  item.uploadProgressValue
+                    ? html`
+                        <div class="progress-container">
+                          <paper-progress .value="${item.uploadProgressValue}"></paper-progress>
+                          <span>${item.uploadProgressMsg}</span>
+                          <div></div>
+                        </div>
+                      `
+                    : ''
+                }
               </div>
             `
           )}
@@ -147,15 +155,40 @@ export class EtoolsUploadMulti extends OfflineMixin(RequestHelperMulti(CommonMix
         type: Array,
         attribute: 'raw-files'
       },
-      _filenames: Array
+      _filenames: Array,
+      language: {
+        type: String
+      }
     };
   }
 
   constructor() {
     super();
-    this.uploadBtnLabel = 'Upload files';
+
+    if (!this.language) {
+      this.language = window.localStorage.defaultLanguage || 'en';
+    }
+    this.handleLanguageChange = this.handleLanguageChange.bind(this);
+
     this.rawFiles = [];
     this._filenames = [];
+  }
+
+  connectedCallback() {
+    super.connectedCallback();
+
+    document.addEventListener('language-changed', this.handleLanguageChange);
+    this.originalErrorMessage = this.errorMessage;
+    this.uploadBtnLabel = getTranslation(this.language, 'UPLOAD_FILES');
+  }
+
+  disconnectedCallback() {
+    super.disconnectedCallback();
+    document.removeEventListener('language-changed', this.handleLanguageChange);
+  }
+
+  handleLanguageChange(e) {
+    this.language = e.detail.language;
   }
 
   _filesSelected(e) {
@@ -204,7 +237,10 @@ export class EtoolsUploadMulti extends OfflineMixin(RequestHelperMulti(CommonMix
           uploadInProgress: false
         });
       } catch (error) {
-        errors.push('Error saving attachment' + fileInfo.filename + ' in IndexedDb');
+        errors.push(
+          `${getTranslation(this.language, 'ERROR_SAVING_ATTACHMENT')} ${fileInfo.filename}
+           ${getTranslation(this.language, 'IN')} IndexedDb`
+        );
         this._updateFilename(i, {
           fail: true,
           uploadInProgress: false
@@ -283,7 +319,7 @@ export class EtoolsUploadMulti extends OfflineMixin(RequestHelperMulti(CommonMix
               uploadProgressMsg: ''
             });
 
-            allErrorResponses.push(this.prepareErrorMessage(err));
+            allErrorResponses.push(this.prepareErrorMessage(this.language, err));
 
             if (counter + 1 === files.length) {
               resolve({
