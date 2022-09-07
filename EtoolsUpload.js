@@ -14,6 +14,7 @@ import {abortActiveRequests} from '@unicef-polymer/etools-ajax/upload-helper';
 import {OfflineMixin} from './offline/offline-mixin';
 import {getBlob, getFileUrl} from './offline/file-conversion';
 import {storeFileInDexie} from './offline/dexie-operations';
+import {getTranslation} from './translate.js';
 
 /**
  * `etools-upload`
@@ -159,7 +160,11 @@ export class EtoolsUpload extends OfflineMixin(RequestHelperMixin(CommonMixin(Li
                 : ''}
             </div>
             <div class="upload-status">
-              <iron-icon title="Uploaded successfuly!" icon="done" ?hidden="${!this.success}"></iron-icon>
+              <iron-icon
+                title="${getTranslation(this.language, 'UPLOADED_SUCCESSFULY')}"
+                icon="done"
+                ?hidden="${!this.success}"
+              ></iron-icon>
               <iron-icon icon="error-outline" ?hidden="${!this.fail}"></iron-icon>
             </div>
 
@@ -170,10 +175,10 @@ export class EtoolsUpload extends OfflineMixin(RequestHelperMixin(CommonMixin(Li
                 @tap="${this._downloadFile}"
                 ?disabled="${!this._showDownloadBtn(this.fileUrl)}"
                 ?hidden="${!this._showDownloadBtn(this.fileUrl)}"
-                title="Download"
+                title="${getTranslation(this.language, 'DOWNLOAD')}"
               >
                 <iron-icon icon="cloud-download" class="dw-icon"></iron-icon>
-                Download
+                ${getTranslation(this.language, 'DOWNLOAD')}
               </paper-button>
 
               <paper-button
@@ -182,7 +187,7 @@ export class EtoolsUpload extends OfflineMixin(RequestHelperMixin(CommonMixin(Li
                 ?disabled="${!this._showChange(this.readonly, this._filename, this.uploadInProgress)}"
                 ?hidden="${!this._showChange(this.readonly, this._filename, this.uploadInProgress)}"
               >
-                Change
+                ${getTranslation(this.language, 'CHANGE')}
               </paper-button>
 
               <paper-button
@@ -196,7 +201,7 @@ export class EtoolsUpload extends OfflineMixin(RequestHelperMixin(CommonMixin(Li
                   this.uploadInProgress
                 )}"
               >
-                Delete
+                ${getTranslation(this.language, 'DELETE')}
               </paper-button>
 
               <paper-button
@@ -205,7 +210,7 @@ export class EtoolsUpload extends OfflineMixin(RequestHelperMixin(CommonMixin(Li
                 ?disabled="${!this._showCancelBtn(this.uploadInProgress, this.fileUrl, this.fail)}"
                 ?hidden="${!this._showCancelBtn(this.uploadInProgress, this.fileUrl, this.fail)}"
               >
-                Cancel
+                ${getTranslation(this.language, 'CANCEL')}
               </paper-button>
             </div>
             <!-- ------------------ -->
@@ -299,6 +304,9 @@ export class EtoolsUpload extends OfflineMixin(RequestHelperMixin(CommonMixin(Li
        */
       _savedFileUrl: {
         type: String
+      },
+      language: {
+        type: String
       }
     };
   }
@@ -342,11 +350,17 @@ export class EtoolsUpload extends OfflineMixin(RequestHelperMixin(CommonMixin(Li
 
   constructor() {
     super();
+
+    if (!this.language) {
+      this.language = window.localStorage.defaultLanguage || 'en';
+    }
+    this.handleLanguageChange = this.handleLanguageChange.bind(this);
+
     this.initializeProperties();
   }
 
   initializeProperties() {
-    this.uploadBtnLabel = 'Upload file';
+    this.uploadBtnLabel = getTranslation(this.language, 'UPLOAD_FILE');
     this.alwaysFloatLabel = true;
     this._fileUrl = null;
     this._filename = null;
@@ -363,7 +377,17 @@ export class EtoolsUpload extends OfflineMixin(RequestHelperMixin(CommonMixin(Li
 
   connectedCallback() {
     super.connectedCallback();
+    document.addEventListener('language-changed', this.handleLanguageChange);
     this.originalErrorMessage = this.errorMessage;
+  }
+
+  disconnectedCallback() {
+    super.disconnectedCallback();
+    document.removeEventListener('language-changed', this.handleLanguageChange);
+  }
+
+  handleLanguageChange(e) {
+    this.language = e.detail.language;
   }
 
   _thereIsAFileSelectedOrSaved(_filename) {
@@ -432,11 +456,12 @@ export class EtoolsUpload extends OfflineMixin(RequestHelperMixin(CommonMixin(Li
       .catch((err) => {
         if (!this._cancelTriggered) {
           this.fail = true;
-          const errorMessage = this.prepareErrorMessage(err);
-          this.serverErrorMsg = 'Error uploading file' + (errorMessage ? ': ' + errorMessage : '');
+          const errorMessage = this.prepareErrorMessage(this.language, err);
+          this.serverErrorMsg =
+            getTranslation(this.language, 'ERROR_UPLOADING') + (errorMessage ? ': ' + errorMessage : '');
           this.setInvalid(true, this.serverErrorMsg);
         } else {
-          this.serverErrorMsg = 'Upload process canceled';
+          this.serverErrorMsg = getTranslation(this.language, 'UPLOAD_CANCELED');
           this.setInvalid(false, this.serverErrorMsg);
         }
 
@@ -583,7 +608,7 @@ export class EtoolsUpload extends OfflineMixin(RequestHelperMixin(CommonMixin(Li
 
       if (!this.rawFile && !this.fileUrl) {
         valid = false;
-        errMsg = 'This field is required';
+        errMsg = getTranslation(this.language, 'REQUIRED_FIELD');
       }
       if (uploadRequestFailed) {
         valid = false;
@@ -623,7 +648,7 @@ export class EtoolsUpload extends OfflineMixin(RequestHelperMixin(CommonMixin(Li
     if (acceptedExtensions.indexOf('.' + fileExtension) > -1) {
       return true;
     }
-    this.setInvalid(true, 'Please change file. Accepted file types: ' + this.accept);
+    this.setInvalid(true, `${getTranslation(this.language, 'PLEASE_CHANGE_FILE')}: ${this.accept}}`);
     return false;
   }
 

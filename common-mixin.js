@@ -1,3 +1,5 @@
+import {getTranslation} from './translate';
+
 export const CommonMixin = (baseClass) =>
   class extends baseClass {
     static get properties() {
@@ -113,10 +115,10 @@ export const CommonMixin = (baseClass) =>
       window.URL.revokeObjectURL(url);
     }
 
-    prepareErrorMessage(error) {
+    prepareErrorMessage(lang, error) {
       const message = (error.request ? error.error.message : error.message) || '';
       if (message.includes('413')) {
-        return 'File too large.';
+        return getTranslation(lang, 'FILE_TOO_LARGE');
       }
       return message;
     }
