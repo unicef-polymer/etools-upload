@@ -238,7 +238,7 @@ export class EtoolsUploadMulti extends OfflineMixin(RequestHelperMulti(CommonMix
         });
       } catch (error) {
         errors.push(
-          `${getTranslation(this.language, 'ERROR_SAVING_ATTACHMENT_INDEXDB').replace('{0}', fileInfo.filename)};
+          `${getTranslation(this.language, 'ERROR_SAVING_ATTACHMENT_INDEXDB').replace('{0}', fileInfo.filename)}`
         );
         this._updateFilename(i, {
           fail: true,
