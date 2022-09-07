@@ -89,7 +89,8 @@ When `autoUpload` is true and `uploadEndpoint` is set , it automatically uploads
 16. `on-delete-file`: triggered on file delete with the file url as parameter (Ex: {file: fileUrl})
 
 ## Internationalization
-`assets/translations.js` contains the translations file.
+- `assets/translations.js` contains the translations file.
+- the component handles the `language-changed` event fired by the parent app
 
 ## Usage example
 
