@@ -73,11 +73,11 @@ export class EtoolsUploadMulti extends OfflineMixin(RequestHelperMulti(CommonMix
           <paper-button
             class="upload-button"
             @tap="${this._openFileChooser}"
-            title="${this.uploadBtnLabel}"
+            title="${this.uploadBtnLabel || getTranslation(this.language, 'UPLOAD_FILES')}"
             ?disabled="${this._shouldDisableUploadBtn(this.readonly, this.uploadInProgress)}"
           >
             <iron-icon icon="file-upload"></iron-icon>
-            ${this.uploadBtnLabel}
+            ${this.uploadBtnLabel || getTranslation(this.language, 'UPLOAD_FILES')}
           </paper-button>
 
           <div class="file-actions">
@@ -179,7 +179,6 @@ export class EtoolsUploadMulti extends OfflineMixin(RequestHelperMulti(CommonMix
 
     document.addEventListener('language-changed', this.handleLanguageChange);
     this.originalErrorMessage = this.errorMessage;
-    this.uploadBtnLabel = getTranslation(this.language, 'UPLOAD_FILES');
   }
 
   disconnectedCallback() {
