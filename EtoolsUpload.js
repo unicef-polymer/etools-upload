@@ -132,13 +132,13 @@ export class EtoolsUpload extends OfflineMixin(RequestHelperMixin(CommonMixin(Li
           <paper-button
             class="upload-button"
             @tap="${this._openFileChooser}"
-            title="${this.uploadBtnLabel}"
+            title="${this.uploadBtnLabel || getTranslation(this.language, 'UPLOAD_FILE')}"
             ?disabled="${this.readonly}"
             ?hidden="${this._thereIsAFileSelectedOrSaved(this._filename)}"
           >
             <span ?hidden="${this.readonly}">
               <iron-icon icon="file-upload"></iron-icon>
-              ${this.uploadBtnLabel}
+              ${this.uploadBtnLabel || getTranslation(this.language, 'UPLOAD_FILE')}
             </span>
             <label ?hidden="${!this.readonly}">—</label>
           </paper-button>
@@ -360,7 +360,6 @@ export class EtoolsUpload extends OfflineMixin(RequestHelperMixin(CommonMixin(Li
   }
 
   initializeProperties() {
-    this.uploadBtnLabel = getTranslation(this.language, 'UPLOAD_FILE');
     this.alwaysFloatLabel = true;
     this._fileUrl = null;
     this._filename = null;

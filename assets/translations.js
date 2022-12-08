@@ -15,6 +15,22 @@ const translations = {
     UPLOAD_FAILED: 'Upload Failed!',
     FILE_TOO_LARGE: 'File too large'
   },
+  ar: {
+    UPLOADED_SUCCESSFULY: 'تم الرفع بنجاح!',
+    DOWNLOAD: 'تحميل',
+    CHANGE: 'تغيير',
+    DELETE: 'حذف',
+    CANCEL: 'إلغاء الأمر',
+    PLEASE_CHANGE_FILE: 'الرجاء تغيير الملف. أنواع الملفات المقبولة',
+    REQUIRED_FIELD: 'هذا الحقل مطلوب',
+    UPLOAD_CANCELED: 'تم إلغاء عملية التحميل',
+    ERROR_UPLOADING: 'خطأ في تحميل الملف',
+    UPLOAD_FILES: 'تحميل الملفات',
+    UPLOAD_FILE: 'تحميل الملف',
+    ERROR_SAVING_ATTACHMENT_INDEXDB: 'خطأ في حفظ المرفق {0} في IndexedDb',
+    UPLOAD_FAILED: 'فشل التحميل!',
+    FILE_TOO_LARGE: 'ملف كبير جدا'
+  },
   fr: {
     UPLOADED_SUCCESSFULY: 'Importé avec succès!',
     DOWNLOAD: 'Télécharger',
@@ -62,6 +78,22 @@ const translations = {
     ERROR_SAVING_ATTACHMENT_INDEXDB: 'Erro ao salvar o anexo {0} no IndexedDb',
     UPLOAD_FAILED: 'Falha ao enviar!',
     FILE_TOO_LARGE: 'Arquivo muito grande'
+  },
+  es: {
+    UPLOADED_SUCCESSFULY: '¡Subido correctamente!',
+    DOWNLOAD: 'Descargar',
+    CHANGE: 'Cambio',
+    DELETE: 'Borrar',
+    CANCEL: 'Cancelar',
+    PLEASE_CHANGE_FILE: 'Por favor, cambie el archivo. Tipos de archivo aceptados',
+    REQUIRED_FIELD: 'Este campo es obligatorio',
+    UPLOAD_CANCELED: 'Proceso de carga cancelado',
+    ERROR_UPLOADING: 'Error al cargar el archivo',
+    UPLOAD_FILES: 'Subir archivos',
+    UPLOAD_FILE: 'Subir archivo',
+    ERROR_SAVING_ATTACHMENT_INDEXDB: 'Error al guardar {0} de datos adjuntos en IndexedDb',
+    UPLOAD_FAILED: '¡Error de carga!',
+    FILE_TOO_LARGE: 'Archivo demasiado grande'
   },
   ru: {
     UPLOADED_SUCCESSFULY: 'Загружено успешно!',
