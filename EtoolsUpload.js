@@ -43,7 +43,7 @@ export class EtoolsUpload extends OfflineMixin(RequestHelperMixin(CommonMixin(Li
         }
 
         .file-icon {
-          padding-right: 8px;
+          padding-inline-end: 8px;
           color: var(--secondary-text-color, rgba(0, 0, 0, 0.54));
         }
 
