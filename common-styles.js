@@ -50,7 +50,7 @@ export const CommonStyles = html` <style>
 
   .upload-button {
     color: var(--etools-upload-primary-color, var(--primary-color));
-    margin-right: 8px;
+    margin-inline-end: 8px;
   }
 
   paper-button:focus {
@@ -69,7 +69,7 @@ export const CommonStyles = html` <style>
   }
 
   .upload-button iron-icon {
-    margin-right: 8px;
+    margin-inline-end: 8px;
   }
 
   iron-icon {

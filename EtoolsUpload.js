@@ -71,14 +71,14 @@ export class EtoolsUpload extends OfflineMixin(RequestHelperMixin(CommonMixin(Li
         .download-button {
           justify-content: center;
           padding: 0 0;
-          margin-left: 8px;
+          margin-inline-start: 8px;
           color: var(--etools-upload-primary-color, var(--primary-color));
         }
 
         .filename-container {
           display: flex;
           flex-direction: column;
-          margin-right: 8px;
+          margin-inline-end: 8px;
           min-width: 145px;
           overflow-wrap: break-word;
           font-size: 16px;
@@ -102,7 +102,7 @@ export class EtoolsUpload extends OfflineMixin(RequestHelperMixin(CommonMixin(Li
         }
 
         .dw-icon {
-          margin-right: 8px;
+          margin-inline-end: 8px;
         }
 
         .change-button {
