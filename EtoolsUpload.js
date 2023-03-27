@@ -637,6 +637,7 @@ export class EtoolsUpload extends OfflineMixin(RequestHelperMixin(CommonMixin(Li
       if (this.fail) {
         // clean up after a failed upload
         this._resetFilename();
+        this.resetRawFile();
       }
       this.resetStatus();
       this.resetValidations();
