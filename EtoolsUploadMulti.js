@@ -36,7 +36,8 @@ export class EtoolsUploadMulti extends OfflineMixin(RequestHelperMulti(CommonMix
           display: block;
         }
         .filename {
-          padding: 0 16px 0 8px;
+          padding: 0;
+          padding-inline: 8px 16px;
           overflow: hidden;
           text-overflow: ellipsis;
           white-space: nowrap;
@@ -45,7 +46,7 @@ export class EtoolsUploadMulti extends OfflineMixin(RequestHelperMulti(CommonMix
           vertical-align: middle;
         }
         .delete-button {
-          padding-left: 24px;
+          padding-inline-start: 24px;
         }
         .filename-container {
           white-space: nowrap;
