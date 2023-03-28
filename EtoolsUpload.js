@@ -43,7 +43,7 @@ export class EtoolsUpload extends OfflineMixin(RequestHelperMixin(CommonMixin(Li
         }
 
         .file-icon {
-          padding-right: 8px;
+          padding-inline-end: 8px;
           color: var(--secondary-text-color, rgba(0, 0, 0, 0.54));
         }
 
@@ -71,14 +71,14 @@ export class EtoolsUpload extends OfflineMixin(RequestHelperMixin(CommonMixin(Li
         .download-button {
           justify-content: center;
           padding: 0 0;
-          margin-left: 8px;
+          margin-inline-start: 8px;
           color: var(--etools-upload-primary-color, var(--primary-color));
         }
 
         .filename-container {
           display: flex;
           flex-direction: column;
-          margin-right: 8px;
+          margin-inline-end: 8px;
           min-width: 145px;
           overflow-wrap: break-word;
           font-size: 16px;
@@ -102,7 +102,7 @@ export class EtoolsUpload extends OfflineMixin(RequestHelperMixin(CommonMixin(Li
         }
 
         .dw-icon {
-          margin-right: 8px;
+          margin-inline-end: 8px;
         }
 
         .change-button {
@@ -426,6 +426,7 @@ export class EtoolsUpload extends OfflineMixin(RequestHelperMixin(CommonMixin(Li
      * by selecting All Files from the File selection dialog
      */
     if (this.accept && !this.validFileType(this.rawFile.name)) {
+      this.fail = true;
       return;
     }
     this._cancelTriggered = false;
@@ -574,6 +575,7 @@ export class EtoolsUpload extends OfflineMixin(RequestHelperMixin(CommonMixin(Li
     this.resetStatus();
     this._resetFilename();
     this.resetRawFile();
+    this.resetValidations();
 
     this.fireEvent('delete-file', {file: this.fileUrl});
   }
@@ -635,6 +637,7 @@ export class EtoolsUpload extends OfflineMixin(RequestHelperMixin(CommonMixin(Li
       if (this.fail) {
         // clean up after a failed upload
         this._resetFilename();
+        this.resetRawFile();
       }
       this.resetStatus();
       this.resetValidations();
