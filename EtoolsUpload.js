@@ -426,6 +426,7 @@ export class EtoolsUpload extends OfflineMixin(RequestHelperMixin(CommonMixin(Li
      * by selecting All Files from the File selection dialog
      */
     if (this.accept && !this.validFileType(this.rawFile.name)) {
+      this.fail = true;
       return;
     }
     this._cancelTriggered = false;
@@ -574,6 +575,7 @@ export class EtoolsUpload extends OfflineMixin(RequestHelperMixin(CommonMixin(Li
     this.resetStatus();
     this._resetFilename();
     this.resetRawFile();
+    this.resetValidations();
 
     this.fireEvent('delete-file', {file: this.fileUrl});
   }
@@ -635,6 +637,7 @@ export class EtoolsUpload extends OfflineMixin(RequestHelperMixin(CommonMixin(Li
       if (this.fail) {
         // clean up after a failed upload
         this._resetFilename();
+        this.resetRawFile();
       }
       this.resetStatus();
       this.resetValidations();
