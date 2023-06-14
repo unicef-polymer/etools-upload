@@ -6,6 +6,7 @@ export const CommonStyles = html` <style>
 
   :host {
     display: block;
+    box-sizing: border-box;
     width: 100%;
     --paper-input-container-underline: {
       display: none;
