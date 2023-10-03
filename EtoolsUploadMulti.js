@@ -167,7 +167,7 @@ export class EtoolsUploadMulti extends OfflineMixin(RequestHelperMulti(CommonMix
     super();
 
     if (!this.language) {
-      this.language = window.localStorage.defaultLanguage || 'en';
+      this.language = window.EtoolsLanguage || 'en';
     }
     this.handleLanguageChange = this.handleLanguageChange.bind(this);
 
